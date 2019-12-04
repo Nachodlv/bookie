@@ -13,4 +13,15 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+
+<!--    LOGIN -->
+    <string name="email_input">Email</string>
+    <string name="password_input">Password</string>
+    <string name="login_button">Login</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="register">Register</string>
+
+    <string name="invalid_password">The password must have more than six characters</string>
+
 </resources>
