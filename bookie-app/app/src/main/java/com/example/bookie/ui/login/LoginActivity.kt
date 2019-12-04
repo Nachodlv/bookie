@@ -9,7 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.bookie.R
 import com.example.bookie.utils.TextValidator
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_loader.*
 import kotlinx.android.synthetic.main.login_main.*
+import java.util.*
+
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +21,16 @@ class LoginActivity : AppCompatActivity() {
 
         email.addTextChangedListener(emailValidator)
 
+        password.setOnEditorActionListener { textView, _, _ ->
+            login(textView.rootView)
+            password.clearFocus()
+            true
+        }
+
         login_button.setOnClickListener { login(it) }
+
+        loader.visibility = View.GONE
+
     }
 
     private val emailValidator: TextValidator
@@ -40,7 +52,25 @@ class LoginActivity : AppCompatActivity() {
             Snackbar.LENGTH_LONG
         )
             .setAction("Action", null).show()
+        showLoader()
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    hideLoader()
+                }
+            }
+        }, 2000)
     }
 
+
+    private fun showLoader() {
+        loader.visibility = View.VISIBLE
+        login_button.visibility = View.GONE
+    }
+
+    private fun hideLoader() {
+        loader.visibility = View.GONE
+        login_button.visibility = View.VISIBLE
+    }
 
 }
