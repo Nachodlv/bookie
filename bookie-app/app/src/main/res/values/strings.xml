@@ -22,6 +22,10 @@
     <string name="forgot_password">Forgot your password?</string>
     <string name="register">Register</string>
 
+<!--    REGISTER -->
+    <string name="name">Name</string>
+    <string name="repeat_password">Repeat password</string>
     <string name="invalid_password">The password must have more than six characters</string>
+    <string name="invalid_repeat_password">The passwords must match</string>
 
 </resources>
