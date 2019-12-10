@@ -21,7 +21,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_main)
 
-        email.addTextChangedListener(EmailValidator(email, resources))
+        email.addTextChangedListener(EmailValidator(email))
 
         password.setOnEditorActionListener { textView, _, _ ->
             login(textView.rootView)

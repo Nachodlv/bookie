@@ -13,6 +13,16 @@ import com.example.bookie.R
 abstract class TextValidator(private val textView: TextView) : TextWatcher {
     abstract fun validate(textView: TextView, text: String)
 
+    companion object {
+        fun hasErrors(textView: TextView): Boolean {
+            if(textView.text.isEmpty()) {
+                textView.error = textView.context.getString(R.string.empty_input)
+                return true
+            }
+            return textView.error != null
+        }
+    }
+
     override fun afterTextChanged(s: Editable) {
         val text = textView.text.toString()
         validate(textView, text)
@@ -36,13 +46,13 @@ abstract class TextValidator(private val textView: TextView) : TextWatcher {
 
 }
 
-class EmailValidator(textView: TextView, private val resources: Resources) :
+class EmailValidator(textView: TextView) :
     TextValidator(textView) {
 
     override fun validate(textView: TextView, text: String) {
 
         if (TextUtils.isEmpty(text) || !Patterns.EMAIL_ADDRESS.matcher(text).matches())
-            textView.error = resources.getString(R.string.invalid_email)
+            textView.error = textView.context.getString(R.string.invalid_email)
     }
 
 }

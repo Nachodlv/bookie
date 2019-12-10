@@ -6,7 +6,7 @@ abstract class ApiRoute(private var token: String? = null) {
 
     val timeOut = 3000
 
-    val baseUrl = "localhost:123"
+    val baseUrl = "http://10.0.2.2:1234"
 
     abstract val url: String
 

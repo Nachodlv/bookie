@@ -39,7 +39,6 @@
             android:layout_marginBottom="20dp"
             android:ems="10"
             android:hint="@string/password_input"
-            android:imeOptions="actionDone"
             android:inputType="textPassword" />
 
         <EditText
