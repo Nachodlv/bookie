@@ -19,7 +19,10 @@ class Login(var email: String, var password: String) :
 }
 
 class Register(
-    private val email: String, private val password: String, private val name: String
+    private val email: String,
+    private val password: String,
+    private val name: String,
+    private val lastName: String
 ) : ApiRoute() {
 
     override val url: String
@@ -28,5 +31,10 @@ class Register(
         get() = Request.Method.POST
 
     override val params: HashMap<String, String>
-        get() = hashMapOf("email" to email, "password" to password, "name" to name)
+        get() = hashMapOf(
+            "email" to email,
+            "password" to password,
+            "name" to name,
+            "lastName" to lastName
+        )
 }

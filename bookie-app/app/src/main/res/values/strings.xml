@@ -28,5 +28,6 @@
     <string name="repeat_password">Repeat password</string>
     <string name="invalid_password">The password must have more than six characters</string>
     <string name="invalid_repeat_password">The passwords must match</string>
+    <string name="lastName">Last name</string>
 
 </resources>
