@@ -8,6 +8,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.bookie.ui.login.LoginActivity
+import com.example.bookie.ui.temp.TestActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, TestActivity::class.java)
         startActivity(intent)
 
 //        val toolbar: Toolbar = findViewById(R.id.toolbar)

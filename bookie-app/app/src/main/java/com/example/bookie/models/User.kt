@@ -3,7 +3,7 @@ package com.example.bookie.models
 import com.google.gson.annotations.SerializedName
 
 data class User(
-    @SerializedName("id") val id: Int,
+    @SerializedName("id") val id: String = "",
     @SerializedName("email") val email: String,
     @SerializedName("name") val name: String
 ) : JSONConvertable
