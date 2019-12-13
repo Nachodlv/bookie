@@ -15,6 +15,7 @@ class WebSecurityConfiguration(
         http.csrf().disable()
         http
                 .authorizeRequests()
+                .antMatchers("/user/register").permitAll() // Is this correct?
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
