@@ -15,9 +15,9 @@ import java.util.stream.Collectors
 @Transactional // Is this necessary?
 class CustomUserDetailsService(private val userService: UserService) : UserDetailsService {
 
-    override fun loadUserByUsername(id: String): UserDetails { // Should the id be allowed to be null?
-        val user: User = userService.getById(id).orElseThrow {
-            throw UsernameNotFoundException("No user found with id:$id")
+    override fun loadUserByUsername(email: String): UserDetails { // Should the id be allowed to be null?
+        val user: User = userService.getByEmail(email).orElseThrow {
+            throw UsernameNotFoundException("No user found with email:$email")
         }
 
         return org.springframework.security.core.userdetails.User(

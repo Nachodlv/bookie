@@ -1,5 +1,6 @@
 package com.bookie.backend.services;
 
+import com.bookie.backend.dto.LoginRequest
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
@@ -53,4 +54,10 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
         // Check what we want to return here.
     }
+
+    /*
+    fun validateUser(login: LoginRequest): {
+
+    }
+     */
 }

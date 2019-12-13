@@ -24,6 +24,9 @@ dependencies {
 	}
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("io.jsonwebtoken:jjwt-api:0.10.7")
+	implementation("io.jsonwebtoken:jjwt-impl:0.10.7")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.10.7")
 }
 
 tasks.withType<Test> {
