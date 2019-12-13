@@ -3,11 +3,11 @@ package com.bookie.backend.services;
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
+import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service;
-import java.lang.RuntimeException
 import java.util.*
 
 @Service
@@ -44,12 +44,13 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
      */
     fun registerUser(user: UserDto): User {
         // We need to return a conflict http error
-        getByEmail(user.email).ifPresent{throw RuntimeException("Email already exists")}
+        getByEmail(user.email).ifPresent{throw EmailAlreadyExistsException("Email already exists")}
         val newUser = User(
                 user.firstName,
                 user.lastName,
                 user.email,
                 passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
+        // Check what we want to return here.
     }
 }
