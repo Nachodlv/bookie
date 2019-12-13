@@ -5,12 +5,13 @@ import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service;
 import java.lang.RuntimeException
 import java.util.*
 
 @Service
-class UserService(val userDao: UserDao) : BasicCrud<String, User> {
+class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : BasicCrud<String, User> {
 
     override fun getAll(pageable: Pageable): Page<User> = userDao.findAll(pageable)
 
@@ -42,9 +43,13 @@ class UserService(val userDao: UserDao) : BasicCrud<String, User> {
      * Registers a new user.
      */
     fun registerUser(user: UserDto): User {
-        // Check if this works correctly.
-        getByEmail(user.email).ifPresent{throw RuntimeException("Email already exists")} // Create a custom exception or return an error
-        val newUser = User(user.firstName, user.lastName, user.email, user.password)
+        // We need to return a conflict http error
+        getByEmail(user.email).ifPresent{throw RuntimeException("Email already exists")}
+        val newUser = User(
+                user.firstName,
+                user.lastName,
+                user.email,
+                passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
     }
 }
