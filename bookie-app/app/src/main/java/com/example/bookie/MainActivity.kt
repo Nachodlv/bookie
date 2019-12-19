@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -19,11 +20,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this, LoginActivity::class.java)
+//        startActivity(intent)
 
-//        val toolbar: Toolbar = findViewById(R.id.toolbar)
-//        setSupportActionBar(toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 //
 //        val fab: FloatingActionButton = findViewById(R.id.fab)
 //        fab.setOnClickListener { view ->
