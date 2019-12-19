@@ -1,11 +1,18 @@
 package com.example.bookie.models
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
+@Entity
 data class User(
-    @SerializedName("id") val id: Int,
-    @SerializedName("email") val email: String,
-    @SerializedName("name") val name: String
+    @PrimaryKey @SerializedName("id") @ColumnInfo(name = "id") val id: Long,
+    @SerializedName("email") @ColumnInfo(name = "email") val email: String,
+    @SerializedName("name") @ColumnInfo(name = "name") val name: String,
+    @SerializedName("lastName") @ColumnInfo(name = "lastName") val lastName: String,
+    @ColumnInfo(name = "lastFetch") val lastFetch: Long = Calendar.getInstance().timeInMillis
 ) : JSONConvertable
 
 data class UserRegisterForm(

@@ -6,7 +6,7 @@ class Login(var email: String, var password: String) :
     ApiRoute() {
 
     override val url: String
-        get() = "$baseUrl/login"
+        get() = "$baseUrl/user/login"
 
 
     override val httpMethod: Int
@@ -26,7 +26,7 @@ class Register(
 ) : ApiRoute() {
 
     override val url: String
-        get() = "$baseUrl/register"
+        get() = "$baseUrl/user/register"
     override val httpMethod: Int
         get() = Request.Method.POST
 
@@ -37,4 +37,17 @@ class Register(
             "name" to name,
             "lastName" to lastName
         )
+}
+
+class UserById(private val id: String, token: String) : ApiRoute(token) {
+
+    override val url: String
+        get() = "$baseUrl/user/$id"
+
+    override val httpMethod: Int
+        get() = Request.Method.GET
+
+    override val params: HashMap<String, String>
+        get() = HashMap()
+
 }
