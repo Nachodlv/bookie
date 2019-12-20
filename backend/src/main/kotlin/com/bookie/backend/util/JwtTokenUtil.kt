@@ -8,7 +8,7 @@ import java.util.*
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import javax.crypto.spec.SecretKeySpec
 
 @Component
 class JwtTokenUtil : Serializable {
@@ -33,7 +33,11 @@ class JwtTokenUtil : Serializable {
 
     //for retrieveing any information from token we will need the secret key
     private fun getAllClaimsFromToken(token: String?): Claims {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
+        return Jwts
+                .parser()
+                .setSigningKey(SecretKeySpec(secret?.toByteArray(), "HmacSHA256"))
+                .parseClaimsJws(token)
+                .body
     }
 
     //check if the token has expired
@@ -54,9 +58,13 @@ class JwtTokenUtil : Serializable {
     //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
     //   compaction of the JWT to a URL-safe string
     private fun doGenerateToken(claims: Map<String, Any>, subject: String): String {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(Date(System.currentTimeMillis()))
                 .setExpiration(Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact()
+                .signWith(SecretKeySpec(secret?.toByteArray(), "HmacSHA256"))
+                .compact()
     }
 
     //validate token

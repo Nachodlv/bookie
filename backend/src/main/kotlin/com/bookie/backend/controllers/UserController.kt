@@ -42,4 +42,9 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.CONFLICT) // We could send a message too, but how do we do that?
         }
     }
+
+    @GetMapping("/secure")
+    fun secretRequest(): ResponseEntity<String> {
+        return ResponseEntity("Logged in!", HttpStatus.OK)
+    }
 }

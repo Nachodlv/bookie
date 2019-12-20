@@ -1,6 +1,7 @@
 package com.bookie.backend.security
 
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
+@Configuration
 @EnableWebSecurity
 class WebSecurityConfiguration(
         private val passwordEncoderAndMatcher: PasswordEncoder,
@@ -25,15 +27,15 @@ class WebSecurityConfiguration(
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/user/register")
                 .permitAll()
-                .antMatchers(HttpMethod.POST,"/login") // Login might need to be moved.
+                .antMatchers("/login")
                 .permitAll()
                 .anyRequest().authenticated()
-                .and()
                 /*
+                .and()
                 .formLogin()
                 .loginPage("/login").permitAll()
-                .and()
                  */
+                .and()
                 .logout()
                 .permitAll()
                 .and()
@@ -44,20 +46,16 @@ class WebSecurityConfiguration(
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        // What is happening here?
+        // http.addFilterBefore(UsernamePasswordAuthenticationFilter(), jwtRequestFilter::class.java)
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(customUserDetailsService)
+        auth
+                .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoderAndMatcher)
     }
-
-    /*
-    @Bean(name = [BeanIds.AUTHENTICATION_MANAGER])
-    @Throws(Exception::class)
-    override fun authenticationManagerBean(): AuthenticationManager? {
-        return super.authenticationManagerBean()
-    }
-    */
 
     @Bean
     @Throws(java.lang.Exception::class)

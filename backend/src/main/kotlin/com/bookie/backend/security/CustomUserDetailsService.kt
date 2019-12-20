@@ -22,7 +22,7 @@ class CustomUserDetailsService(private val userService: UserService) : UserDetai
 
         return org.springframework.security.core.userdetails.User(
                 user.email,
-                user.password.toLowerCase(),
+                user.password, // Why to lower case? had .toLowerCase()
                 true,
                 true,
                 true,

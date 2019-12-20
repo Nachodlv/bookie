@@ -27,6 +27,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.10.7")
 	implementation("io.jsonwebtoken:jjwt-impl:0.10.7")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.10.7")
+
+	implementation("com.fasterxml.jackson.core:jackson-core:2.10.1")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.10.1")
 }
 
 tasks.withType<Test> {

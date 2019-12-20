@@ -1,6 +1,5 @@
-package com.bookie.backend.services;
+package com.bookie.backend.services
 
-import com.bookie.backend.dto.LoginRequest
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
@@ -8,7 +7,7 @@ import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
@@ -54,10 +53,4 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
         // Check what we want to return here.
     }
-
-    /*
-    fun validateUser(login: LoginRequest): {
-
-    }
-     */
 }
