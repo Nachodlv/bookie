@@ -1,5 +1,6 @@
 package com.bookie.backend.controllers
 
+import com.bookie.backend.dto.RegisterResponse
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
@@ -22,7 +23,6 @@ class UserController(private val userService: UserService) {
     fun getById(@PathVariable id: String): Optional<User> = userService.getById(id)
 
     @PostMapping
-    // Do we need to have a confirm password?
     fun insert(@RequestBody user: User): User = userService.insert(user)
 
     @PutMapping
@@ -32,19 +32,15 @@ class UserController(private val userService: UserService) {
     fun deleteById(@PathVariable id: String): Optional<User> = userService.deleteById(id)
 
     @PostMapping("/register")
-    fun registerUser(@RequestBody user: UserDto): ResponseEntity<User> {
+    fun registerUser(@RequestBody user: UserDto): ResponseEntity<RegisterResponse> {
         return try {
-            // We should return a DTO with the relevant data.
-            ResponseEntity(userService.registerUser(user), HttpStatus.OK)
+            val newUser = userService.registerUser(user)
+            val response = newUser.id?.let { RegisterResponse(it, newUser.firstName, newUser.lastName, newUser.email) }
+            ResponseEntity(response, HttpStatus.OK)
         } catch (e: EmailAlreadyExistsException) {
             // This behavior can be generalized so that exceptions are handled automatically and return a desired status.
             // This is done using exception handlers
             ResponseEntity(HttpStatus.CONFLICT) // We could send a message too, but how do we do that?
         }
-    }
-
-    @GetMapping("/secure")
-    fun secretRequest(): ResponseEntity<String> {
-        return ResponseEntity("Logged in!", HttpStatus.OK)
     }
 }
