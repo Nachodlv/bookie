@@ -19,6 +19,25 @@ class AuthenticationController(private val authenticationManager: Authentication
                                private val jwtTokenUtil: JwtTokenUtil,
                                private val userDetailsService: CustomUserDetailsService) {
 
+    /**
+     * Logs the user in, returning a token which can later be used to make calls to secure routes.
+     *
+     * In subsequent calls, the token much be included in the Authorization header.
+     * The value of the authorization header must be 'Bearer {token}',
+     * where {token} is the token returned by this endpoint.
+     *
+     * The credentials must have the following content:
+     *
+     * {
+     *      email: String,
+     *      password: String
+     * }
+     *
+     * This route requires no authentication
+     *
+     * @return {@code HttpStatus.OK} and the token if the login was successful
+     * @return {@code HttpStatus.UNAUTHORIZED} if the login credentials are invalid
+     */
     @PostMapping("/login")
     fun loginUser(@RequestBody login: LoginRequest): ResponseEntity<LoginResponse> {
 

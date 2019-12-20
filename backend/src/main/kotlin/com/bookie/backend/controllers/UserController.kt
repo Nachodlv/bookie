@@ -31,6 +31,23 @@ class UserController(private val userService: UserService) {
     @DeleteMapping("{id}")
     fun deleteById(@PathVariable id: String): Optional<User> = userService.deleteById(id)
 
+    /**
+     * Registers a new user in the application.
+     *
+     * The data required for the user is the following:
+     *
+     * {
+     *     firstName: String,
+     *     lastName: String,
+     *     email: String,
+     *     password: String
+     * }
+     *
+     * This route requires no authentication
+     *
+     * @return {@code HttpStatus.OK} if the creation was successful, with the data of the new created user
+     * @return {@code HttpStatus.CONFLICT} if the email provided is already in use
+     */
     @PostMapping("/register")
     fun registerUser(@RequestBody user: UserDto): ResponseEntity<RegisterResponse> {
         return try {

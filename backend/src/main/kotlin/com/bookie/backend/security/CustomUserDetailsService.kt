@@ -12,17 +12,17 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.stream.Collectors
 
 @Service
-@Transactional // Is this necessary?
+@Transactional
 class CustomUserDetailsService(private val userService: UserService) : UserDetailsService {
 
-    override fun loadUserByUsername(email: String): UserDetails { // Should the id be allowed to be null?
+    override fun loadUserByUsername(email: String): UserDetails {
         val user: User = userService.getByEmail(email).orElseThrow {
             throw UsernameNotFoundException("No user found with email:$email")
         }
 
         return org.springframework.security.core.userdetails.User(
                 user.email,
-                user.password, // Why to lower case? had .toLowerCase()
+                user.password,
                 true,
                 true,
                 true,

@@ -30,11 +30,6 @@ class WebSecurityConfiguration(
                 .antMatchers("/login")
                 .permitAll()
                 .anyRequest().authenticated()
-                /*
-                .and()
-                .formLogin()
-                .loginPage("/login").permitAll()
-                 */
                 .and()
                 .logout()
                 .permitAll()
@@ -46,9 +41,6 @@ class WebSecurityConfiguration(
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
-
-        // What is happening here?
-        // http.addFilterBefore(UsernamePasswordAuthenticationFilter(), jwtRequestFilter::class.java)
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {

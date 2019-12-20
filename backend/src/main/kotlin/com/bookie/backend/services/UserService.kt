@@ -37,13 +37,12 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
     /**
      * Looks for a user with the specified email.
      */
-    fun getByEmail(email: String): Optional<User> = userDao.findByEmail(email) // Test if this method works correctly.
+    fun getByEmail(email: String): Optional<User> = userDao.findByEmail(email)
 
     /**
      * Registers a new user.
      */
     fun registerUser(user: UserDto): User {
-        // We need to return a conflict http error
         getByEmail(user.email).ifPresent{throw EmailAlreadyExistsException("Email already exists")}
         val newUser = User(
                 user.firstName,
@@ -51,6 +50,5 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
                 user.email,
                 passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
-        // Check what we want to return here.
     }
 }
