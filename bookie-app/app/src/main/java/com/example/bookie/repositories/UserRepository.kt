@@ -1,6 +1,7 @@
 package com.example.bookie.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.bookie.api.client.UserClient
 import com.example.bookie.dao.UserDao
 import com.example.bookie.models.User
@@ -24,10 +25,16 @@ class UserRepository @Inject constructor(
     private val executor: Executor,
     private val userDao: UserDao
 ) {
-    fun getUser(userId: String): LiveData<User> {
+    private val status: MutableLiveData<RepositoryStatus<User>> by lazy {
+        val list = MutableLiveData<RepositoryStatus<User>>()
+        list.value = RepositoryStatus.Loading()
+        list
+    }
+
+    fun getUser(userId: String): LiveData<RepositoryStatus<User>> {
         refreshUser(userId)
         // Returns a LiveData object directly from the database.
-        return userDao.getById(userId)
+        return status
     }
 
     private fun refreshUser(userId: String) {
@@ -35,11 +42,20 @@ class UserRepository @Inject constructor(
         executor.execute {
             // Check if user data was fetched recently.
             val userExists = userDao.hasUser(userId, FRESH_TIMEOUT)
-            if (!userExists) {
+            if (userExists == null) {
                 // Refreshes the data.
-                userClient.getUserById(userId) { user, _ -> user?.let { userDao.save(it) } }
+                userClient.getUserById(userId) { user, error ->
+                    run {
+                        if (user != null) {
+                            user.let { userDao.save(it) }
+                            status.value = RepositoryStatus.Success(user)
+                        } else {
+                            status.value = RepositoryStatus.Error(error)
+                        }
 
-            }
+                    }
+                }
+            } else status.value = RepositoryStatus.Success(userExists)
         }
     }
 

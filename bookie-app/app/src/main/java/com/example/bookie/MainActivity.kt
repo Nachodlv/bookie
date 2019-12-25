@@ -4,10 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
+import com.example.bookie.models.User
+import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.ui.login.LoginActivity
+import com.example.bookie.view_models.UserViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,8 +25,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this, LoginActivity::class.java)
+//        startActivity(intent)
+        val model = ViewModelProviders.of(this)[UserViewModel::class.java]
+        model.init("1")
+        model.user!!.observe(this, Observer<RepositoryStatus<User>>{
+            when(it) {
+                is RepositoryStatus.Error-> println(it.error)
+                is RepositoryStatus.Loading -> println("Loading")
+                is RepositoryStatus.Success -> println("User: ${it.data}")
+            }
+        })
 
 //        val toolbar: Toolbar = findViewById(R.id.toolbar)
 //        setSupportActionBar(toolbar)

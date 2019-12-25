@@ -1,7 +1,9 @@
 package com.example.bookie.view_models
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.example.bookie.models.User
+import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.UserRepository
 import javax.inject.Inject
 
@@ -14,14 +16,19 @@ import javax.inject.Inject
 *
 * */
 
-class UserViewModel(@Inject private val repository: UserRepository):
+class UserViewModel :
     ViewModel() {
 
-    private var user: LiveData<User>? = null
+    var repository: UserRepository? = null
+        @Inject set
+
+    var user: LiveData<RepositoryStatus<User>>? = null
+    get() = field
+    private set
 
     fun init(id: String) {
-        if(user != null) return
-        user = repository.getUser(id)
+        if (user != null || repository == null) return
+        user = repository!!.getUser(id)
     }
 
 }

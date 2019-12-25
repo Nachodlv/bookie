@@ -28,6 +28,6 @@ interface UserDao {
     fun getById(id: String): LiveData<User>
 
     @Query("SELECT * FROM USER WHERE id = :id and lastFetch >= (:now - :timeout)")
-    fun hasUser(id: String, timeout: Long, now: Long = Calendar.getInstance().timeInMillis): Boolean
+    fun hasUser(id: String, timeout: Long, now: Long = Calendar.getInstance().timeInMillis): User?
 
 }
