@@ -32,4 +32,6 @@
     <string name="invalid_repeat_password">The passwords must match</string>
     <string name="lastName">Last name</string>
 
+<!--    SEARCH BAR -->
+    <string name="search_hint">Search for a book</string>
 </resources>
