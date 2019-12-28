@@ -34,9 +34,10 @@ class UserClient(ctx: Context) : ApiClient(ctx) {
         email: String,
         password: String,
         name: String,
+        lastName: String,
         completion: (user: User?, message: String) -> Unit
     ) {
-        val route = Register(email, password, name)
+        val route = Register(email, password, name, lastName)
         this.performRequest(route) { success, response ->
             if (success) {
                 val user: User = response.json.toObject()

@@ -85,7 +85,7 @@ class RegisterActivity : AppCompatActivity() {
                 TextValidator.hasErrors(password)
             ).or(
                 TextValidator.hasErrors(repeat_password)
-            )
+            ).or(TextValidator.hasErrors(lastName))
         ) return
 
         loaderFragment.showLoader(register_button)
@@ -93,7 +93,8 @@ class RegisterActivity : AppCompatActivity() {
         UserClient(applicationContext).registerUser(
             email.text.toString(),
             password.text.toString(),
-            name.text.toString()
+            name.text.toString(),
+            lastName.text.toString()
         ) { user, response -> onFinishRegistering(user, response, view) }
     }
 
