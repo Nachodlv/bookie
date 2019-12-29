@@ -22,7 +22,6 @@ class MainActivity : AppCompatActivity() {
     val model: UserViewModel by injector.instance()
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,9 +33,9 @@ class MainActivity : AppCompatActivity() {
 
 
         model.init("1")
-        model.user!!.observe(this, Observer<RepositoryStatus<User>>{
-            when(it) {
-                is RepositoryStatus.Error-> println(it.error)
+        model.user!!.observe(this, Observer<RepositoryStatus<User>> {
+            when (it) {
+                is RepositoryStatus.Error -> println(it.error)
                 is RepositoryStatus.Loading -> println("Loading")
                 is RepositoryStatus.Success -> println("User: ${it.data}")
             }
