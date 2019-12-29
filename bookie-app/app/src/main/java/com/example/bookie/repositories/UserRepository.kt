@@ -7,8 +7,6 @@ import com.example.bookie.dao.UserDao
 import com.example.bookie.models.User
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /*
 * Get view model from view
@@ -18,8 +16,7 @@ import javax.inject.Singleton
         })
 *
 * */
-@Singleton
-class UserRepository @Inject constructor(
+class UserRepository constructor(
     private val userClient: UserClient,
     // Simple in-memory cache. Details omitted for brevity.
     private val executor: Executor,

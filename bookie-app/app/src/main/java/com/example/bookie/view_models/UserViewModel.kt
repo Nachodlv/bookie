@@ -5,30 +5,28 @@ import androidx.lifecycle.ViewModel
 import com.example.bookie.models.User
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.UserRepository
-import javax.inject.Inject
 
-/*
+/**
 * Get view model from view
-*   val model = ViewModelProviders.of(this)[UsersViewModel::class.java]
-        model.getUsers().observe(this, Observer<List<User>>{ users ->
-            // update UI
-        })
-*
+
+        val injector = KodeinInjector()
+        val model: UserViewModel by injector.instance()
+
+       override fun onCreate(savedInstanceState: Bundle?) {
+           injector.inject(appKodein())
+       }
+
 * */
 
-class UserViewModel :
+class UserViewModel constructor(private val userRepository: UserRepository) :
     ViewModel() {
 
-    var repository: UserRepository? = null
-        @Inject set
-
     var user: LiveData<RepositoryStatus<User>>? = null
-    get() = field
-    private set
+        private set
 
     fun init(id: String) {
-        if (user != null || repository == null) return
-        user = repository!!.getUser(id)
+        if (user != null) return
+        user = userRepository.getUser(id)
     }
 
 }

@@ -1,26 +1,14 @@
 package com.example.bookie.api.client
 
 import android.content.Context
-import com.example.bookie.MyApplication
 import com.example.bookie.api.routes.Login
 import com.example.bookie.api.routes.Register
 import com.example.bookie.api.routes.UserById
 import com.example.bookie.models.User
 import com.example.bookie.models.toObject
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
-
-@Module
-class UserClient(ctx: Context) : ApiClient(ctx) {
-
-    @Singleton
-    @Provides
-    fun provideUserClient(context: Context): UserClient =
-        UserClient(context)
 
 
-
+class UserClient(ctx: Context?) : ApiClient(ctx) {
     /**
      * --------- LOGIN USER ----------------------------
      **/

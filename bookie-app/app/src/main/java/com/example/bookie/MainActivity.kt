@@ -1,24 +1,27 @@
 package com.example.bookie
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.bookie.models.User
 import com.example.bookie.repositories.RepositoryStatus
-import com.example.bookie.ui.login.LoginActivity
 import com.example.bookie.view_models.UserViewModel
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    val injector = KodeinInjector()
+    val model: UserViewModel by injector.instance()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +30,9 @@ class MainActivity : AppCompatActivity() {
 
 //        val intent = Intent(this, LoginActivity::class.java)
 //        startActivity(intent)
-        val model = ViewModelProviders.of(this)[UserViewModel::class.java]
+        injector.inject(appKodein())
+
+
         model.init("1")
         model.user!!.observe(this, Observer<RepositoryStatus<User>>{
             when(it) {
