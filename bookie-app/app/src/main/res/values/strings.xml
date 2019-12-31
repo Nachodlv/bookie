@@ -31,6 +31,9 @@
     <string name="invalid_password">The password must have more than six characters</string>
     <string name="invalid_repeat_password">The passwords must match</string>
     <string name="lastName">Last name</string>
+    <string name="register_successful">The registration was made successfully</string>
+    <string name="register_unsuccessful">An error occurred while trying to register</string>
+    <string name="email_repeated">The email is already taken</string>
 
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>

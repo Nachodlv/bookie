@@ -10,19 +10,29 @@ import androidx.fragment.app.Fragment
 import com.example.bookie.R
 import com.example.bookie.api.client.UserClient
 import com.example.bookie.models.User
+import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.EmailValidator
 import com.example.bookie.utils.TextValidator
+import com.example.bookie.view_models.UserViewModel
+import com.github.salomonbrys.kodein.KodeinAware
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.register_main.*
 
 class RegisterActivity : AppCompatActivity() {
 
     private var loaderFragment: LoaderFragment = LoaderFragment()
+    val injector = KodeinInjector()
+    val repository: UserRepository by injector.instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.register_main)
+
+        injector.inject(appKodein())
 
         addListeners()
 
@@ -90,7 +100,7 @@ class RegisterActivity : AppCompatActivity() {
 
         loaderFragment.showLoader(register_button)
 
-        UserClient(applicationContext).registerUser(
+        repository.registerUser(
             email.text.toString(),
             password.text.toString(),
             name.text.toString(),
@@ -109,7 +119,6 @@ class RegisterActivity : AppCompatActivity() {
             )
                 .setAction("Action", null).show()
         } else {
-            // TODO save user
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }

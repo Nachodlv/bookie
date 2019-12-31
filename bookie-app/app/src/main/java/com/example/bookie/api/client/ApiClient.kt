@@ -8,40 +8,54 @@ import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
 import com.example.bookie.api.ApiResponse
 import com.example.bookie.api.routes.ApiRoute
+import org.json.JSONObject
 
 abstract class ApiClient(val ctx: Context?) {
 
     /***
      * PERFORM REQUEST
      */
-    protected fun performRequest(route: ApiRoute, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
-        val request: StringRequest = object : StringRequest(route.httpMethod, route.url, { response ->
-            this.handle(response, completion)
-        }, {
-            it.printStackTrace()
-            if (it.networkResponse != null && it.networkResponse.data != null)
-                this.handle(String(it.networkResponse.data), completion)
-            else
-                this.handle(getStringError(it), completion)
-        }) {
-            override fun getParams(): MutableMap<String, String> {
-                return route.params
-            }
+    protected fun performRequest(route: ApiRoute, completion: (apiResponse: ApiResponse) -> Unit) {
+        val request: StringRequest =
+            object : StringRequest(route.httpMethod, route.url, { response ->
+                completion(ApiResponse(200, response))
+            }, {
+                it.printStackTrace()
+                if (it.networkResponse != null && it.networkResponse.data != null)
+                    this.handle(it.networkResponse, completion)
+                else
+                    this.handle(it.networkResponse, completion)
+            }) {
 
-            override fun getHeaders(): MutableMap<String, String> {
-                return route.headers
+                override fun getHeaders(): MutableMap<String, String> {
+                    return route.headers
+                }
+
+                @Throws(AuthFailureError::class)
+                override fun getBody(): ByteArray {
+                    return JSONObject(route.params as Map<String, String>).toString().toByteArray()
+                }
             }
-        }
-        request.retryPolicy = DefaultRetryPolicy(route.timeOut, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+        request.retryPolicy = DefaultRetryPolicy(
+            route.timeOut,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
         getRequestQueue()!!.add(request)
     }
 
     /**
      * This method will make the creation of the answer as ApiResponse
      **/
-    private fun handle(response: String, completion: (success: Boolean, apiResponse: ApiResponse) -> Unit) {
-        val ar = ApiResponse(response)
-        completion.invoke(ar.success, ar)
+    private fun handle(
+        networkResponse: NetworkResponse,
+        completion: (apiResponse: ApiResponse) -> Unit
+    ) {
+        val ar = ApiResponse(
+            networkResponse.statusCode,
+            JSONObject(networkResponse.data.toString()).toString()
+        )
+        completion.invoke(ar)
     }
 
     /**
@@ -58,6 +72,7 @@ abstract class ApiClient(val ctx: Context?) {
             else -> "Internet error"
         }
     }
+
     /**
      * We create and return a new instance for the queue of Volley requests.
      **/

@@ -34,6 +34,23 @@ class UserRepository constructor(
         return status
     }
 
+    fun registerUser(
+        email: String,
+        password: String,
+        name: String,
+        lastName: String,
+        completion: (user: User?, message: String) -> Unit
+    ){
+        userClient.registerUser(email, password, name, lastName){user, message ->
+            run {
+                if(user != null) {
+                    userDao.save(user)
+                }
+                completion(user, message)
+            }
+        }
+    }
+
     private fun refreshUser(userId: String) {
         // Runs in a background thread.
         executor.execute {
