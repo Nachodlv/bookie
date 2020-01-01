@@ -39,16 +39,10 @@ class UserRepository constructor(
         password: String,
         name: String,
         lastName: String,
-        completion: (user: User?, message: String) -> Unit
+        completion: ( message: String) -> Unit,
+        onError: (errorCode: Int, message: String) -> Unit
     ){
-        userClient.registerUser(email, password, name, lastName){user, message ->
-            run {
-                if(user != null) {
-                    userDao.save(user)
-                }
-                completion(user, message)
-            }
-        }
+        userClient.registerUser(email, password, name, lastName, completion, onError)
     }
 
     private fun refreshUser(userId: String) {

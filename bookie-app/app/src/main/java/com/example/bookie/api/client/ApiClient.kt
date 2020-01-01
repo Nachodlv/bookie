@@ -51,9 +51,12 @@ abstract class ApiClient(val ctx: Context?) {
         networkResponse: NetworkResponse,
         completion: (apiResponse: ApiResponse) -> Unit
     ) {
+
         val ar = ApiResponse(
             networkResponse.statusCode,
-            JSONObject(networkResponse.data.toString()).toString()
+            if (networkResponse.data.isNotEmpty())
+                JSONObject(networkResponse.data.toString()).toString()
+            else ""
         )
         completion.invoke(ar)
     }

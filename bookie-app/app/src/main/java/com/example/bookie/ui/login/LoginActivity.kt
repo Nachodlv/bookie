@@ -36,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
 
         register_button.setOnClickListener { goToRegisterView() }
 
+        showMessage()
     }
 
     private fun login(view: View) {
@@ -58,6 +59,16 @@ class LoginActivity : AppCompatActivity() {
     private fun goToRegisterView() {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun showMessage() {
+        val bundle = intent.extras ?: return
+        val message = bundle.getString("message") ?: return
+        Snackbar.make(
+            email.rootView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction("Action", null).show()
     }
 
 }

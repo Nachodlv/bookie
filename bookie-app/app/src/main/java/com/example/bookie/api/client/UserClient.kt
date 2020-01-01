@@ -7,7 +7,6 @@ import com.example.bookie.api.routes.Register
 import com.example.bookie.api.routes.UserById
 import com.example.bookie.models.User
 import com.example.bookie.models.toObject
-import kotlinx.android.synthetic.main.login_main.*
 
 
 class UserClient(ctx: Context?) : ApiClient(ctx) {
@@ -38,26 +37,30 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         password: String,
         firstName: String,
         lastName: String,
-        completion: (user: User?, message: String) -> Unit
-    ) {
-        if(ctx == null) return
+        completion: (message: String) -> Unit,
+        onError: (errorCode: Int, message: String) -> Unit
+        ) {
+        if (ctx == null) return
         val route = Register(email, password, firstName, lastName)
         this.performRequest(route) { response ->
             when (response.statusCode) {
                 200 -> {
-                    val user: User = response.json.toObject()
-                    completion.invoke(user, ctx.getString(R.string.register_successful))
+                    completion.invoke(ctx.getString(R.string.register_successful))
                 }
                 409 -> {
-                    completion.invoke(null, ctx.getString(R.string.email_repeated))
+                    onError.invoke(409, ctx.getString(R.string.email_repeated))
                 }
                 else -> {
-                    completion.invoke(null, ctx.getString(R.string.register_unsuccessful))
+                    onError.invoke(
+                        response.statusCode,
+                        ctx.getString(R.string.register_unsuccessful)
+                    )
                 }
             }
         }
     }
-//
+
+    //
     fun getUserById(id: String, completion: (user: User?, message: String) -> Unit) {
 //        TODO get token in shared preferences
         val route = UserById(id, "")
