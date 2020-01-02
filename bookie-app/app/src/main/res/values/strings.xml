@@ -2,19 +2,9 @@
     <string name="app_name">BookieApp</string>
     <string name="app_logo">BookieApp logo</string>
 
-
-    <!--NAVIGATION-->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Bookie</string>
-
-    <string name="action_logout">Logout</string>
-
-    <string name="menu_home">Home</string>
-    <string name="menu_profile">Profile</string>
-    <string name="menu_scan">Scan Book</string>
-    <string name="menu_shelf">Shelf</string>
-    <string name="menu_settings">Settings</string>
+<!--    SHARED PREFERENCES-->
+    <string name="shared_preferences">app.bookie.com.shared_preferences</string>
+    <string name="login_token">login_token</string>
 
 <!--    LOGIN -->
     <string name="email_input">Email</string>
@@ -37,6 +27,19 @@
     <string name="register_successful">The registration was made successfully</string>
     <string name="register_unsuccessful">An error occurred while trying to register</string>
     <string name="email_repeated">The email is already taken</string>
+
+    <!--NAVIGATION-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Bookie</string>
+
+    <string name="action_logout">Logout</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_scan">Scan Book</string>
+    <string name="menu_shelf">Shelf</string>
+    <string name="menu_settings">Settings</string>
 
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
