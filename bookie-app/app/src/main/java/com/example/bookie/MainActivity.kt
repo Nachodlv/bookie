@@ -29,10 +29,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        TODO Add login and register.
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 //

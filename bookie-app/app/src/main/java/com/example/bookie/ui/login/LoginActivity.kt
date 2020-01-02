@@ -5,21 +5,30 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.bookie.MainActivity
 import com.example.bookie.R
+import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.EmailValidator
+import com.example.bookie.utils.TextValidator
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.login_main.*
-import java.util.*
 
 
 class LoginActivity : AppCompatActivity() {
 
     private var loaderFragment: LoaderFragment = LoaderFragment()
+    private val injector = KodeinInjector()
+    private val repository: UserRepository by injector.instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_main)
+
+        injector.inject(appKodein())
 
         email.addTextChangedListener(EmailValidator(email))
 
@@ -32,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
         login_button.setOnClickListener { login(it) }
 
         val fragment: Fragment? = supportFragmentManager.findFragmentById(R.id.fragment_loader)
-        if(fragment != null) loaderFragment = fragment as LoaderFragment
+        if (fragment != null) loaderFragment = fragment as LoaderFragment
 
         register_button.setOnClickListener { goToRegisterView() }
 
@@ -40,20 +49,32 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun login(view: View) {
+        if (TextValidator.hasErrors(email).or(
+                TextValidator.hasErrors(password)
+            )
+        ) return
+
+        repository.loginUser(
+            email.text.toString(),
+            password.text.toString(),
+            { loginSuccessful() },
+            { _, message -> loginUnsuccessful(message, view) })
+    }
+
+    private fun loginSuccessful() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun loginUnsuccessful(response: String, view: View) {
+        loaderFragment.hideLoader(login_button)
+
         Snackbar.make(
             view,
-            "Email: ${email.text}, password: ${password.text}",
+            response,
             Snackbar.LENGTH_LONG
-        )
-            .setAction("Action", null).show()
-        loaderFragment.showLoader(login_button)
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                runOnUiThread {
-                    loaderFragment.hideLoader(login_button)
-                }
-            }
-        }, 2000)
+        ).setAction("Action", null).show()
+
     }
 
     private fun goToRegisterView() {

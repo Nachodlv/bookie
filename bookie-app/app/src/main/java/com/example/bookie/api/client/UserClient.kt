@@ -16,15 +16,24 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
     fun loginUser(
         email: String,
         password: String,
-        completion: (user: User?, message: String) -> Unit
+        completion: (token: String, message: String) -> Unit,
+        onError: (errorCode: Int, message: String) -> Unit
     ) {
+        if (ctx == null) return
+
         val route = Login(email, password)
         this.performRequest(route) { response ->
-            if (response.statusCode == 200) {
-                val user: User = response.json.toObject()
-                completion.invoke(user, "Log in successful")
-            } else {
-                completion.invoke(null, "Error login in")
+            when (response.statusCode) {
+                200 -> {
+                    val token = response.json
+                    completion.invoke(token, ctx.getString(R.string.login_successful))
+                }
+                401 -> {
+                    onError.invoke(401, ctx.getString(R.string.invalid_credentials))
+                }
+                else -> {
+                    onError.invoke(400, ctx.getString(R.string.login_unsuccessful))
+                }
             }
         }
     }
