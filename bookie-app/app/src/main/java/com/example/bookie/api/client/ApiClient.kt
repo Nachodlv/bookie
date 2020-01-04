@@ -9,7 +9,7 @@ import com.android.volley.toolbox.StringRequest
 import com.example.bookie.api.ApiResponse
 import com.example.bookie.api.routes.ApiRoute
 
-abstract class ApiClient(val ctx: Context) {
+abstract class ApiClient(val ctx: Context?) {
 
     /***
      * PERFORM REQUEST
@@ -33,7 +33,7 @@ abstract class ApiClient(val ctx: Context) {
             }
         }
         request.retryPolicy = DefaultRetryPolicy(route.timeOut, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
-        getRequestQueue().add(request)
+        getRequestQueue()!!.add(request)
     }
 
     /**
@@ -61,9 +61,9 @@ abstract class ApiClient(val ctx: Context) {
     /**
      * We create and return a new instance for the queue of Volley requests.
      **/
-    private fun getRequestQueue(): RequestQueue {
+    private fun getRequestQueue(): RequestQueue? {
         val maxCacheSize = 20 * 1024 * 1024
-        val cache = DiskBasedCache(ctx.cacheDir, maxCacheSize)
+        val cache = DiskBasedCache(ctx?.cacheDir, maxCacheSize)
         val netWork = BasicNetwork(HurlStack())
         val mRequestQueue = RequestQueue(cache, netWork)
         mRequestQueue.start()
