@@ -1,34 +1,17 @@
 package com.example.bookie.injection
 
-import com.example.bookie.MyApplication
-import com.example.bookie.api.client.UserClient
-import com.example.bookie.dao.UserDao
-import com.example.bookie.dao.AppDatabase
-import com.example.bookie.repositories.UserRepository
-import com.example.bookie.view_models.UserViewModel
-import com.github.salomonbrys.kodein.*
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.singleton
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 val modules = Kodein.Module {
-
-    bind<UserDao>() with singleton {
-        val database: AppDatabase  = instance()
-        database.userDao()
+    bind<Executor>() with singleton {
+        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     }
 
-    bind<UserClient>() with singleton {
-        UserClient(MyApplication.appContext)
-    }
+    import(authModule)
+    import(userModule)
 
-    bind<UserRepository>() with singleton {
-        UserRepository(
-            instance(),
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-            instance()
-        )
-    }
-
-    bind<UserViewModel>() with singleton {
-        UserViewModel(instance())
-    }
 }

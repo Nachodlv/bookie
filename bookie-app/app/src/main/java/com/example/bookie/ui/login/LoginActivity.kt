@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.bookie.MainActivity
 import com.example.bookie.R
+import com.example.bookie.repositories.AuthRepository
 import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.EmailValidator
@@ -22,13 +23,15 @@ class LoginActivity : AppCompatActivity() {
 
     private var loaderFragment: LoaderFragment = LoaderFragment()
     private val injector = KodeinInjector()
-    private val repository: UserRepository by injector.instance()
+    private val authRepository: AuthRepository by injector.instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_main)
 
         injector.inject(appKodein())
+
+        containsValidToken()
 
         email.addTextChangedListener(EmailValidator(email))
 
@@ -54,7 +57,8 @@ class LoginActivity : AppCompatActivity() {
             )
         ) return
 
-        repository.loginUser(
+        loaderFragment.showLoader(login_button)
+        authRepository.loginUser(
             email.text.toString(),
             password.text.toString(),
             { loginSuccessful() },
@@ -62,6 +66,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginSuccessful() {
+        loaderFragment.hideLoader(login_button)
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
     }
@@ -90,6 +95,10 @@ class LoginActivity : AppCompatActivity() {
             message,
             Snackbar.LENGTH_LONG
         ).setAction("Action", null).show()
+    }
+
+    private fun containsValidToken() {
+        authRepository.isUserLogged()
     }
 
 }

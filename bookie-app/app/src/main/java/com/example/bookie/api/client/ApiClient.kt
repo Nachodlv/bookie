@@ -54,7 +54,7 @@ abstract class ApiClient(val ctx: Context?) {
 
         val ar = ApiResponse(
             networkResponse.statusCode,
-            if (networkResponse.data.isNotEmpty())
+            if (networkResponse.statusCode == 200)
                 JSONObject(networkResponse.data.toString()).toString()
             else ""
         )

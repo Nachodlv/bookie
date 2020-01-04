@@ -1,28 +1,24 @@
 package com.example.bookie.utils
 
-import android.util.Base64
-import java.io.UnsupportedEncodingException
-import java.nio.charset.Charset
+import com.auth0.android.jwt.DecodeException
+import com.auth0.android.jwt.JWT
 
 
 object JWTUtils {
 
     @Throws(Exception::class)
-    fun decoded(JWTEncoded: String): String? {
+    fun isJwtValid(JWTEncoded: String): Boolean {
+        val jwt = getJwt(JWTEncoded)?: return false
+        return jwt.isExpired(0)
+    }
+
+    fun getJwt(JWTEncoded: String): JWT? {
         return try {
-            val split = JWTEncoded.split("\\.").toTypedArray()
-            print("Header: " + getJson(split[0]))
-            print("Body: " + getJson(split[1]))
-            split[1]
-        } catch (e: UnsupportedEncodingException) { //Error
+            JWT(JWTEncoded)
+        } catch (e: DecodeException) { //Error
             e.printStackTrace()
             null
         }
     }
 
-    @Throws(UnsupportedEncodingException::class)
-    private fun getJson(strEncoded: String): String {
-        val decodedBytes: ByteArray = Base64.decode(strEncoded, Base64.URL_SAFE)
-        return String(decodedBytes, Charset.forName("UTF-8"))
-    }
 }

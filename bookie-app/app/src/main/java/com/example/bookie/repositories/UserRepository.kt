@@ -3,6 +3,7 @@ package com.example.bookie.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookie.api.client.UserClient
+import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.dao.UserDao
 import com.example.bookie.models.User
 import java.util.concurrent.Executor
@@ -20,7 +21,8 @@ class UserRepository constructor(
     private val userClient: UserClient,
     // Simple in-memory cache. Details omitted for brevity.
     private val executor: Executor,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val sharedPreferencesDao: SharedPreferencesDao
 ) {
     private val status: MutableLiveData<RepositoryStatus<User>> by lazy {
         val list = MutableLiveData<RepositoryStatus<User>>()
@@ -43,18 +45,6 @@ class UserRepository constructor(
         onError: (errorCode: Int, message: String) -> Unit
     ) {
         userClient.registerUser(email, password, name, lastName, completion, onError)
-    }
-
-    fun loginUser(
-        email: String,
-        password: String,
-        completion: (message: String) -> Unit,
-        onError: (errorCode: Int, message: String) -> Unit
-    ) {
-        userClient.loginUser(email, password, { token, message ->
-            // TODO save token
-            completion(message)
-        }, onError)
     }
 
     private fun refreshUser(userId: String) {
