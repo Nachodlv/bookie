@@ -5,74 +5,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/book-card"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="25dp">
+    android:layout_height="wrap_content"
+    android:paddingLeft="25dp"
+    android:paddingTop="25dp"
+    android:paddingRight="25dp"
+    android:paddingBottom="0dp">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/book-card-container"
+        android:id="@+id/book_card_container"
         android:layout_width="match_parent"
-        android:layout_height="194dp" >
+        android:layout_height="wrap_content"
+        android:background="#FFFAFA"
+        app:cardBackgroundColor="#F0FFFF">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container-constraint"
+            android:id="@+id/card_constraint"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:padding="15dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/card-constraint"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
+            <ImageView
+                android:id="@+id/book_image"
+                android:layout_width="127dp"
+                android:layout_height="132dp"
+                android:contentDescription="Book cover image"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="56dp">
+                tools:srcCompat="@tools:sample/avatars" />
 
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="127dp"
-                    android:layout_height="132dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:srcCompat="@tools:sample/avatars"
-                    android:contentDescription="Book cover image" />
+            <TextView
+                android:id="@+id/book_title"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="The Fellowship of the Ring"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/book-title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:text="The lord of the rings"
-                    app:layout_constraintStart_toEndOf="@+id/imageView2"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/book_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:text="JRR Tolkien"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@+id/book_image"
+                app:layout_constraintTop_toBottomOf="@+id/book_title" />
 
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="8dp"
-                    android:text="J.R.R Tolkien"
-                    app:layout_constraintStart_toEndOf="@+id/imageView2"
-                    app:layout_constraintTop_toBottomOf="@+id/book-title" />
+            <!--Rating bar only for visualization, user cant interact with it.-->
+            <RatingBar
+                android:id="@+id/rating_bar"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginBottom="8dp"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:scaleX="1.60"
+                android:scaleY="1.60"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/book_image" />
 
-                <!--Rating bar only for visualization, user cant interact with it.-->
-                <RatingBar
-                    android:id="@+id/ratingBar"
-                    style="?android:attr/ratingBarStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="48dp"
-                    android:layout_marginBottom="8dp"
-                    android:isIndicator="true"
-                    android:numStars="5"
-                    android:scaleX="1.60"
-                    android:scaleY="1.60"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageView2" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginTop="160dp"
+            android:background="#D3D3D3">
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="#D3D3D3" />
 
     </androidx.cardview.widget.CardView>
 </FrameLayout>
