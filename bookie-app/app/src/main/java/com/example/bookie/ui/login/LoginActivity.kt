@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.example.bookie.MainActivity
 import com.example.bookie.R
+import com.example.bookie.models.User
 import com.example.bookie.repositories.AuthRepository
-import com.example.bookie.repositories.UserRepository
+import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.EmailValidator
+import com.example.bookie.utils.SnackbarUtil
 import com.example.bookie.utils.TextValidator
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
@@ -74,12 +77,7 @@ class LoginActivity : AppCompatActivity() {
     private fun loginUnsuccessful(response: String, view: View) {
         loaderFragment.hideLoader(login_button)
 
-        Snackbar.make(
-            view,
-            response,
-            Snackbar.LENGTH_LONG
-        ).setAction("Action", null).show()
-
+        SnackbarUtil.showSnackbar(view, response)
     }
 
     private fun goToRegisterView() {
@@ -90,15 +88,22 @@ class LoginActivity : AppCompatActivity() {
     private fun showMessage() {
         val bundle = intent.extras ?: return
         val message = bundle.getString("message") ?: return
-        Snackbar.make(
-            email.rootView,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction("Action", null).show()
+        SnackbarUtil.showSnackbar(email.rootView, message)
     }
 
     private fun containsValidToken() {
-        authRepository.isUserLogged()
+        val (isLogged, observable) = authRepository.isUserLogged()
+
+        if (!isLogged) return
+
+        observable?.observe(this, Observer<RepositoryStatus<User>> { status ->
+            when (status) {
+                is RepositoryStatus.Loading -> return@Observer
+                is RepositoryStatus.Error -> return@Observer
+                is RepositoryStatus.Success -> startActivity(Intent(this, MainActivity::class.java))
+            }
+        })
     }
+
 
 }

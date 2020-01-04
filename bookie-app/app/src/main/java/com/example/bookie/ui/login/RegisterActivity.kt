@@ -12,6 +12,7 @@ import com.example.bookie.models.User
 import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.EmailValidator
+import com.example.bookie.utils.SnackbarUtil
 import com.example.bookie.utils.TextValidator
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
@@ -120,10 +121,6 @@ class RegisterActivity : AppCompatActivity() {
         if (errorCode == 409) {
             email.error = message
         }
-        Snackbar.make(
-            view,
-            message,
-            Snackbar.LENGTH_LONG
-        ).setAction("Action", null).show()
+        SnackbarUtil.showSnackbar(view, message)
     }
 }

@@ -32,11 +32,11 @@ class AuthRepository constructor(
         }, onError)
     }
 
-    fun isUserLogged(): Pair<Boolean, LiveData<RepositoryStatus<User>>>? {
+    fun isUserLogged(): Pair<Boolean, LiveData<RepositoryStatus<User>>?> {
         return if (sharedPreferencesDao.isTokenValid()) {
             Pair(true, getUserLoggedIn())
         } else {
-            Pair(false, status)
+            Pair(false, null)
         }
     }
 

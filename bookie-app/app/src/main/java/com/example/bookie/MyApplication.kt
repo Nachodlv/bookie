@@ -16,6 +16,7 @@ class MyApplication : Application(), KodeinAware {
     override val kodein: Kodein = Kodein {
         bind<AppDatabase>() with singleton {
             Room.databaseBuilder(this@MyApplication, AppDatabase::class.java, "bookie-db")
+                .fallbackToDestructiveMigration()
                 .build()
         }
         import(modules)
