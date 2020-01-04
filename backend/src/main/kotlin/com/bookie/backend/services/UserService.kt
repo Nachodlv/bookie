@@ -3,7 +3,9 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
+import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : BasicCrud<String, User> {
+class UserService(val userDao: UserDao,
+                  val passwordEncoder: PasswordEncoder,
+                  private val tokenUtil: JwtTokenUtil) : BasicCrud<String, User> {
 
     override fun getAll(pageable: Pageable): Page<User> = userDao.findAll(pageable)
 
@@ -50,5 +54,47 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
                 user.email,
                 passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
+    }
+
+    /**
+     * The currently logged in user starts to follow the user with the provided id.
+     *
+     * The new follower will be added to the followed user's list.
+     * The followed user will be added to the current user's following list.
+     *
+     * @param token: The token of the currently logged in user, received in the request.
+     * @param id: The string of the user to be followed.
+     */
+    fun followUser(token: String, id: String) {
+
+        val email = tokenUtil.getUsernameFromToken(token)
+        val loggedUser: User = getByEmail(email).get()
+
+        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
+
+        followedUser.addFollower(loggedUser)
+        update(loggedUser)
+        update(followedUser)
+
+        // followedUser.ifPresent{ user -> user.addFollower(loggedUser.get())}
+
+        // How do we make this prettier?
+        /*
+        if (followedUser.isPresent) {
+            followedUser.get().addFollower(loggedUser.get())
+
+            update(loggedUser.get())
+            update(followedUser.get())
+        } else {
+            throw UserNotFoundException("The user to be followed was not found")
+        }
+         */
+
+        // If it doesn't exist, throw exception.
+
+        // Exceptions
+        // 201 fine
+        // 404 user not found
+        // 409 follow already exists
     }
 }
