@@ -29,14 +29,35 @@ data class User(
 
         val newFollower = Follower(follower.firstName, follower.lastName, follower.id)
         this.followers.add(newFollower)
-
         this.followerAmount++
 
         follower.addFollowing(this)
     }
 
+    /**
+     * Removes a follower from the user and decrements its follower count by one.
+     *
+     * The user is also removed from the following list of the provided user to maintain consistency.
+     *
+     * @throws FollowingException if the user was not being followed by the provided user.
+     */
+    fun removeFollower(follower: User) {
+        val existing = this.followers.find{ item -> item.id == follower.id}
+                ?: throw FollowingException("User already followed")
+
+        this.followers.remove(existing)
+        this.followerAmount--
+
+        follower.removeFollowing(this)
+    }
+
     private fun addFollowing(following: User) {
         val newFollowing = Follower(following.firstName, following.lastName, following.id)
         this.following.add(newFollowing)
+    }
+
+    private fun removeFollowing(following: User) {
+        val oldFollowing = Follower(following.firstName, following.lastName, following.id)
+        this.following.remove(oldFollowing)
     }
 }

@@ -75,26 +75,26 @@ class UserService(val userDao: UserDao,
         followedUser.addFollower(loggedUser)
         update(loggedUser)
         update(followedUser)
+    }
 
-        // followedUser.ifPresent{ user -> user.addFollower(loggedUser.get())}
+    /**
+     * The currently logged in user stops following the user with the provided id.
+     *
+     * The follower will be removed from the followed user's list.
+     * The followed user will be removed from the current user's following list.
+     *
+     * @param token: The token of the currently logged in user, received in the request.
+     * @param id: The string of the user to be unfollowed.
+     */
+    fun unfollowUser(token: String, id: String) {
 
-        // How do we make this prettier?
-        /*
-        if (followedUser.isPresent) {
-            followedUser.get().addFollower(loggedUser.get())
+        val email = tokenUtil.getUsernameFromToken(token)
+        val loggedUser: User = getByEmail(email).get()
 
-            update(loggedUser.get())
-            update(followedUser.get())
-        } else {
-            throw UserNotFoundException("The user to be followed was not found")
-        }
-         */
+        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
 
-        // If it doesn't exist, throw exception.
-
-        // Exceptions
-        // 201 fine
-        // 404 user not found
-        // 409 follow already exists
+        followedUser.removeFollower(loggedUser)
+        update(loggedUser)
+        update(followedUser)
     }
 }

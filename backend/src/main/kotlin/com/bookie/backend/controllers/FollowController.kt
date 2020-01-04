@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/follow")
+@RequestMapping("/user")
 class FollowController(private val userService: UserService) {
 
     /**
@@ -31,11 +31,9 @@ class FollowController(private val userService: UserService) {
      * @return {@code HttpStatus.CONFLICT} the currently logged user was already following the specified user
      * @return {@code HttpStatus.NOT_FOUND} the provided id for the followed user does not exist
      */
-    @PostMapping
+    @PostMapping("/follow")
     fun follow(@RequestBody followRequest: FollowRequest,
-               @RequestHeader headers: Map<String, String>): ResponseEntity<FollowResponse> { // We shouldn't return a user here.
-        // Find the user that made the request. Find out who it is and its data in order to update.
-
+               @RequestHeader headers: Map<String, String>): ResponseEntity<FollowResponse> {
         val token = headers["authorization"]?.substring(7)
 
         try {
@@ -49,33 +47,38 @@ class FollowController(private val userService: UserService) {
         }
 
         return ResponseEntity(FollowResponse("User followed successfully"), HttpStatus.OK)
+    }
 
-        /*
-        val email = tokenUtil.getUsernameFromToken(token)
+    /**
+     * Unfollows a user.
+     *
+     * The data required for the user is the following:
+     *
+     * {
+     *     userId: String
+     * }
+     *
+     * The userId belongs to the unfollowed user, which the currently logged in user wants to unfollow.
+     *
+     * @return {@code HttpStatus.OK} the follow was successful
+     * @return {@code HttpStatus.CONFLICT} the currently logged user was already following the specified user
+     * @return {@code HttpStatus.NOT_FOUND} the provided id for the followed user does not exist
+     */
+    @PostMapping("/unfollow")
+    fun unfollow(@RequestBody followRequest: FollowRequest,
+               @RequestHeader headers: Map<String, String>): ResponseEntity<FollowResponse> {
+        val token = headers["authorization"]?.substring(7)
 
-        val loggedUser = userService.getByEmail(email)
-
-        // Find out if the user provided in the request actually exists (If is doesn't, return some type of error.
-
-        val followId = followRequest.userId
-
-        val followUser = userService.getById(followId) // Return some error if the user is not found, how should it be handled?
-
-        // This should be done by the service, I'll leave it here for now just to see if it works.
         try {
-            followUser.ifPresent{ user -> user.addFollower(loggedUser.get())} // This should be handled by the service
-        } catch (e: FollowingException) {
-            // Return a message saying that the user was already following the other user.
+            if (token != null) {
+                this.userService.unfollowUser(token, followRequest.userId)
+            }
+        } catch (e1: FollowingException) {
+            return ResponseEntity(HttpStatus.CONFLICT) // We could return some other exception.
+        } catch (e2: UserNotFoundException) {
+            return ResponseEntity(HttpStatus.NOT_FOUND)
         }
 
-        userService.update(loggedUser.get())
-
-        userService.update(followUser.get())
-
-        // Update both users.
-
-        // Return
-
-         */
+        return ResponseEntity(FollowResponse("User unfollowed successfully"), HttpStatus.OK)
     }
 }
