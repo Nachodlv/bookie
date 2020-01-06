@@ -43,4 +43,7 @@
 
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
+
+<!--    ERROR -->
+    <string name="default_error">An unexpected error occurred</string>
 </resources>

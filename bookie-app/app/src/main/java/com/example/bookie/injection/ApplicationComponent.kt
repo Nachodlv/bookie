@@ -13,5 +13,6 @@ val modules = Kodein.Module {
 
     import(authModule)
     import(userModule)
+    import(bookModule)
 
 }
