@@ -2,11 +2,11 @@ package com.example.bookie.ui.scan
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.view.*
-import android.widget.Button
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.view.SurfaceHolder
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
@@ -23,20 +23,10 @@ import java.io.IOException
 class ScanFragment : Fragment() {
 
     private lateinit var scanViewModel: ScanViewModel
-    var btnOpenCamera: Button? = null
-    private var txtResultBody: TextView? = null
-
-    private var detector: BarcodeDetector? = null
-    private var imageUri: Uri? = null
-    private val requestCameraPermission = 200
-    private val cameraRequest = 101
-    private val savedInstanceUri = "uri"
-    private val savedInstanceResult = "result"
 
     private var barcodeDetector: BarcodeDetector? = null
     private var cameraSource: CameraSource? = null
     var intentData = ""
-    var isEmail = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,25 +39,9 @@ class ScanFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_scan, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initViews()
-    }
-
-
-    private fun initViews() {
-        btnAction.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                if (intentData.length > 0) {
-                    //TODO search
-                    print("Searching...")
-                }
-            }
-        })
-    }
-
     private fun initialiseDetectorsAndSources() {
         val currentContext = context?: return
-        Toast.makeText(context, "Barcode scanner started", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Please scan a book", Toast.LENGTH_SHORT)
             .show()
         barcodeDetector = BarcodeDetector.Builder(currentContext)
             .setBarcodeFormats(Barcode.ALL_FORMATS)
@@ -110,28 +84,20 @@ class ScanFragment : Fragment() {
         })
         barcodeDetector?.setProcessor(object : Detector.Processor<Barcode> {
             override fun release() {
-                Toast.makeText(
-                    context,
-                    "To prevent memory leaks barcode scanner has been stopped",
-                    Toast.LENGTH_SHORT
-                ).show()
+
             }
 
             override fun receiveDetections(detections: Detector.Detections<Barcode>) {
                 val barcodes = detections.detectedItems
                 if (barcodes.size() != 0) {
-                    txtBarcodeValue!!.post {
-                        if (barcodes.valueAt(0).email != null) {
-                            txtBarcodeValue!!.removeCallbacks(null)
-                            intentData = barcodes.valueAt(0).email.address
-                            txtBarcodeValue!!.text = intentData
-                            isEmail = true
-                            btnAction.text = "ADD CONTENT TO THE MAIL"
-                        } else {
-                            isEmail = false
-                            btnAction.text = "LAUNCH URL"
-                            intentData = barcodes.valueAt(0).displayValue
-                            txtBarcodeValue!!.text = intentData
+                    if(barcodes.valueAt(0).rawValue != null) {
+                        intentData = barcodes.valueAt(0).rawValue
+                        activity!!.runOnUiThread {
+                            Toast.makeText(
+                                activity,
+                                getString(R.string.code_detected),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
