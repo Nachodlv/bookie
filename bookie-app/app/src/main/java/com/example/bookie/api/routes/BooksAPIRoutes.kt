@@ -15,3 +15,13 @@ class SearchRecommendation(private val query: String, private val limitation: In
         get() = hashMapOf()
 
 }
+
+class IsbnSearch(private val isbn: String): BooksAPIRoute() {
+    override val url: String
+        get() = "$baseUrl/volumes?q=isbn:$isbn"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, String>
+        get() = hashMapOf()
+
+}

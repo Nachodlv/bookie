@@ -10,8 +10,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.bookie.R
+import com.example.bookie.models.Book
+import com.example.bookie.repositories.BookRepository
+import com.example.bookie.repositories.RepositoryStatus
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -26,7 +34,11 @@ class ScanFragment : Fragment() {
 
     private var barcodeDetector: BarcodeDetector? = null
     private var cameraSource: CameraSource? = null
-    var intentData = ""
+
+    private val injector = KodeinInjector()
+    private val bookRepository: BookRepository by injector.instance()
+
+    private var previousIsbn: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,11 +48,13 @@ class ScanFragment : Fragment() {
         scanViewModel =
             ViewModelProviders.of(this).get(ScanViewModel::class.java)
 
+        injector.inject(appKodein())
+
         return inflater.inflate(R.layout.fragment_scan, container, false)
     }
 
     private fun initialiseDetectorsAndSources() {
-        val currentContext = context?: return
+        val currentContext = context ?: return
         Toast.makeText(context, "Please scan a book", Toast.LENGTH_SHORT)
             .show()
         barcodeDetector = BarcodeDetector.Builder(currentContext)
@@ -90,16 +104,29 @@ class ScanFragment : Fragment() {
             override fun receiveDetections(detections: Detector.Detections<Barcode>) {
                 val barcodes = detections.detectedItems
                 if (barcodes.size() != 0) {
-                    if(barcodes.valueAt(0).rawValue != null) {
-                        intentData = barcodes.valueAt(0).rawValue
+                    if (barcodes.valueAt(0).rawValue != null) {
+                        val isbn = barcodes.valueAt(0).rawValue
+                        if (previousIsbn == isbn) return
+                        previousIsbn = isbn
                         activity!!.runOnUiThread {
-                            Toast.makeText(
-                                activity,
-                                getString(R.string.code_detected),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToast(getString(R.string.code_detected))
+                            observeSearchResult(bookRepository.searchByIsbn(isbn))
                         }
                     }
+                }
+            }
+        })
+    }
+
+
+    private fun observeSearchResult(result: LiveData<RepositoryStatus<Book>>) {
+        result.observe(this, Observer {
+            when (it) {
+                is RepositoryStatus.Success -> showToast("Your book is called ${it.data.title}")
+                is RepositoryStatus.Loading -> return@Observer
+                is RepositoryStatus.Error -> {
+                    previousIsbn = null
+                    showToast(it.error)
                 }
             }
         })
@@ -120,4 +147,11 @@ class ScanFragment : Fragment() {
     }
 
 
+    private fun showToast(message: String) {
+        Toast.makeText(
+            activity,
+            message,
+            Toast.LENGTH_LONG
+        ).show()
+    }
 }
