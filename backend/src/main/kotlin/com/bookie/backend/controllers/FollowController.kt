@@ -2,6 +2,7 @@ package com.bookie.backend.controllers
 
 import com.bookie.backend.dto.FollowRequest
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.FollowingException
@@ -36,17 +37,17 @@ class FollowController(private val userService: UserService) {
                @RequestHeader headers: Map<String, String>): ResponseEntity<FollowResponse> {
         val token = headers["authorization"]?.substring(7)
 
-        try {
-            if (token != null) {
-                this.userService.followUser(token, followRequest.userId)
+        if (token != null) {
+            return try {
+                val followedUser = this.userService.followUser(token, followRequest.userId)
+                ResponseEntity(followedUser.id?.let { FollowResponse(it, followedUser.firstName, followedUser.lastName, true) }, HttpStatus.OK)
+            } catch (e1: FollowingException) {
+                ResponseEntity(HttpStatus.CONFLICT)
+            } catch (e2: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
             }
-        } catch (e1: FollowingException) {
-            return ResponseEntity(HttpStatus.CONFLICT)
-        } catch (e2: UserNotFoundException) {
-            return ResponseEntity(HttpStatus.NOT_FOUND)
         }
-
-        return ResponseEntity(FollowResponse("User followed successfully"), HttpStatus.OK)
+        return ResponseEntity(HttpStatus.UNAUTHORIZED) // This shouldn't happen.
     }
 
     /**
@@ -69,16 +70,39 @@ class FollowController(private val userService: UserService) {
                @RequestHeader headers: Map<String, String>): ResponseEntity<FollowResponse> {
         val token = headers["authorization"]?.substring(7)
 
-        try {
-            if (token != null) {
-                this.userService.unfollowUser(token, followRequest.userId)
+        if (token !== null) {
+            return try {
+                val unfollowedUser = this.userService.unfollowUser(token, followRequest.userId)
+                ResponseEntity(unfollowedUser.id?.let { FollowResponse(it, unfollowedUser.firstName, unfollowedUser.lastName, false) }, HttpStatus.OK)
+            } catch (e1: FollowingException) {
+                return ResponseEntity(HttpStatus.CONFLICT) // We could return some other exception.
+            } catch (e2: UserNotFoundException) {
+                return ResponseEntity(HttpStatus.NOT_FOUND)
             }
-        } catch (e1: FollowingException) {
-            return ResponseEntity(HttpStatus.CONFLICT) // We could return some other exception.
-        } catch (e2: UserNotFoundException) {
-            return ResponseEntity(HttpStatus.NOT_FOUND)
         }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
 
-        return ResponseEntity(FollowResponse("User unfollowed successfully"), HttpStatus.OK)
+    // Add pagination
+    /**
+     * Returns the followers of a specific user (identified by the provided id)
+     *
+     * The result provides information on whether the currently logged user is following each user in it or not.
+     */
+    @GetMapping("/followers/{id}")
+    fun getFollowers(@PathVariable id: String): Unit {
+        // How should they be returned?
+        // We probably need a new DTO to add the data of whether the current user is following or not.
+    }
+
+    // Add pagination
+    /**
+     * Returns the users that a specific user follows (identified by the provided id)
+     *
+     * The result provides information on whether the currently logged user is following each user in it or not.
+     */
+    @GetMapping("/following/{id}")
+    fun getFollowing(@PathVariable id: String): Unit {
+        // Same DTO as the one used in getFollowers.
     }
 }

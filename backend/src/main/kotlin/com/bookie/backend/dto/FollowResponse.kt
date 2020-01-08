@@ -1,3 +1,3 @@
 package com.bookie.backend.dto
 
-data class FollowResponse(val message: String) // What information should we send here?
+data class FollowResponse(val id: String, val firstName: String, val lastName: String, val followed: Boolean? = null)

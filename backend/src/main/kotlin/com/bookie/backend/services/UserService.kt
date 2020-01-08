@@ -65,7 +65,7 @@ class UserService(val userDao: UserDao,
      * @param token: The token of the currently logged in user, received in the request.
      * @param id: The string of the user to be followed.
      */
-    fun followUser(token: String, id: String) {
+    fun followUser(token: String, id: String): User {
 
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
@@ -75,6 +75,8 @@ class UserService(val userDao: UserDao,
         followedUser.addFollower(loggedUser)
         update(loggedUser)
         update(followedUser)
+
+        return followedUser
     }
 
     /**
@@ -86,7 +88,7 @@ class UserService(val userDao: UserDao,
      * @param token: The token of the currently logged in user, received in the request.
      * @param id: The string of the user to be unfollowed.
      */
-    fun unfollowUser(token: String, id: String) {
+    fun unfollowUser(token: String, id: String): User {
 
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
@@ -96,5 +98,7 @@ class UserService(val userDao: UserDao,
         followedUser.removeFollower(loggedUser)
         update(loggedUser)
         update(followedUser)
+
+        return followedUser
     }
 }
