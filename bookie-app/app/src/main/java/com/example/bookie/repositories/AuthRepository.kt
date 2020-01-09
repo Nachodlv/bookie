@@ -6,6 +6,9 @@ import com.example.bookie.api.client.AuthClient
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.dao.UserDao
 import com.example.bookie.models.User
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.Executor
 
 class AuthRepository constructor(
@@ -13,7 +16,7 @@ class AuthRepository constructor(
     private val authClient: AuthClient,
     private val userDao: UserDao,
     private val executor: Executor
-    ) {
+) {
     private val status: MutableLiveData<RepositoryStatus<User>> by lazy {
         val list = MutableLiveData<RepositoryStatus<User>>()
         list.value = RepositoryStatus.Loading()
@@ -43,27 +46,31 @@ class AuthRepository constructor(
     fun getUserLoggedIn(): LiveData<RepositoryStatus<User>> {
 
         val jwt = sharedPreferencesDao.getTokenAsJwt()
-        if(jwt == null)
+        if (jwt == null)
             status.value = RepositoryStatus.Error("Authentication Error")
         else {
             val subject = jwt.subject
-            if(subject != null) refreshUser(subject)
+            if (subject != null) refreshUser(subject)
         }
 
         return status
     }
 
-    fun refreshUser(email: String) {
+    private fun refreshUser(email: String) {
         // Runs in a background thread.
         executor.execute {
             // Check if user data was fetched recently.
             val userExists = userDao.hasUserByEmail(email, UserRepository.FRESH_TIMEOUT)
+
             if (userExists == null) {
-                authClient.getUserLoggedIn({ user, _ ->
-                    userDao.save(user)
+                authClient.getUserLoggedIn({ user ->
+                    executor.execute {
+                        user.lastFetch = Calendar.getInstance().timeInMillis
+                        userDao.save(user)
+                    }
                     status.value = RepositoryStatus.Success(user)
                 }, { _, message -> status.value = RepositoryStatus.Error(message) })
-            } else status.value = RepositoryStatus.Success(userExists)
+            } else GlobalScope.launch {  status.postValue(RepositoryStatus.Success(userExists))}
         }
     }
 }
