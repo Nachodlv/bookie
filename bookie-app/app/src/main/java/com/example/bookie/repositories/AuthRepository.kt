@@ -56,6 +56,10 @@ class AuthRepository constructor(
         return status
     }
 
+    fun logout() {
+        sharedPreferencesDao.deleteToken()
+    }
+
     private fun refreshUser(email: String) {
         // Runs in a background thread.
         executor.execute {
