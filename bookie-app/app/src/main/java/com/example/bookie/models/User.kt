@@ -10,7 +10,7 @@ import java.util.*
 data class User(
     @PrimaryKey @SerializedName("id") @ColumnInfo(name = "id") val id: Long,
     @SerializedName("email") @ColumnInfo(name = "email") val email: String,
-    @SerializedName("name") @ColumnInfo(name = "name") val name: String,
+    @SerializedName("firstName") @ColumnInfo(name = "firstName") val firstName: String,
     @SerializedName("lastName") @ColumnInfo(name = "lastName") val lastName: String,
     @ColumnInfo(name = "lastFetch") val lastFetch: Long = Calendar.getInstance().timeInMillis
 ) : JSONConvertable

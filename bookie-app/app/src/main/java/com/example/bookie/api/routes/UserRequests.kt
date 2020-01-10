@@ -21,7 +21,7 @@ class Login(var email: String, var password: String) :
 class Register(
     private val email: String,
     private val password: String,
-    private val name: String,
+    private val firstName: String,
     private val lastName: String
 ) : ApiRoute() {
 
@@ -34,7 +34,7 @@ class Register(
         get() = hashMapOf(
             "email" to email,
             "password" to password,
-            "name" to name,
+            "firstName" to firstName,
             "lastName" to lastName
         )
 }
