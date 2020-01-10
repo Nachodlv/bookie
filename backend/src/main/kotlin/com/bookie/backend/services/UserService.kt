@@ -1,10 +1,13 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.SelfFollowingException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -44,6 +47,13 @@ class UserService(val userDao: UserDao,
     fun getByEmail(email: String): Optional<User> = userDao.findByEmail(email)
 
     /**
+     * Returns some of a user's data.
+     *
+     * @param id: The id of the user
+     */
+    fun getUserDataById(id: String): Optional<UserData> = userDao.findUserDataById(id)
+
+    /**
      * Registers a new user.
      */
     fun registerUser(user: UserDto): User {
@@ -65,16 +75,20 @@ class UserService(val userDao: UserDao,
      * @param token: The token of the currently logged in user, received in the request.
      * @param id: The string of the user to be followed.
      */
-    fun followUser(token: String, id: String) {
+    fun followUser(token: String, id: String): User {
 
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
+
+        if (loggedUser.id == id) throw SelfFollowingException("You can't follow yourself")
 
         val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
 
         followedUser.addFollower(loggedUser)
         update(loggedUser)
         update(followedUser)
+
+        return followedUser
     }
 
     /**
@@ -86,7 +100,7 @@ class UserService(val userDao: UserDao,
      * @param token: The token of the currently logged in user, received in the request.
      * @param id: The string of the user to be unfollowed.
      */
-    fun unfollowUser(token: String, id: String) {
+    fun unfollowUser(token: String, id: String): User {
 
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
@@ -96,6 +110,74 @@ class UserService(val userDao: UserDao,
         followedUser.removeFollower(loggedUser)
         update(loggedUser)
         update(followedUser)
+
+        return followedUser
+    }
+
+    /**
+     * Gets the followers for a specific user.
+     *
+     * Information is also provided about whether the current user is following each of the users in the result list or not.
+     *
+     * @param id: The id of the user whose followers will be returned
+     * @param page: The page number
+     * @param size: The size of the page
+     * @param token: The authorization token of the current user
+     */
+    fun getFollowers(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        val following = userDao.findAllFollowingByEmail(email).following
+
+        val result = userDao.findFollowersById(id, page * size, size)
+        if (!result.isPresent) throw UserNotFoundException("No user found with that id")
+
+        val followerList: List<FollowResponse> = result.get().followers
+
+        checkFollowing(followerList, following)
+        return followerList
+    }
+
+    /**
+     * Gets the users that a specific user follows.
+     *
+     * Information is also provided about whether the current user is following each of the users in the result list or not.
+     *
+     * @param id: The id of the user
+     * @param page: The page number
+     * @param size: The size of the page
+     * @param token: The authorization token of the current user
+     */
+    fun getFollowing(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        val following = userDao.findAllFollowingByEmail(email).following
+
+        val result = userDao.findFollowingById(id, page * size, size)
+        if (!result.isPresent) throw UserNotFoundException("No user found with that id")
+
+        val followerList: List<FollowResponse> = result.get().following
+
+        checkFollowing(followerList, following)
+        return followerList
+    }
+
+    /**
+     * For each item in result, we check if there is an item in following with the same id.
+     * If there is, then the followed value in the result item is set to true.
+     *
+     * @param result: The follower list to be returned
+     * @param following: A list with the users that the current user follows
+     */
+    private fun checkFollowing(result: List<FollowResponse>, following: List<FollowResponse>) {
+        result.map{
+            item ->
+            run {
+                if (following.firstOrNull { entry -> entry.id == item.id } !== null) {
+                    item.followed = true
+                    print("test")
+                }
+            }
+        }
+
     }
 
     /**
