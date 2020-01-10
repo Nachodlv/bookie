@@ -1,9 +1,7 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.FollowResponse
-import com.bookie.backend.dto.FollowResponseList
 import com.bookie.backend.dto.UserDto
-import com.bookie.backend.models.Follower
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
@@ -105,15 +103,47 @@ class UserService(val userDao: UserDao,
         return followedUser
     }
 
-    fun getFollowers(id: String, page: Int, size: Int): List<FollowResponse> { // Should we return the DTO here? Page<List<Follower>>
-        // How do we ask the dao layer to get the followers of a user by user id? (This should be possible)
-        // This is required in order to get the results as different pages
-        // If we simply get all the followers, we would have to handle pagination ourselves, which is less than ideal.
-        // Once we get a page of followers (check how to implement that) we need to check for each one if the current user follows them
-        return  userDao.findFollowersById(id, page * size, size).followers
+    /**
+     * Gets the followers for a specific user.
+     *
+     * Information is also provided about whether the current user is following each of the users in the result list or not.
+     *
+     * @param id: The id of the user whose followers will be returned
+     * @param page: The page number
+     * @param size: The size of the page
+     * @param token: The authorization token of the current user.
+     */
+    fun getFollowers(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        val following = userDao.findAllFollowingByEmail(email).followers
+
+        val followerList: List<FollowResponse> = userDao.findFollowersById(id, page * size, size).followers
+
+        checkFollowing(followerList, following)
+        return followerList
     }
 
     fun getFollowing(id: String, pageable: Pageable) {
+
+    }
+
+    /**
+     * For each item in result, we check if there is an item in following with the same id.
+     * If there is, then the followed value in the result item is set to true.
+     *
+     * @param result: The follower list to be returned
+     * @param following: A list with the users that the current user follows
+     */
+    private fun checkFollowing(result: List<FollowResponse>, following: List<FollowResponse>) {
+        result.map{
+            item ->
+            run {
+                if (following.firstOrNull { entry -> entry.id == item.id } !== null) {
+                    item.followed = true
+                    print("test")
+                }
+            }
+        }
 
     }
 }

@@ -88,17 +88,34 @@ class FollowController(private val userService: UserService) {
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
-    // Add pagination
     /**
      * Returns the followers of a specific user (identified by the provided id)
      *
      * The result provides information on whether the currently logged user is following each user in it or not.
+     *
+     * The data returned has the following structure:
+     *
+     * [
+     *     {
+     *         id: String
+     *         firstName: String
+     *         lastName: String
+     *         followed: Boolean
+     *     }
+     * ]
+     *
+     * The followed attribute will be true if the current user is following that user.
      */
     @GetMapping("/followers/{id}")
     fun getFollowers(@PathVariable id: String,
                      @PathParam(value = "page") page: Int = 0,
-                     @PathParam(value = "size") size: Int = 10): List<FollowResponse> { // ResponseEntity<Page<FollowResponse>> Page<List<Follower>>
-        return userService.getFollowers(id, page, size)
+                     @PathParam(value = "size") size: Int = 10,
+                     @RequestHeader headers: Map<String, String>): ResponseEntity<List<FollowResponse>> {
+        val token = headers["authorization"]?.substring(7)
+        if (token !== null) {
+            return ResponseEntity(userService.getFollowers(id, page, size, token), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
     // Add pagination
