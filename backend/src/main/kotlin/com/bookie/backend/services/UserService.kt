@@ -1,6 +1,9 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.FollowResponseList
 import com.bookie.backend.dto.UserDto
+import com.bookie.backend.models.Follower
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
@@ -100,5 +103,17 @@ class UserService(val userDao: UserDao,
         update(followedUser)
 
         return followedUser
+    }
+
+    fun getFollowers(id: String, page: Int, size: Int): List<FollowResponse> { // Should we return the DTO here? Page<List<Follower>>
+        // How do we ask the dao layer to get the followers of a user by user id? (This should be possible)
+        // This is required in order to get the results as different pages
+        // If we simply get all the followers, we would have to handle pagination ourselves, which is less than ideal.
+        // Once we get a page of followers (check how to implement that) we need to check for each one if the current user follows them
+        return  userDao.findFollowersById(id, page * size, size).followers
+    }
+
+    fun getFollowing(id: String, pageable: Pageable) {
+
     }
 }

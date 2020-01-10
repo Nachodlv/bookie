@@ -2,14 +2,19 @@ package com.bookie.backend.controllers
 
 import com.bookie.backend.dto.FollowRequest
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.FollowResponseList
+import com.bookie.backend.models.Follower
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.FollowingException
 import com.bookie.backend.util.exceptions.UserNotFoundException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.websocket.server.PathParam
 
 @RestController
 @RequestMapping("/user")
@@ -90,9 +95,10 @@ class FollowController(private val userService: UserService) {
      * The result provides information on whether the currently logged user is following each user in it or not.
      */
     @GetMapping("/followers/{id}")
-    fun getFollowers(@PathVariable id: String): Unit {
-        // How should they be returned?
-        // We probably need a new DTO to add the data of whether the current user is following or not.
+    fun getFollowers(@PathVariable id: String,
+                     @PathParam(value = "page") page: Int = 0,
+                     @PathParam(value = "size") size: Int = 10): List<FollowResponse> { // ResponseEntity<Page<FollowResponse>> Page<List<Follower>>
+        return userService.getFollowers(id, page, size)
     }
 
     // Add pagination
@@ -102,7 +108,8 @@ class FollowController(private val userService: UserService) {
      * The result provides information on whether the currently logged user is following each user in it or not.
      */
     @GetMapping("/following/{id}")
-    fun getFollowing(@PathVariable id: String): Unit {
+    fun getFollowing(@PathVariable id: String, pageable: Pageable) {
         // Same DTO as the one used in getFollowers.
+        this.userService.getFollowing(id, pageable)
     }
 }
