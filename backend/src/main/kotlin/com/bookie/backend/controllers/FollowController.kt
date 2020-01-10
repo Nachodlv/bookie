@@ -8,6 +8,7 @@ import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.FollowingException
+import com.bookie.backend.util.exceptions.SelfFollowingException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -50,6 +51,8 @@ class FollowController(private val userService: UserService) {
                 ResponseEntity(HttpStatus.CONFLICT)
             } catch (e2: UserNotFoundException) {
                 ResponseEntity(HttpStatus.NOT_FOUND)
+            } catch (e3: SelfFollowingException) {
+                ResponseEntity(HttpStatus.BAD_REQUEST)
             }
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED) // This shouldn't happen.

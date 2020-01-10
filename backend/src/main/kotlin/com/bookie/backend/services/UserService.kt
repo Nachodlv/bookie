@@ -7,6 +7,7 @@ import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.SelfFollowingException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -78,6 +79,8 @@ class UserService(val userDao: UserDao,
 
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
+
+        if (loggedUser.id == id) throw SelfFollowingException("You can't follow yourself")
 
         val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
 
