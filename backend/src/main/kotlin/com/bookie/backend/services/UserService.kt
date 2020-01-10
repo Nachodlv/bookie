@@ -111,11 +111,11 @@ class UserService(val userDao: UserDao,
      * @param id: The id of the user whose followers will be returned
      * @param page: The page number
      * @param size: The size of the page
-     * @param token: The authorization token of the current user.
+     * @param token: The authorization token of the current user
      */
     fun getFollowers(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
         val email = tokenUtil.getUsernameFromToken(token)
-        val following = userDao.findAllFollowingByEmail(email).followers
+        val following = userDao.findAllFollowingByEmail(email).following
 
         val followerList: List<FollowResponse> = userDao.findFollowersById(id, page * size, size).followers
 
@@ -123,8 +123,25 @@ class UserService(val userDao: UserDao,
         return followerList
     }
 
-    fun getFollowing(id: String, pageable: Pageable) {
+    /**
+     * Gets the users that a specific user follows.
+     *
+     * Information is also provided about whether the current user is following each of the users in the result list or not.
+     *
+     * @param id: The id of the user
+     * @param page: The page number
+     * @param size: The size of the page
+     * @param token: The authorization token of the current user
+     */
+    fun getFollowing(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        val test = userDao.findAllFollowingByEmail(email)
+        val following = userDao.findAllFollowingByEmail(email).following
 
+        val followerList: List<FollowResponse> = userDao.findFollowingById(id, page * size, size).following
+
+        checkFollowing(followerList, following)
+        return followerList
     }
 
     /**
