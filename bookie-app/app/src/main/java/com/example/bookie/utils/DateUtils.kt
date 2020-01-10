@@ -32,7 +32,7 @@ object DateUtils {
         }else if (elapsedMinutes >= 1) {
             return "$elapsedMinutes minutes ago"
         } else {
-            return "just now"
+            return "Just now"
         }
     }
 

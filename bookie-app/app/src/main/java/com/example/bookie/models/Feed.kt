@@ -40,6 +40,6 @@ class FollowerReview(
         @SerializedName("time") val time: Date)
     : FeedItem(id, title, author, image, type)
 
-enum class FeedItemType {
-    BOOK, COMMENT, REVIEW
+enum class FeedItemType(val id: Int) {
+    BOOK(0), COMMENT(1), REVIEW(2)
 }
