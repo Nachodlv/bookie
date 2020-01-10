@@ -80,8 +80,8 @@ class BookController(private val bookService: BookService) {
      */
     @GetMapping("/reviews/{id}")
     fun getReviews(@PathVariable id: String,
-                   @PathParam(value = "page") page: Int = 0,
-                   @PathParam(value = "size") size: Int = 10): ResponseEntity<List<Review>> {
+                   @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
+                   @RequestParam(value = "size",required = false, defaultValue = "10") size: Int): ResponseEntity<List<Review>> {
         return ResponseEntity(bookService.getReviews(id, page, size), HttpStatus.OK)
     }
 }
