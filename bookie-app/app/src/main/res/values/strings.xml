@@ -47,4 +47,11 @@
 
 <!--    ERRORS-->
     <string name="no_internet">Can\'t connect to the internet</string>
+    <string name="default_error">An unexpected error occurred</string>
+
+<!--    SCAN-->
+    <string name="scanning">Scanning…</string>
+    <string name="code_detected">Code detected. Searching for the book</string>
+    <string name="start_scanning">Looking for the book…</string>
+    <string name="no_book_found">No book found with that code</string>
 </resources>

@@ -25,12 +25,18 @@ class MyApplication : Application(), KodeinAware {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
+        MyApplication.kodein = kodein
     }
 
     companion object {
         private var context: Context? = null
+        private lateinit var kodein: Kodein
+
         val appContext: Context?
             get() = context
+
+        val appKodein: Kodein
+            get() = kodein
     }
 }
 

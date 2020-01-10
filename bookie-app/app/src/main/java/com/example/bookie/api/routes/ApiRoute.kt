@@ -1,12 +1,11 @@
 package com.example.bookie.api.routes
 
-import android.content.Context
-
-abstract class ApiRoute(private var token: String? = null) {
+abstract class ApiRoute(
+    private var token: String? = null,
+    val baseUrl: String = "http://10.0.2.2:8080"
+) {
 
     val timeOut = 3000
-
-    val baseUrl = "http://10.0.2.2:8080"
 
     abstract val url: String
 
@@ -18,7 +17,7 @@ abstract class ApiRoute(private var token: String? = null) {
         get() {
             val map: HashMap<String, String> = hashMapOf()
             map["Content-Type"] = "application/json"
-            if(token != null) map["Authorization"] = "Bearer $token"
+            if (token != null) map["Authorization"] = "Bearer $token"
             return map
         }
 
