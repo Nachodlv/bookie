@@ -116,7 +116,12 @@ class FollowController(private val userService: UserService) {
                      @RequestHeader headers: Map<String, String>): ResponseEntity<List<FollowResponse>> {
         val token = headers["authorization"]?.substring(7)
         if (token !== null) {
-            return ResponseEntity(userService.getFollowers(id, page, size, token), HttpStatus.OK)
+            return try {
+                ResponseEntity(userService.getFollowers(id, page, size, token), HttpStatus.OK)
+            } catch (e: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
@@ -146,7 +151,12 @@ class FollowController(private val userService: UserService) {
                      @RequestHeader headers: Map<String, String>): ResponseEntity<List<FollowResponse>> {
         val token = headers["authorization"]?.substring(7)
         if (token !== null) {
-            return ResponseEntity(userService.getFollowing(id, page, size, token), HttpStatus.OK)
+            return try {
+                ResponseEntity(userService.getFollowing(id, page, size, token), HttpStatus.OK)
+            } catch (e: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }

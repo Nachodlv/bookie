@@ -23,7 +23,7 @@ interface UserDao: MongoRepository<User, String> {
      * @param limit: The maximum amount of followers to be returned
      */
     @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'followers' : { '\$slice' : [ ?1, ?2 ] } }")
-    fun findFollowersById(id: String, skip: Int, limit: Int): FollowResponseList
+    fun findFollowersById(id: String, skip: Int, limit: Int): Optional<FollowResponseList>
 
     /**
      * Finds the users that a specific user is following.
@@ -33,7 +33,7 @@ interface UserDao: MongoRepository<User, String> {
      * @param limit: The maximum amount of followers to be returned
      */
     @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'following' : { '\$slice' : [ ?1, ?2 ] } }")
-    fun findFollowingById(id: String, skip: Int, limit: Int): FollowingResponseList
+    fun findFollowingById(id: String, skip: Int, limit: Int): Optional<FollowingResponseList>
 
     /**
      * Finds all the users that a specific user follows. (Taken from the "following" list)
