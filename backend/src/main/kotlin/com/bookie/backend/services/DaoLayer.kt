@@ -1,9 +1,6 @@
 package com.bookie.backend.services
 
-import com.bookie.backend.dto.FollowResponseList
-import com.bookie.backend.dto.FollowingResponseList
-import com.bookie.backend.dto.RatingResponse
-import com.bookie.backend.dto.UserData
+import com.bookie.backend.dto.*
 import com.bookie.backend.models.Book
 import com.bookie.backend.models.User
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -53,4 +50,14 @@ interface BookDao: MongoRepository<Book, String> {
      */
     @Query(value="{ 'id' : ?0 }", fields="{ 'reviews': 0 }")
     fun findScoreById(id: String): Optional<RatingResponse>
+
+    /**
+     * Finds the reviews of a specific book.
+     *
+     * @param id: The id of the book whose reviews will be returned
+     * @param skip: The amount of reviews to skip before the first result (If using page and size, skip would be page * size)
+     * @param limit: The maximum amount of reviews to be returned
+     */
+    @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'reviews' : { '\$slice' : [ ?1, ?2 ] } }")
+    fun findReviewsById(id: String, skip: Int, limit: Int): Optional<ReviewList>
 }

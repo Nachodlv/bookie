@@ -81,12 +81,17 @@ class BookService(val bookDao: BookDao,
     fun getBookScore(id: String): RatingResponse {
         val result = bookDao.findScoreById(id)
         return result.orElse(RatingResponse(id, 0.0, 0))
-        /*
+    }
+
+    /**
+     * Returns the reviews for a specific book.
+     */
+    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+        val result = bookDao.findReviewsById(id, page * size, size)
         if (result.isPresent) {
-            return result.get()
+            return result.get().reviews
         }
-        // return ScoreResponse(id, 0.0, 0)
-         */
+        return emptyList()
     }
 
 }

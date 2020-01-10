@@ -8,6 +8,7 @@ import com.bookie.backend.util.exceptions.InvalidScoreException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.websocket.server.PathParam
 
 @RestController
 @RequestMapping("/book")
@@ -56,5 +57,31 @@ class BookController(private val bookService: BookService) {
     @GetMapping("/rating/{id}")
     fun getBookScore(@PathVariable id: String): ResponseEntity<RatingResponse> {
         return ResponseEntity(bookService.getBookScore(id), HttpStatus.OK)
+    }
+
+    /**
+     * Returns a page of reviews for a specific book
+     *
+     * The structure of the response is as follows:
+     *
+     * {
+     *     id: String,
+     *     comment: String,
+     *     rating: Int,
+     *     author: {
+     *         id: String,
+     *         firstName: String,
+     *         lastName: String
+     *     },
+     *     timestamp: Instant
+     * }
+     *
+     * If there are no reviews for the book, an empty list is returned.
+     */
+    @GetMapping("/reviews/{id}")
+    fun getReviews(@PathVariable id: String,
+                   @PathParam(value = "page") page: Int = 0,
+                   @PathParam(value = "size") size: Int = 10): ResponseEntity<List<Review>> {
+        return ResponseEntity(bookService.getReviews(id, page, size), HttpStatus.OK)
     }
 }
