@@ -1,0 +1,41 @@
+package com.bookie.backend.controllers
+
+import com.bookie.backend.dto.ReviewRequest
+import com.bookie.backend.models.Review
+import com.bookie.backend.services.BookService
+import com.bookie.backend.util.exceptions.InvalidScoreException
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/book")
+class BookController(private val bookService: BookService) {
+
+    /**
+     * Adds a new review to a book
+     *
+     * The structure of the request should be the following:
+     *
+     * {
+     *     id: String,
+     *     comment: String,
+     *     score: String
+     * }
+     *
+     * Where id is the id of the book, comment is the text entered by the user and score is a value from 1 to 5
+     */
+    @PostMapping("/review")
+    fun reviewBook(@RequestBody review: ReviewRequest,
+                   @RequestHeader headers: Map<String, String>): ResponseEntity<Review> {
+        val token = headers["authorization"]?.substring(7)
+        if (token != null) {
+            return try {
+                ResponseEntity(bookService.reviewBook(review.id, review.comment, review.score, token), HttpStatus.OK)
+            } catch (e: InvalidScoreException) {
+                ResponseEntity(HttpStatus.BAD_REQUEST)
+            }
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
+}

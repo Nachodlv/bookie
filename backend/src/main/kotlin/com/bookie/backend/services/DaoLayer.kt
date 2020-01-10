@@ -3,6 +3,7 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.FollowResponseList
 import com.bookie.backend.dto.FollowingResponseList
 import com.bookie.backend.dto.UserData
+import com.bookie.backend.models.Book
 import com.bookie.backend.models.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
@@ -42,4 +43,8 @@ interface UserDao: MongoRepository<User, String> {
      */
     @Query(value="{ 'email' : ?0 }", fields="{ 'id' : 0, 'following' : 1 }")
     fun findAllFollowingByEmail(email: String): FollowingResponseList
+}
+
+interface BookDao: MongoRepository<Book, String> {
+
 }
