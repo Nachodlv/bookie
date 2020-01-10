@@ -13,7 +13,7 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 
-@Database(entities = [User::class, Book::class], version = 5)
+@Database(entities = [User::class, Book::class], version = 6)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

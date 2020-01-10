@@ -6,6 +6,7 @@ import com.example.bookie.api.routes.Login
 import com.example.bookie.api.routes.UserLogged
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.User
+import com.example.bookie.models.toObject
 
 class AuthClient(ctx: Context?, val sharedPreferencesDao: SharedPreferencesDao) : ApiClient(ctx) {
     /**
@@ -37,14 +38,22 @@ class AuthClient(ctx: Context?, val sharedPreferencesDao: SharedPreferencesDao) 
     }
 
     fun getUserLoggedIn(
-        completion: (user: User, message: String) -> Unit,
+        completion: (user: User) -> Unit,
         onError: (errorCode: Int, message: String) -> Unit
     ) {
         if (ctx == null) return
         val token = sharedPreferencesDao.getToken() ?: return
         val route = UserLogged(token)
-        this.performRequest(route) { reponse ->
-
+        this.performRequest(route) { response ->
+            when(response.statusCode) {
+                200 -> {
+                    val user = response.json.toObject<User>()
+                    completion(user)
+                }
+                else -> {
+                    onError(response.statusCode, ctx.getString(R.string.error_getting_user))
+                }
+            }
         }
 
     }

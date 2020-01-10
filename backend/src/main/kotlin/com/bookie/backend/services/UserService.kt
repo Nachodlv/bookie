@@ -3,6 +3,7 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
+import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : BasicCrud<String, User> {
+class UserService(val userDao: UserDao,
+                  val passwordEncoder: PasswordEncoder,
+                  val tokenUtil: JwtTokenUtil) : BasicCrud<String, User> {
 
     override fun getAll(pageable: Pageable): Page<User> = userDao.findAll(pageable)
 
@@ -50,5 +53,13 @@ class UserService(val userDao: UserDao, val passwordEncoder: PasswordEncoder) : 
                 user.email,
                 passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
+    }
+
+    /**
+     * Returns the user for the token provided.
+     */
+    fun getByToken(token: String): Optional<User> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        return getByEmail(email)
     }
 }

@@ -60,4 +60,20 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.CONFLICT) // We could send a message too, but how do we do that?
         }
     }
+
+    /**
+     * Returns the data of the currently logged in user.
+     */
+    @GetMapping("/current")
+    fun getCurrentUser(@RequestHeader headers: Map<String, String>): Optional<User> {
+
+        val token = headers["authorization"]?.substring(7)
+
+        return if (token != null) {
+            userService.getByToken(token)
+        } else {
+            Optional.empty() // This could be handled better, but token cannot be null because the method wouldn't be executed in that case.
+        }
+    }
+
 }
