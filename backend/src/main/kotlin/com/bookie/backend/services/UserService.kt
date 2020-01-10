@@ -1,6 +1,7 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
@@ -43,6 +44,13 @@ class UserService(val userDao: UserDao,
      * Looks for a user with the specified email.
      */
     fun getByEmail(email: String): Optional<User> = userDao.findByEmail(email)
+
+    /**
+     * Returns some of a user's data.
+     *
+     * @param id: The id of the user
+     */
+    fun getUserDataById(id: String): Optional<UserData> = userDao.findUserDataById(id)
 
     /**
      * Registers a new user.
@@ -135,7 +143,6 @@ class UserService(val userDao: UserDao,
      */
     fun getFollowing(id: String, page: Int, size: Int, token: String): List<FollowResponse> {
         val email = tokenUtil.getUsernameFromToken(token)
-        val test = userDao.findAllFollowingByEmail(email)
         val following = userDao.findAllFollowingByEmail(email).following
 
         val followerList: List<FollowResponse> = userDao.findFollowingById(id, page * size, size).following

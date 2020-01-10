@@ -2,6 +2,7 @@ package com.bookie.backend.services
 
 import com.bookie.backend.dto.FollowResponseList
 import com.bookie.backend.dto.FollowingResponseList
+import com.bookie.backend.dto.UserData
 import com.bookie.backend.models.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
@@ -10,6 +11,9 @@ import java.util.*
 interface UserDao: MongoRepository<User, String> {
 
     fun findByEmail(email: String): Optional<User>
+
+    @Query(value="{ 'id' : ?0 }")
+    fun findUserDataById(id: String): Optional<UserData> // Does this work correctly?
 
     /**
      * Finds the followers for a specific user.
