@@ -173,4 +173,12 @@ class UserService(val userDao: UserDao,
         }
 
     }
+
+    /**
+     * Returns the user for the token provided.
+     */
+    fun getByToken(token: String): Optional<User> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        return getByEmail(email)
+    }
 }

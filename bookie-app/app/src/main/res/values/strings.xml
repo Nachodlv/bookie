@@ -2,6 +2,32 @@
     <string name="app_name">BookieApp</string>
     <string name="app_logo">BookieApp logo</string>
 
+<!--    SHARED PREFERENCES-->
+    <string name="shared_preferences">app.bookie.com.shared_preferences</string>
+    <string name="login_token">login_token</string>
+
+<!--    LOGIN -->
+    <string name="email_input">Email</string>
+    <string name="password_input">Password</string>
+    <string name="login_button">Login</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="register">Register</string>
+    <string name="empty_input">The input can not be empty</string>
+    <string name="login_successful">The login was made successfully</string>
+    <string name="invalid_credentials">The email or the password are incorrect</string>
+    <string name="login_unsuccessful">An error occurred while trying to login</string>
+    <string name="error_getting_user">An error occurred while getting the logged user</string>
+
+<!--    REGISTER -->
+    <string name="name">Name</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="invalid_password">The password must have more than six characters</string>
+    <string name="invalid_repeat_password">The passwords must match</string>
+    <string name="lastName">Last name</string>
+    <string name="register_successful">The registration was made successfully</string>
+    <string name="register_unsuccessful">An error occurred while trying to register</string>
+    <string name="email_repeated">The email is already taken</string>
 
     <!--NAVIGATION-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -16,22 +42,16 @@
     <string name="menu_shelf">Shelf</string>
     <string name="menu_settings">Settings</string>
 
-<!--    LOGIN -->
-    <string name="email_input">Email</string>
-    <string name="password_input">Password</string>
-    <string name="login_button">Login</string>
-    <string name="invalid_email">Invalid Email</string>
-    <string name="forgot_password">Forgot your password?</string>
-    <string name="register">Register</string>
-    <string name="empty_input">The input can not be empty</string>
-
-<!--    REGISTER -->
-    <string name="name">Name</string>
-    <string name="repeat_password">Repeat password</string>
-    <string name="invalid_password">The password must have more than six characters</string>
-    <string name="invalid_repeat_password">The passwords must match</string>
-    <string name="lastName">Last name</string>
-
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
+
+<!--    ERRORS-->
+    <string name="no_internet">Can\'t connect to the internet</string>
+    <string name="default_error">An unexpected error occurred</string>
+
+<!--    SCAN-->
+    <string name="scanning">Scanning…</string>
+    <string name="code_detected">Code detected. Searching for the book</string>
+    <string name="start_scanning">Looking for the book…</string>
+    <string name="no_book_found">No book found with that code</string>
 </resources>
