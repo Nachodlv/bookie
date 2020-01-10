@@ -111,12 +111,17 @@ class FollowController(private val userService: UserService) {
      */
     @GetMapping("/followers/{id}")
     fun getFollowers(@PathVariable id: String,
-                     @PathParam(value = "page") page: Int = 0,
-                     @PathParam(value = "size") size: Int = 10,
+                     @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
+                     @RequestParam(value = "size",required = false, defaultValue = "10") size: Int,
                      @RequestHeader headers: Map<String, String>): ResponseEntity<List<FollowResponse>> {
         val token = headers["authorization"]?.substring(7)
         if (token !== null) {
-            return ResponseEntity(userService.getFollowers(id, page, size, token), HttpStatus.OK)
+            return try {
+                ResponseEntity(userService.getFollowers(id, page, size, token), HttpStatus.OK)
+            } catch (e: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
@@ -141,12 +146,17 @@ class FollowController(private val userService: UserService) {
      */
     @GetMapping("/following/{id}")
     fun getFollowing(@PathVariable id: String,
-                     @PathParam(value = "page") page: Int = 0,
-                     @PathParam(value = "size") size: Int = 10,
+                     @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
+                     @RequestParam(value = "size",required = false, defaultValue = "10") size: Int,
                      @RequestHeader headers: Map<String, String>): ResponseEntity<List<FollowResponse>> {
         val token = headers["authorization"]?.substring(7)
         if (token !== null) {
-            return ResponseEntity(userService.getFollowing(id, page, size, token), HttpStatus.OK)
+            return try {
+                ResponseEntity(userService.getFollowing(id, page, size, token), HttpStatus.OK)
+            } catch (e: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }

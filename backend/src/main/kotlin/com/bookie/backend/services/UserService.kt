@@ -128,7 +128,10 @@ class UserService(val userDao: UserDao,
         val email = tokenUtil.getUsernameFromToken(token)
         val following = userDao.findAllFollowingByEmail(email).following
 
-        val followerList: List<FollowResponse> = userDao.findFollowersById(id, page * size, size).followers
+        val result = userDao.findFollowersById(id, page * size, size)
+        if (!result.isPresent) throw UserNotFoundException("No user found with that id")
+
+        val followerList: List<FollowResponse> = result.get().followers
 
         checkFollowing(followerList, following)
         return followerList
@@ -148,7 +151,10 @@ class UserService(val userDao: UserDao,
         val email = tokenUtil.getUsernameFromToken(token)
         val following = userDao.findAllFollowingByEmail(email).following
 
-        val followerList: List<FollowResponse> = userDao.findFollowingById(id, page * size, size).following
+        val result = userDao.findFollowingById(id, page * size, size)
+        if (!result.isPresent) throw UserNotFoundException("No user found with that id")
+
+        val followerList: List<FollowResponse> = result.get().following
 
         checkFollowing(followerList, following)
         return followerList
@@ -172,5 +178,13 @@ class UserService(val userDao: UserDao,
             }
         }
 
+    }
+
+    /**
+     * Returns the user for the token provided.
+     */
+    fun getByToken(token: String): Optional<User> {
+        val email = tokenUtil.getUsernameFromToken(token)
+        return getByEmail(email)
     }
 }
