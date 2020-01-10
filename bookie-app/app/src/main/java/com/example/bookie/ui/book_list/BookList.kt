@@ -39,7 +39,7 @@ class BookList : AppCompatActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
         toolbar.setTitle(R.string.register)
         toolbar.setSubtitle(R.string.register)
-//        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
     private fun searchForBooks() {

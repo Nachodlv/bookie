@@ -6,6 +6,8 @@ import com.example.bookie.api.client.BookApiClient
 import com.example.bookie.dao.BookDao
 import com.example.bookie.models.Book
 import com.example.bookie.repositories.UserRepository.Companion.FRESH_TIMEOUT
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.Executor
 
@@ -53,6 +55,7 @@ class BookRepository constructor(
             isbn,
             { book ->
                 initStatus.value = RepositoryStatus.Success(book)
+                book.lastFetch = Calendar.getInstance().timeInMillis
                 executor.execute { bookDao.save(book) }
             },
             { error -> initStatus.value = RepositoryStatus.Error(error) })
@@ -68,13 +71,14 @@ class BookRepository constructor(
             if (bookExists == null) {
                 // Refreshes the data.
                 bookApiClient.getBookById(bookId, { book ->
-                    run {
+                    executor.execute {
+                        book.lastFetch = Calendar.getInstance().timeInMillis
                         book.let { bookDao.save(it) }
                         status.value = RepositoryStatus.Success(book)
 
                     }
-                }, { error -> status.value = RepositoryStatus.Error(error) })
-            } else status.value = RepositoryStatus.Success(bookExists)
+                }, { error -> GlobalScope.launch { status.postValue(RepositoryStatus.Error(error)) }})
+            } else GlobalScope.launch { status.postValue(RepositoryStatus.Success(bookExists))}
         }
     }
 
