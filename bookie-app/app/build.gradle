@@ -17,6 +17,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        buildConfigField("String", "API_KEY", API_KEY)
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -78,4 +79,15 @@ dependencies {
 //  dependency injection
     implementation 'com.github.salomonbrys.kodein:kodein:4.1.0'
     implementation 'com.github.salomonbrys.kodein:kodein-android:4.1.0'
+
+//  jwt
+    implementation 'com.auth0.android:jwtdecode:1.4.0'
+
+//  coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

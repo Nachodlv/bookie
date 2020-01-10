@@ -10,24 +10,6 @@ import com.example.bookie.models.toObject
 
 
 class UserClient(ctx: Context?) : ApiClient(ctx) {
-    /**
-     * --------- LOGIN USER ----------------------------
-     **/
-    fun loginUser(
-        email: String,
-        password: String,
-        completion: (user: User?, message: String) -> Unit
-    ) {
-        val route = Login(email, password)
-        this.performRequest(route) { response ->
-            if (response.statusCode == 200) {
-                val user: User = response.json.toObject()
-                completion.invoke(user, "Log in successful")
-            } else {
-                completion.invoke(null, "Error login in")
-            }
-        }
-    }
 
     /**
      * --------- REGISTER USER ----------------------------
