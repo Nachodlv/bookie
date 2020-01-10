@@ -45,7 +45,8 @@
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
 
-<!--    ERROR -->
+<!--    ERRORS-->
+    <string name="no_internet">Can\'t connect to the internet</string>
     <string name="default_error">An unexpected error occurred</string>
 
 <!--    SCAN-->
