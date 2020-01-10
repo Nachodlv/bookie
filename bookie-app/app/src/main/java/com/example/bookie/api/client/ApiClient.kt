@@ -48,10 +48,10 @@ abstract class ApiClient(val ctx: Context?) {
      * This method will make the creation of the answer as ApiResponse
      **/
     private fun handle(
-        networkResponse: NetworkResponse,
+        networkResponse: NetworkResponse?,
         completion: (apiResponse: ApiResponse) -> Unit
     ) {
-
+        if (networkResponse == null) return completion(ApiResponse(500, "Server error"))
         val ar = ApiResponse(
             networkResponse.statusCode,
             if (networkResponse.statusCode == 200)
