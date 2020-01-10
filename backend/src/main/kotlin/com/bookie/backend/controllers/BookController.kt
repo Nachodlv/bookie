@@ -1,6 +1,7 @@
 package com.bookie.backend.controllers
 
 import com.bookie.backend.dto.ReviewRequest
+import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.models.Review
 import com.bookie.backend.services.BookService
 import com.bookie.backend.util.exceptions.InvalidScoreException
@@ -37,5 +38,23 @@ class BookController(private val bookService: BookService) {
             }
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
+
+    /**
+     * Returns the score of a book, as well as the number of existing reviews
+     *
+     * The structure of the response is as follows:
+     *
+     * {
+     *     id: String,
+     *     rating: Double,
+     *     amountOfReviews: Int
+     * }
+     *
+     * If there are no reviews for book, the score returned will be 0
+     */
+    @GetMapping("/rating/{id}")
+    fun getBookScore(@PathVariable id: String): ResponseEntity<RatingResponse> {
+        return ResponseEntity(bookService.getBookScore(id), HttpStatus.OK)
     }
 }

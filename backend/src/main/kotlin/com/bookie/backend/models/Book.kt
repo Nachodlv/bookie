@@ -9,19 +9,20 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 data class Book(
         @Id val id: String, // This id is the same one as the one used by Google
-        var score: Double,
-        // val reviewAmount: Int
-        val reviews: MutableList<Review> = mutableListOf()) {
+        var rating: Double,
+        val reviews: MutableList<Review> = mutableListOf(),
+        var reviewAmount: Int = 0) {
 
     /**
      * Adds a new review to the
      */
     fun addReview(review: Review) {
-        recalculateScore(review.score.toDouble())
+        recalculateRating(review.rating.toDouble())
         this.reviews.add(review)
+        this.reviewAmount++
     }
 
-    private fun recalculateScore(score: Double) {
-        this.score = ( this.score * this.reviews.size + score ) / (this.reviews.size+1) // Check if this works correctly.
+    private fun recalculateRating(rating: Double) {
+        this.rating = ( this.rating * reviewAmount + rating ) / (reviewAmount+1)
     }
 }

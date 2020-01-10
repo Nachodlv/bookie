@@ -7,7 +7,7 @@ import java.time.Instant
 /**
  * Represents a book review
  */
-data class Review(val score: Int, // Score is a whole number
+data class Review(val rating: Int, // Score is a whole number
                   val comment: String,
                   val author: Author,
                   val timestamp: Instant,

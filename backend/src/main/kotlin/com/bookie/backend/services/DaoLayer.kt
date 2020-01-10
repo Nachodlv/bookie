@@ -2,6 +2,7 @@ package com.bookie.backend.services
 
 import com.bookie.backend.dto.FollowResponseList
 import com.bookie.backend.dto.FollowingResponseList
+import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.models.Book
 import com.bookie.backend.models.User
@@ -47,4 +48,9 @@ interface UserDao: MongoRepository<User, String> {
 
 interface BookDao: MongoRepository<Book, String> {
 
+    /**
+     * Returns the score for a specific book and the number of reviews.
+     */
+    @Query(value="{ 'id' : ?0 }", fields="{ 'reviews': 0 }")
+    fun findScoreById(id: String): Optional<RatingResponse>
 }

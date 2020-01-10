@@ -1,5 +1,6 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.models.Author
 import com.bookie.backend.models.Book
 import com.bookie.backend.models.Review
@@ -72,6 +73,20 @@ class BookService(val bookDao: BookDao,
         }
 
         return review
+    }
+
+    /**
+     * Returns the score for a specific book and the number of reviews.
+     */
+    fun getBookScore(id: String): RatingResponse {
+        val result = bookDao.findScoreById(id)
+        return result.orElse(RatingResponse(id, 0.0, 0))
+        /*
+        if (result.isPresent) {
+            return result.get()
+        }
+        // return ScoreResponse(id, 0.0, 0)
+         */
     }
 
 }
