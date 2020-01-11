@@ -11,10 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.*
 import com.example.bookie.repositories.AuthRepository
 import com.example.bookie.ui.login.LoginActivity
 import com.github.salomonbrys.kodein.KodeinInjector
@@ -74,7 +71,6 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBar(navController)
         setupNavigationMenu(navController)
-
     }
 
 
@@ -92,8 +88,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavigationMenu(navController: NavController) {
         val sideNavView = findViewById<NavigationView>(R.id.nav_view) ?: return
         sideNavView.setupWithNavController(navController)
-        sideNavView.setNavigationItemSelectedListener { onNavigationItemSelected(it) }
-
+        sideNavView.setNavigationItemSelectedListener { onNavigationItemSelected(it, navController) }
     }
 
     private fun setupActionBar(navController: NavController) {
@@ -104,11 +99,13 @@ class MainActivity : AppCompatActivity() {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
     }
 
-    private fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
+    private fun onNavigationItemSelected(menuItem: MenuItem, navController: NavController): Boolean {
         when (menuItem.itemId) {
             R.id.action_logout -> onLogoutPressed()
+            else -> menuItem.onNavDestinationSelected(navController)
         }
-        return true //To change body of created functions use File | Settings | File Templates.
+        drawerLayout.closeDrawers()
+        return true
     }
 
     private fun onLogoutPressed() {
