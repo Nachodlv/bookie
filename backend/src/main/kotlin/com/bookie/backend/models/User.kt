@@ -14,7 +14,8 @@ data class User(
         val roles: List<String> = emptyList(),
         var followerAmount: Int = 0,
         val followers: MutableList<Follower> = mutableListOf(),
-        val following: MutableList<Follower> = mutableListOf()) {
+        val following: MutableList<Follower> = mutableListOf(),
+        val reviews: MutableList<Review> = mutableListOf()) {
 
     /**
      * Adds a follower to the user and increments its follower count by one.
@@ -49,6 +50,14 @@ data class User(
         this.followerAmount--
 
         follower.removeFollowing(this)
+    }
+
+    /**
+     * Adds a review to the user.
+     */
+    fun addReview(review: Review) {
+        // We could add more checks to make sure he is the author and it is not repeated.
+        reviews.add(review)
     }
 
     private fun addFollowing(following: User) {
