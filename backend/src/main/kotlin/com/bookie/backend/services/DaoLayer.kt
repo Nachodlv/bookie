@@ -41,6 +41,16 @@ interface UserDao: MongoRepository<User, String> {
      */
     @Query(value="{ 'email' : ?0 }", fields="{ 'id' : 0, 'following' : 1 }")
     fun findAllFollowingByEmail(email: String): FollowingResponseList
+
+    /**
+     * Finds the reviews written by a specific user.
+     *
+     * @param id: The id of the user whose reviews will be returned
+     * @param skip: The amount of reviews to skip before the first result (If using page and size, skip would be page * size)
+     * @param limit: The maximum amount of reviews to be returned
+     */
+    @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'reviews' : { '\$slice' : [ ?1, ?2 ] } }")
+    fun findReviewsById(id: String, skip: Int, limit: Int): Optional<ReviewList>
 }
 
 interface BookDao: MongoRepository<Book, String> {

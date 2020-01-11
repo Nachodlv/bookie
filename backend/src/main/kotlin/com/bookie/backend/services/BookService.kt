@@ -61,6 +61,10 @@ class BookService(val bookDao: BookDao,
 
         val result: Optional<Book> = bookDao.findById(id)
 
+        val testReview = Review(score, comment, null, timestamp, ObjectId().toHexString())
+        user.addReview(testReview)
+        userService.update(user)
+
         val book: Book
         if (result.isPresent) {
             book = result.get()

@@ -3,6 +3,7 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.FollowResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
+import com.bookie.backend.models.Review
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
@@ -186,5 +187,16 @@ class UserService(val userDao: UserDao,
     fun getByToken(token: String): Optional<User> {
         val email = tokenUtil.getUsernameFromToken(token)
         return getByEmail(email)
+    }
+
+    /**
+     * Returns the reviews written by a specific user.
+     */
+    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+        val result = userDao.findReviewsById(id, page * size, size)
+        if (result.isPresent) {
+            return result.get().reviews
+        }
+        return emptyList()
     }
 }

@@ -1,8 +1,10 @@
 package com.bookie.backend.controllers
 
+import com.bookie.backend.dto.AnonymousReview
 import com.bookie.backend.dto.RegisterResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
+import com.bookie.backend.models.Review
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
@@ -95,6 +97,30 @@ class UserController(private val userService: UserService) {
         } else {
             Optional.empty() // This could be handled better, but token cannot be null because the method wouldn't be executed in that case.
         }
+    }
+
+    /**
+     * Returns the reviews written by a user
+     *
+     * The structure of the response is as follows:
+     *
+     * {
+     *     id: String,
+     *     comment: String,
+     *     rating: Int,
+     *     timestamp: Instant
+     * }
+     *
+     * The author property is omitted as it is already known and would be repeated for every review.
+     *
+     */
+    @GetMapping("/reviews/{id}")
+    fun getUserReviews(@PathVariable id: String,
+                       @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
+                       @RequestParam(value = "size",required = false, defaultValue = "10") size: Int): ResponseEntity<List<AnonymousReview>> {
+        val result: List<AnonymousReview> = userService.getReviews(id, page, size)
+                .map{review -> AnonymousReview(review)}
+        return ResponseEntity(result, HttpStatus.OK)
     }
 
 }
