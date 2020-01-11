@@ -6,10 +6,21 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
-import com.example.bookie.models.BookSearch
+import com.example.bookie.MyApplication
+import com.example.bookie.repositories.BookRepository
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.instance
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.FutureTask
+import kotlin.coroutines.resume
 
 
 class SuggestionProvider : ContentProvider() {
+
+    private val injector = KodeinInjector()
+    private val bookRepository: BookRepository by injector.instance()
+//    private val context: Context? = MyApplication.appContext
 
 
     companion object {
@@ -22,6 +33,10 @@ class SuggestionProvider : ContentProvider() {
         )
     }
 
+    override fun onCreate(): Boolean {
+        return true
+    }
+
     override fun query(
         p0: Uri,
         p1: Array<out String>?,
@@ -29,27 +44,41 @@ class SuggestionProvider : ContentProvider() {
         p3: Array<out String>?,
         p4: String?
     ): Cursor? {
+        injector.inject(MyApplication.appKodein)
+
         return if (p3 != null && p3.isNotEmpty() && p3[0].isNotEmpty()) { // the entered text can be found in selectionArgs[0]
             val cursor = MatrixCursor(columns)
-            getSuggestions(p3[0]).forEach { cursor.addRow(it) }
+            runBlocking {
+                getSuggestions(p3[0]).forEach {
+                    cursor.addRow(it)
+                }
+            }
             cursor
         } else { // user hasn't entered anything
             MatrixCursor(columns)
         }
     }
 
-    private fun getSuggestions(query: String): Array<Array<String>> {
-        val books: Array<BookSearch> = arrayOf(
-            BookSearch("0", "The Fellowship of the Ring", "JRR Tolkien"),
-            BookSearch("1", "Jesus our lord, Bible Study", "Charles R. Swindoll")
-        )
+    private suspend fun getSuggestions(query: String): List<Array<String>> {
 
-        return books.map { arrayOf("0", "0", it.name, "by ${it.author}", it.id) }.toTypedArray()
+        return suspendCancellableCoroutine { continuation ->
+            bookRepository.searchRecommendation(
+                query
+            ) { books ->
+                continuation.resume(books.map {
+                    arrayOf(
+                        "0",
+                        "0",
+                        it.title,
+                        if (it.authors != null) "by ${it.authors.reduce { a1, a2 -> "$a1, $a2" }}" else "",
+                        it.id
+                    )
+                })
+            }
+        }
+
     }
 
-    override fun onCreate(): Boolean {
-        return true
-    }
 
     override fun update(p0: Uri, p1: ContentValues?, p2: String?, p3: Array<out String>?): Int {
         return 0

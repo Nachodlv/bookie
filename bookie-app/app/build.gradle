@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -15,12 +17,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        buildConfigField("String", "API_KEY", API_KEY)
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -29,6 +26,12 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     sourceSets {
         main {
@@ -45,9 +48,13 @@ android {
     }
 }
 
+kapt {
+    generateStubs = true
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
@@ -62,6 +69,35 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    // infinite scroll list
     implementation "androidx.recyclerview:recyclerview:1.1.0"
-    implementation 'com.squareup.picasso:picasso:2.71828' //for image downloading
+
+    // image downloading
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // room
+    implementation "androidx.room:room-runtime:2.2.3"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0-rc03"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0-rc03"
+    kapt "androidx.room:room-compiler:2.2.3"
+
+    // dependency injection
+    implementation 'com.github.salomonbrys.kodein:kodein:4.1.0'
+    implementation 'com.github.salomonbrys.kodein:kodein-android:4.1.0'
+
+    // jwt
+    implementation 'com.auth0.android:jwtdecode:1.4.0'
+
+    // coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+
+    // barcode
+    implementation 'com.google.android.gms:play-services:12.0.1'
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

@@ -1,6 +1,7 @@
 package com.bookie.backend.controllers
 
 import com.bookie.backend.dto.RegisterResponse
+import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
@@ -19,8 +20,28 @@ class UserController(private val userService: UserService) {
     @GetMapping
     fun getAll(pageable: Pageable): Page<User> = userService.getAll(pageable)
 
+    /**
+     * Returns the data of the user with the provided id
+     *
+     * The data returned is the following:
+     *
+     * {
+     *     id: String,
+     *     firstName: String,
+     *     lastName: String,
+     *     email: String,
+     *     followerAmount: Int
+     * }
+     *
+     */
     @GetMapping("{id}")
-    fun getById(@PathVariable id: String): Optional<User> = userService.getById(id)
+    fun getById(@PathVariable id: String): ResponseEntity<UserData> {
+        val data: Optional<UserData> = userService.getUserDataById(id)
+        if (data.isPresent) {
+            return ResponseEntity(data.get(), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.NOT_FOUND)
+    }
 
     @PostMapping
     fun insert(@RequestBody user: User): User = userService.insert(user)
@@ -60,4 +81,20 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.CONFLICT) // We could send a message too, but how do we do that?
         }
     }
+
+    /**
+     * Returns the data of the currently logged in user.
+     */
+    @GetMapping("/current")
+    fun getCurrentUser(@RequestHeader headers: Map<String, String>): Optional<User> {
+
+        val token = headers["authorization"]?.substring(7)
+
+        return if (token != null) {
+            userService.getByToken(token)
+        } else {
+            Optional.empty() // This could be handled better, but token cannot be null because the method wouldn't be executed in that case.
+        }
+    }
+
 }
