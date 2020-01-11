@@ -1,12 +1,18 @@
 package com.example.bookie.utils
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookie.BookProfile
+import com.example.bookie.MyApplication
 import com.example.bookie.R
 import com.example.bookie.exceptions.InvalidFeedItemTypeExc
 import com.example.bookie.models.*
@@ -15,7 +21,7 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class MyAdapter(private val myDataset: List<FeedItem>) :
+class MyAdapter(private val myDataset: List<FeedItem>, private val context: Context?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Provide a reference to the views for each data item
@@ -57,7 +63,6 @@ class MyAdapter(private val myDataset: List<FeedItem>) :
                 // create a new view
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.fragment_card_book, parent, false)
-
                 return BookCardViewHolder(view)
             }
             FeedItemType.COMMENT.id -> {
@@ -109,6 +114,7 @@ class MyAdapter(private val myDataset: List<FeedItem>) :
                 else {
                     bookCardViewHolder.ratingBar.visibility = View.GONE
                 }
+                bookCardViewHolder.view.setOnClickListener { onBookClicked(bookData.id) }
 
             }
             FeedItemType.COMMENT -> {
@@ -143,5 +149,14 @@ class MyAdapter(private val myDataset: List<FeedItem>) :
     override fun getItemCount() = myDataset.size
 
     override fun getItemViewType(position: Int): Int = myDataset[position].type.id
+
+    private fun onBookClicked(id: String) {
+        val currentContext = context?: return
+        val intent = Intent(currentContext, BookProfile::class.java)
+        val bundle = Bundle()
+        bundle.putString("bookId", id)
+        intent.putExtras(bundle)
+        startActivity(currentContext, intent, bundle)
+    }
 
 }

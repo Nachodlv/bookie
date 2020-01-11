@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookie.MyApplication
 import com.example.bookie.R
 import com.example.bookie.models.BookFeed
 import com.example.bookie.repositories.BookRepository
@@ -29,6 +30,7 @@ class BookList : AppCompatActivity() {
 
         setupToolbar()
         searchForBooks()
+
 
     }
 
@@ -57,7 +59,7 @@ class BookList : AppCompatActivity() {
     private fun buildList(books: MutableList<BookFeed>, query: String) {
         val recList = findViewById<RecyclerView>(R.id.feed_container)
         val viewManager = LinearLayoutManager(applicationContext)
-        val viewAdapter = MyAdapter(books)
+        val viewAdapter = MyAdapter(books, this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {

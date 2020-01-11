@@ -25,3 +25,4 @@ class BookById(private val id: String): BooksAPIRoute() {
     override val url: String
     get() = "$baseUrl/volumes?q=id:$id"
 }
+
