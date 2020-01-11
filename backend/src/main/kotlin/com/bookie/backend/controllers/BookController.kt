@@ -1,5 +1,6 @@
 package com.bookie.backend.controllers
 
+import com.bookie.backend.dto.RatingRequest
 import com.bookie.backend.dto.ReviewRequest
 import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.models.Review
@@ -57,6 +58,33 @@ class BookController(private val bookService: BookService) {
     @GetMapping("/rating/{id}")
     fun getBookScore(@PathVariable id: String): ResponseEntity<RatingResponse> {
         return ResponseEntity(bookService.getBookScore(id), HttpStatus.OK)
+    }
+
+    /**
+     * Returns the scores of several books.
+     *
+     * The ids of the books should be specified as follows:
+     *
+     * {
+     *     ids: ["1", "2", ... ]
+     * }
+     *
+     * And the result will be a list of elements with the following structure:
+     *
+     * {
+     *     id: String,
+     *     rating: Double,
+     *     amountOfReviews: Int
+     * }
+     *
+     * The results will be in the order they were received.
+     */
+    @PutMapping("/rating")
+    fun getBooksScore(@RequestBody request: RatingRequest): ResponseEntity<List<RatingResponse>> {
+        val result: List<RatingResponse> = request.ids.map{
+            id -> bookService.getBookScore(id)
+        }
+        return ResponseEntity(result, HttpStatus.OK)
     }
 
     /**
