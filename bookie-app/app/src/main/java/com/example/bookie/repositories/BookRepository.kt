@@ -18,7 +18,7 @@ class BookRepository constructor(
 ) {
 
     fun searchRecommendation(query: String, completion: (List<Book>) -> Unit) {
-        searchBooks(query, completion, {}, 4)
+        searchBooks(query, completion, {},  0, 4)
     }
 
 
@@ -26,12 +26,14 @@ class BookRepository constructor(
         query: String,
         completion: (List<Book>) -> Unit,
         error: (String) -> Unit,
-        limitation: Int = 40
+        index: Int,
+        limitation: Int = 10
     ) {
 
         bookApiClient.searchBook(
             query,
             limitation,
+            index,
             { books ->
                 completion(books)
                 executor.execute {

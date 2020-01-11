@@ -14,12 +14,13 @@ class BookApiClient(ctx: Context?) : ApiClient(ctx) {
     fun searchBook(
         query: String,
         limitation: Int,
+        index: Int,
         completion: (books: List<Book>) -> Unit,
         error: (errorMessage: String) -> Unit
     ) {
         if (ctx == null) return
 
-        val route = BookSearch(query, limitation)
+        val route = BookSearch(query, limitation, index)
         this.performRequest(route) { response ->
             when (response.statusCode) {
                 200 -> {

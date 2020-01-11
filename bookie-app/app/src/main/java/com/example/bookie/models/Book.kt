@@ -21,6 +21,15 @@ data class Book(
     @SerializedName("imageLinks") val imageLinks: BookImage?,
     @SerializedName("previewLink") val previewLink: String?,
     @SerializedName("categories") val categories: List<String>,
-    @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis
-
-) : JSONConvertable
+    @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis,
+    var rating: Float?
+) : JSONConvertable {
+    fun toBookFeed(): BookFeed {
+        return BookFeed(
+            id,
+            title,
+            authors?.reduce{a, b -> "$a, $b"},
+            imageLinks?.thumbnail,
+            rating)
+    }
+}

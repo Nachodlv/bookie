@@ -10,10 +10,10 @@ abstract class BooksAPIRoute :
         get() = hashMapOf()
 }
 
-class BookSearch(private val query: String, private val limitation: Int) :
+class BookSearch(private val query: String, private val limitation: Int, private val index: Int) :
     BooksAPIRoute() {
     override val url: String
-        get() = "$baseUrl/volumes?q=$query&maxResults=$limitation" //TODO encodoe
+        get() = "$baseUrl/volumes?q=$query&maxResults=$limitation&startIndex=$index" //TODO encodoe
 }
 
 class IsbnSearch(private val isbn: String): BooksAPIRoute() {

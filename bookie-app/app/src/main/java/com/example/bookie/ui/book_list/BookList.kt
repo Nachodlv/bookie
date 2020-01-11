@@ -3,8 +3,13 @@ package com.example.bookie.ui.book_list
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
+import com.example.bookie.models.BookFeed
 import com.example.bookie.repositories.BookRepository
+import com.example.bookie.utils.MyAdapter
+import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
@@ -37,8 +42,6 @@ class BookList : AppCompatActivity() {
 
 
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp)
-        toolbar.setTitle(R.string.register)
-        toolbar.setSubtitle(R.string.register)
         toolbar.setNavigationOnClickListener { finish() }
     }
 
@@ -46,11 +49,49 @@ class BookList : AppCompatActivity() {
         val bundle = intent.extras ?: return
         val query = bundle.getString("searchQuery") ?: return
         bookRepository.searchBooks(query, { books ->
-            SnackbarUtil.showSnackbar(text.rootView, books.joinToString { "${it.title}, " })
-        }, { error -> showError(error) })
+            buildList(books.map { it.toBookFeed() }.toMutableList(), query)
+        }, { error -> showError(error) }, 0)
     }
 
+
+    private fun buildList(books: MutableList<BookFeed>, query: String) {
+        val recList = findViewById<RecyclerView>(R.id.feed_container)
+        val viewManager = LinearLayoutManager(applicationContext)
+        val viewAdapter = MyAdapter(books)
+        viewManager.orientation = LinearLayoutManager.VERTICAL
+
+        recList.apply {
+            // use this setting to improve performance if you know that changes
+            // in content do not change the layout size of the RecyclerView
+            setHasFixedSize(false)
+
+            // use a linear layout manager
+            layoutManager = viewManager
+
+            // specify an viewAdapter
+            adapter = viewAdapter
+        }
+
+        recList.addOnScrollListener(
+            OnScrollListener(
+                viewManager,
+                viewAdapter,
+                books
+            ) { index, callback ->
+                bookRepository.searchBooks(
+                    query,
+                    { newBook -> callback(newBook.map { it.toBookFeed() }) },
+                    { error ->
+                        showError(error)
+                        callback(emptyList())
+                    },
+                    index
+                )
+            })
+    }
+
+
     private fun showError(errorMessage: String) {
-        text.setText(errorMessage)
+        SnackbarUtil.showSnackbar(feed_container.rootView, errorMessage)
     }
 }
