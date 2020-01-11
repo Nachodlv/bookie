@@ -6,6 +6,7 @@ import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.DiskBasedCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.StringRequest
+import com.example.bookie.R
 import com.example.bookie.api.ApiResponse
 import com.example.bookie.api.routes.ApiRoute
 import org.json.JSONObject
@@ -51,14 +52,17 @@ abstract class ApiClient(val ctx: Context?) {
         networkResponse: NetworkResponse?,
         completion: (apiResponse: ApiResponse) -> Unit
     ) {
-        if (networkResponse == null) return completion(ApiResponse(500, "Server error"))
-        val ar = ApiResponse(
-            networkResponse.statusCode,
-            if (networkResponse.statusCode == 200)
-                JSONObject(networkResponse.data.toString()).toString()
-            else ""
-        )
-        completion.invoke(ar)
+        completion.invoke(if(networkResponse == null) {
+            ApiResponse(500, ctx?.getString(R.string.no_internet) ?: "")
+        } else {
+            ApiResponse(
+                networkResponse.statusCode,
+                if (networkResponse.statusCode == 200)
+                    JSONObject(networkResponse.data.toString()).toString()
+                else ""
+            )
+        })
+
     }
 
     /**

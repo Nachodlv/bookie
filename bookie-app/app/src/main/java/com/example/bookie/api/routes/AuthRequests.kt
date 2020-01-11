@@ -20,7 +20,7 @@ class Login(var email: String, var password: String) :
 
 class UserLogged(token: String) : ApiRoute(token) {
     override val url: String
-        get() = "$baseUrl/logged"
+        get() = "$baseUrl/user/current"
 
     override val httpMethod: Int
         get() = Request.Method.GET
