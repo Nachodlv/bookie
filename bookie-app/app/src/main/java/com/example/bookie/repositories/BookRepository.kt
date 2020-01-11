@@ -37,17 +37,15 @@ class BookRepository constructor(
             limitation,
             index,
             { books ->
-                executor.execute {
-                    books.forEach { b -> b.lastFetch = Calendar.getInstance().timeInMillis }
-                    bookClient.getMultipleRatings(books.map { it.id }, { reviews ->
-                        books.forEachIndexed { index, book -> book.review = reviews[index] }
-                        bookDao.save(*books.toTypedArray())
-                        completion(books)
-                    }, {
-                        bookDao.save(*books.toTypedArray())
-                        completion(books)
-                    })
-                }
+                books.forEach { b -> b.lastFetch = Calendar.getInstance().timeInMillis }
+                bookClient.getMultipleRatings(books.map { it.id }, { reviews ->
+                    books.forEachIndexed { index, book -> book.review = reviews[index] }
+                    executor.execute { bookDao.save(*books.toTypedArray()) }
+                    completion(books)
+                }, {
+                    executor.execute { bookDao.save(*books.toTypedArray()) }
+                    completion(books)
+                })
             },
             error
         )

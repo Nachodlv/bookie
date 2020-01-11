@@ -15,7 +15,7 @@ import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
-import kotlinx.android.synthetic.main.activity_book_list.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class BookList : AppCompatActivity() {
 
@@ -51,7 +51,7 @@ class BookList : AppCompatActivity() {
         val bundle = intent.extras ?: return
         val query = bundle.getString("searchQuery") ?: return
         bookRepository.searchBooks(query, { books ->
-            buildList(books.map { it.toBookFeed() }.toMutableList(), query)
+            runOnUiThread { buildList(books.map { it.toBookFeed() }.toMutableList(), query)}
         }, { error -> showError(error) }, 0)
     }
 

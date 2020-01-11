@@ -6,7 +6,7 @@ abstract class BooksAPIRoute :
     ApiRoute(baseUrl = "https://www.googleapis.com/books/v1") {
     override val httpMethod: Int
         get() = Request.Method.GET
-    override val params: HashMap<String, String>
+    override val params: HashMap<String, Any>
         get() = hashMapOf()
 }
 

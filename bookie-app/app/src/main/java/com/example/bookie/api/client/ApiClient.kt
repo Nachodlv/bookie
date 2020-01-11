@@ -9,6 +9,7 @@ import com.android.volley.toolbox.StringRequest
 import com.example.bookie.R
 import com.example.bookie.api.ApiResponse
 import com.example.bookie.api.routes.ApiRoute
+import org.json.JSONArray
 import org.json.JSONObject
 
 abstract class ApiClient(val ctx: Context?) {
@@ -34,7 +35,7 @@ abstract class ApiClient(val ctx: Context?) {
 
                 @Throws(AuthFailureError::class)
                 override fun getBody(): ByteArray {
-                    return JSONObject(route.params as Map<String, String>).toString().toByteArray()
+                    return JSONObject(route.params as Map<String, Any>).toString().toByteArray()
                 }
             }
         request.retryPolicy = DefaultRetryPolicy(

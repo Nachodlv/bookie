@@ -49,7 +49,7 @@ class BookClient(ctx: Context?) : ApiClient(ctx) {
         this.performRequest(route){response ->
             when(response.statusCode) {
                 200 -> {
-                    var list = Gson().fromJson(response.json, List::class.java)
+                    completion(Gson().fromJson(response.json, List::class.java).map { it.toString().toObject<Review>() })
                 }
                 else -> {
                     error(ctx.getString(R.string.default_error))
