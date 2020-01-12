@@ -4,6 +4,8 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.bookie.BookProfile
+import com.example.bookie.ui.book_list.BookList
 
 class SearchableActivity : AppCompatActivity() {
 
@@ -14,6 +16,7 @@ class SearchableActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
         setIntent(intent)
         handleIntent(intent)
     }
@@ -34,12 +37,19 @@ class SearchableActivity : AppCompatActivity() {
     }
 
     private fun doSearch(query: String) {
-        print("Hello")
-        // TODO go to search result
+        val intent = Intent(this, BookList::class.java)
+        val bundle = Bundle()
+        bundle.putString("searchQuery", query)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
     private fun getById(id: String) {
-        //TODO get book by id
+        val intent = Intent(this, BookProfile::class.java)
+        val bundle = Bundle()
+        bundle.putString("bookId", id)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
 

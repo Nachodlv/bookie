@@ -21,6 +21,6 @@ data class Book(
     @SerializedName("imageLinks") val imageLinks: BookImage?,
     @SerializedName("previewLink") val previewLink: String?,
     @SerializedName("categories") val categories: List<String>,
-    @ColumnInfo(name = "lastFetch") val lastFetch: Long = Calendar.getInstance().timeInMillis
+    @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis
 
 ) : JSONConvertable
