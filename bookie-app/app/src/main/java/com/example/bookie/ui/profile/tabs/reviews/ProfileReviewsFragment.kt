@@ -11,6 +11,7 @@ import com.example.bookie.R
 import com.example.bookie.models.FeedItem
 import com.example.bookie.models.ReviewTab
 import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.OnScrollListenerMock
 import com.example.bookie.utils.ReviewsAdapter
 import java.util.*
 
@@ -81,6 +82,6 @@ class ProfileReviewsFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, reviews))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, reviews))
     }
 }

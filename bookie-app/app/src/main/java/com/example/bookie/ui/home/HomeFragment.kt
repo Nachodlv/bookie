@@ -96,7 +96,7 @@ class HomeFragment : Fragment() {
 
         val recList = homeView.findViewById(R.id.feed_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = MyAdapter(myDataSet, context)
+        val viewAdapter = FeedItemsAdapter(myDataSet, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {

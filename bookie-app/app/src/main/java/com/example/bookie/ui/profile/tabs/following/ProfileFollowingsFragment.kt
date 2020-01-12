@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.OnScrollListenerMock
 
 class ProfileFollowingsFragment : Fragment() {
 
@@ -64,6 +65,6 @@ class ProfileFollowingsFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, followings))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, followings))
     }
 }
