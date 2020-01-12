@@ -1,5 +1,6 @@
 package com.example.bookie.ui.profile.tabs.following
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
+import kotlinx.android.synthetic.main.fragment_followings_tab.*
 
 class ProfileFollowingsFragment : Fragment() {
 
@@ -65,5 +67,13 @@ class ProfileFollowingsFragment : Fragment() {
         }
 
         recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, followings))
+
+        // Add listener to search button
+        search_button.setOnClickListener { goToFollowingSearchView() }
+    }
+
+    private fun goToFollowingSearchView() {
+        val intent = Intent(this.context, ProfileFollowingSearchActivity::class.java)
+        startActivity(intent)
     }
 }

@@ -45,10 +45,14 @@
     <!--BOOK CARDS-->
     <string name="book_content_desc">Book cover image</string>
 
-<!--    SEARCH BAR -->
+    <!--SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
+    <string name="search_hint_dialog">Search for a user</string>
 
-<!--    ERRORS-->
+    <!--FOLLOWING SEARCH-->
+    <string name="find_new_users">Find new users</string>
+
+    <!--ERRORS-->
     <string name="no_internet">Can\'t connect to the internet</string>
     <string name="default_error">An unexpected error occurred</string>
 
