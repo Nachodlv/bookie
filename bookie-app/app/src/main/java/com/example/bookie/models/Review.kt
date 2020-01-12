@@ -13,8 +13,8 @@ data class Author(
 
 data class ReviewResponse(
     @SerializedName("comment") val comment: String,
-    @SerializedName("score") val score: Int,
-    @SerializedName("id") val bookId: String,
+    @SerializedName("rating") val rating: Float,
+    @SerializedName("id") val id: String,
     @SerializedName("timestamp") val timestamp: Date,
     @SerializedName("author") val author: Author
 
@@ -22,12 +22,12 @@ data class ReviewResponse(
 
     fun toReview(): Review {
         return Review(
-            bookId,
+            id,
             author.id,
             author.firstName,
             author.lastName,
-            comment,
-            score,
+            "",
+            rating,
             timestamp,
             Calendar.getInstance().timeInMillis
         )
@@ -41,7 +41,11 @@ data class Review(
     val userFirstName: String,
     val userLastName: String,
     val comment: String,
-    val score: Int,
+    val score: Float,
     val timestamp: Date,
     val lastFetch: Long = Calendar.getInstance().timeInMillis
-)
+) {
+    fun toReviewTab(): ReviewTab {
+        return ReviewTab(bookId, "$userFirstName $userLastName", comment, null, score, 0, timestamp)
+    }
+}

@@ -67,4 +67,6 @@
     <string name="edit_review">Edit</string>
     <string name="rating_required">Please rate the review</string>
     <string name="successful_review">Review submitted!</string>
+    <string name="read_more">Read more…</string>
+    <string name="read_less">Read less</string>
 </resources>

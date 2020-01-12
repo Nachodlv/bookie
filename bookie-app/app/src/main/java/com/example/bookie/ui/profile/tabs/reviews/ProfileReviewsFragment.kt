@@ -59,7 +59,7 @@ class ProfileReviewsFragment : Fragment() {
                         coverImage, 5.0F, 255, Date()),
                 ReviewTab("14", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),
-                ReviewTab("15", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
+                ReviewTab("15", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend.This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date())
         )
 
@@ -67,7 +67,7 @@ class ProfileReviewsFragment : Fragment() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ReviewsAdapter(myDataSet)
+        val viewAdapter = ReviewsAdapter(myDataSet, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {

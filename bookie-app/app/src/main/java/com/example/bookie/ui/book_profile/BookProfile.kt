@@ -6,12 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.Book
+import com.example.bookie.models.ReviewTab
 import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
 import com.example.bookie.ui.loader.LoaderFragment
+import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.ReviewsAdapter
 import com.example.bookie.utils.SnackbarUtil
 import com.example.bookie.utils.TextValidator
 import com.github.salomonbrys.kodein.KodeinInjector
@@ -38,12 +43,13 @@ class BookProfile : AppCompatActivity() {
         injector.inject(appKodein())
 
         setupToolbar()
-        getBook()
+        getBook(review_text.rootView)
         submit_button.setOnClickListener { onSubmitReview(it) }
 
         val fragment: Fragment? = supportFragmentManager.findFragmentById(R.id.fragment_loader)
         loaderFragment = fragment as LoaderFragment?
         loaderFragment?.hideLoader(submit_button)
+
     }
 
     private fun setupToolbar() {
@@ -58,7 +64,7 @@ class BookProfile : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
-    private fun getBook() {
+    private fun getBook(view: View) {
         val bundle = intent.extras ?: return
         val bookId = bundle.getString("bookId") ?: return
 
@@ -67,6 +73,7 @@ class BookProfile : AppCompatActivity() {
                 is RepositoryStatus.Success -> {
                     book = it.data
                     setBookData(it.data)
+                    runOnUiThread { loadReviews(view, it.data) }
                 }
                 is RepositoryStatus.Loading -> return@Observer
                 is RepositoryStatus.Error -> setError(it.error)
@@ -99,12 +106,12 @@ class BookProfile : AppCompatActivity() {
 
     private fun onSubmitReview(view: View) {
         val book = book ?: return
-        loaderFragment?.showLoader(submit_button)
         if (!TextValidator.hasErrors(review_text)) {
             if (review_rating.rating == 0f) SnackbarUtil.showSnackbar(
                 view,
                 applicationContext.getString(R.string.rating_required)
             ) else {
+                loaderFragment?.showLoader(submit_button)
                 reviewRepository.postReview(
                     book.id,
                     review_text.text.toString(),
@@ -132,6 +139,62 @@ class BookProfile : AppCompatActivity() {
 
             }
         }
+    }
+
+    fun loadReviews(view: View, book: Book) {
+
+
+        reviewRepository.getReviews(book.id, 0).observe(this, Observer {
+            when (it) {
+                is RepositoryStatus.Success -> loadList(
+                    view,
+                    book,
+                    it.data.map { r -> r.toReviewTab() }.toMutableList()
+                )
+                is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
+            }
+        })
+
+
+    }
+
+    fun loadList(view: View, book: Book, dataSet: MutableList<ReviewTab>) {
+
+
+        val recList = view.findViewById(R.id.reviews_container) as RecyclerView
+        val viewManager = LinearLayoutManager(applicationContext)
+        val viewAdapter = ReviewsAdapter(dataSet, this)
+        viewManager.orientation = LinearLayoutManager.VERTICAL
+
+        recList.apply {
+            // use this setting to improve performance if you know that changes
+            // in content do not change the layout size of the RecyclerView
+            setHasFixedSize(true)
+
+            // use a linear layout manager
+            layoutManager = viewManager
+
+            // specify an viewAdapter
+            adapter = viewAdapter
+        }
+
+        recList.addOnScrollListener(
+            OnScrollListener(
+                viewManager,
+                viewAdapter,
+                dataSet
+            ) { index, callback ->
+                reviewRepository.getReviews(book.id, index).observe(this, Observer {
+                    when (it) {
+                        is RepositoryStatus.Success -> callback(it.data.map { r -> r.toReviewTab() })
+                        is RepositoryStatus.Error -> {
+                            callback(emptyList())
+                            SnackbarUtil.showSnackbar(view, it.error)
+                        }
+                    }
+                })
+            }
+        )
     }
 
 }
