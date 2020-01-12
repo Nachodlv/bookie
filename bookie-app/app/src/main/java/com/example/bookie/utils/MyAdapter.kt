@@ -11,8 +11,7 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookie.BookProfile
-import com.example.bookie.MyApplication
+import com.example.bookie.ui.book_profile.BookProfile
 import com.example.bookie.R
 import com.example.bookie.exceptions.InvalidFeedItemTypeExc
 import com.example.bookie.models.*
