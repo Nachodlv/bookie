@@ -67,6 +67,20 @@ class UserService(val userDao: UserDao,
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
     }
 
+    fun resetUserPassword(token: String, newPassword: String) {
+        val email = tokenUtil.getUsernameFromToken(token)
+        changeUserPassword(email, newPassword)
+    }
+
+    /**
+     * Changes a user's password to the one provided as method parameter.
+     */
+    fun changeUserPassword(email: String, newPassword: String) {
+        val user: User = getByEmail(email).orElseThrow{ throw UserNotFoundException("No user with that id was found.") }
+        user.password = passwordEncoder.encode(newPassword)
+        update(user)
+    }
+
     /**
      * The currently logged in user starts to follow the user with the provided id.
      *

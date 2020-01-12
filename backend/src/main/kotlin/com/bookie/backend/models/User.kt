@@ -9,7 +9,7 @@ data class User(
         val firstName: String,
         val lastName: String,
         val email: String,
-        val password: String,
+        var password: String,
         @Id val id: String? = null,
         val roles: List<String> = emptyList(),
         var followerAmount: Int = 0,
