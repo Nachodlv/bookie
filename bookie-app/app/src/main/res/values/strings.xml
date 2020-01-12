@@ -61,4 +61,7 @@
 <!--    BOOK PROFILE-->
     <string name="write_review">Did you read it? Write a review!</string>
     <string name="submit_review">Submit</string>
+    <string name="edit_review">Edit</string>
+    <string name="rating_required">Please rate the review</string>
+    <string name="successful_review">Review submitted!</string>
 </resources>

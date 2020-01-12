@@ -72,13 +72,33 @@ class BookRepository constructor(
         return initStatus
     }
 
+    fun addReview(bookId: String, score: Int, newReview: Boolean, status: MutableLiveData<RepositoryStatus<Book>>) {
+        executor.execute {
+            val book = bookDao.getByIdInstant(bookId)
+            if (book != null) {
+                val review = book.review
+                if (review != null) {
+                    if(newReview) {
+                        review.rating =
+                            (review.rating * review.reviewAmount + score) / (review.reviewAmount + 1)
+                        review.reviewAmount++
+                        status.postValue(RepositoryStatus.Success(book))
+                        bookDao.update(book)
+                    } else {
+                        refreshBook(bookId, status, true)
+                    }
 
-    private fun refreshBook(bookId: String, status: MutableLiveData<RepositoryStatus<Book>>) {
+                }
+            }
+        }
+    }
+
+    private fun refreshBook(bookId: String, status: MutableLiveData<RepositoryStatus<Book>>, forceRefresh: Boolean = false) {
         // Runs in a background thread.
         executor.execute {
             // Check if user data was fetched recently.
-            val bookExists = bookDao.hasBook(bookId, FRESH_TIMEOUT)
-            if (bookExists == null) {
+           val bookExists = bookDao.hasBook(bookId, FRESH_TIMEOUT)
+            if (forceRefresh || bookExists == null) {
                 // Refreshes the data.
                 bookApiClient.getBookById(
                     bookId,
@@ -103,5 +123,6 @@ class BookRepository constructor(
             },
             { GlobalScope.launch { status.postValue(RepositoryStatus.Success(book)) } })
     }
+
 
 }

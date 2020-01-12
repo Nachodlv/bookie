@@ -22,7 +22,7 @@ data class Book(
     @SerializedName("previewLink") val previewLink: String?,
     @SerializedName("categories") val categories: List<String>?,
     @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis,
-    var review: Review?
+    var review: Rating?
 ) : JSONConvertable {
     fun toBookFeed(): BookFeed {
         return BookFeed(
@@ -35,7 +35,7 @@ data class Book(
     }
 }
 
-data class Review(
+data class Rating(
     @SerializedName("rating") var rating: Float,
-    @SerializedName("amountOfReviews") var amountOfReviews: Int
+    @SerializedName("reviewAmount") var reviewAmount: Int
 ) : JSONConvertable
