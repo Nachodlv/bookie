@@ -1,10 +1,7 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.RatingResponse
-import com.bookie.backend.models.Author
-import com.bookie.backend.models.Book
-import com.bookie.backend.models.Review
-import com.bookie.backend.models.User
+import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.InvalidScoreException
@@ -75,6 +72,8 @@ class BookService(val bookDao: BookDao,
             book.addReview(review)
             insert(book)
         }
+
+        userService.addReviewToFollowers(review, user)
 
         return review
     }

@@ -3,7 +3,9 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.FollowResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
+import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.Review
+import com.bookie.backend.models.ReviewFeedItem
 import com.bookie.backend.models.User
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -198,5 +201,36 @@ class UserService(val userDao: UserDao,
             return result.get().reviews
         }
         return emptyList()
+    }
+
+    /**
+     * Returns a user's feed.
+     */
+    fun getFeed(token: String, size: Int): List<FeedItem> {
+
+        val email = tokenUtil.getUsernameFromToken(token)
+        val user: Optional<User> = userDao.findByEmail(email)
+        if (user.isPresent) {
+            val result = user.get().getLatestFeedItems(size)
+            update(user.get())
+            return result
+        }
+        throw UserNotFoundException("No user found with the provided id.")
+    }
+
+    fun addReviewToFollowers(review: Review, reviewer: User) {
+        val feedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
+
+        reviewer.followers.forEach{
+            follower -> addFeedItemToUser(feedItem, follower.id)
+        }
+    }
+
+    private fun addFeedItemToUser(item: FeedItem, id: String?) {
+        if (id != null) {
+            val user = userDao.findById(id).get()
+            user.addFeedItem(item)
+            update(user)
+        }
     }
 }
