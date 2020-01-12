@@ -6,8 +6,12 @@ import com.example.bookie.models.FeedItem
 
 
 
-class OnScrollListener(private val layoutManager: LinearLayoutManager, private val adapter: MyAdapter,
-                       private var dataList: MutableList<FeedItem>, private val fullList: MutableList<FeedItem>) : RecyclerView.OnScrollListener() {
+class OnScrollListener<T, F: RecyclerView.ViewHolder>(
+        private val layoutManager: LinearLayoutManager,
+        private val adapter: RecyclerView.Adapter<F>,
+        private var dataList: MutableList<T>,
+        private val fullList: MutableList<T>
+) : RecyclerView.OnScrollListener() {
 
     private var loading = false
 

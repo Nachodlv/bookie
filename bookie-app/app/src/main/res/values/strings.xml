@@ -42,6 +42,9 @@
     <string name="menu_shelf">Shelf</string>
     <string name="menu_settings">Settings</string>
 
+    <!--BOOK CARDS-->
+    <string name="book_content_desc">Book cover image</string>
+
 <!--    SEARCH BAR -->
     <string name="search_hint">Search for a book</string>
 

@@ -16,7 +16,7 @@ import java.util.*
 
 
 
-class MyAdapter(private val myDataset: List<FeedItem>) :
+class FeedItemsAdapter(private val myDataset: List<FeedItem>) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Provide a reference to the views for each data item
