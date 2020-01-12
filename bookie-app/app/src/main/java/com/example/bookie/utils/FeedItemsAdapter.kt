@@ -20,7 +20,7 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class MyAdapter(private val myDataset: List<FeedItem>, private val context: Context?) :
+class FeedItemsAdapter(private val myDataSet: List<FeedItem>, private val context: Context?) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // Provide a reference to the views for each data item
@@ -61,20 +61,21 @@ class MyAdapter(private val myDataset: List<FeedItem>, private val context: Cont
             FeedItemType.BOOK.id -> {
                 // create a new view
                 val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.fragment_card_book, parent, false)
+                        .inflate(R.layout.fragment_book_card, parent, false)
+
                 return BookCardViewHolder(view)
             }
             FeedItemType.COMMENT.id -> {
                 // create a new view
                 val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.fragment_follower_comment, parent, false)
+                        .inflate(R.layout.fragment_follower_comment_card, parent, false)
 
                 return FollowerCommentViewHolder(view)
             }
             FeedItemType.REVIEW.id -> {
                 // create a new view
                 val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.fragment_follower_review, parent, false)
+                        .inflate(R.layout.fragment_follower_review_card, parent, false)
 
                 return FollowerReviewViewHolder(view)
             }
@@ -87,7 +88,7 @@ class MyAdapter(private val myDataset: List<FeedItem>, private val context: Cont
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        val data = myDataset[position]
+        val data = myDataSet[position]
 
         val imageErrorCallback = object : Callback {
             override fun onSuccess() {}
@@ -145,9 +146,9 @@ class MyAdapter(private val myDataset: List<FeedItem>, private val context: Cont
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = myDataset.size
+    override fun getItemCount() = myDataSet.size
 
-    override fun getItemViewType(position: Int): Int = myDataset[position].type.id
+    override fun getItemViewType(position: Int): Int = myDataSet[position].type.id
 
     private fun onBookClicked(id: String) {
         val currentContext = context?: return
