@@ -9,7 +9,7 @@ import com.example.bookie.repositories.RepositoryStatus
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
-import kotlinx.android.synthetic.main.activity_book_list.*
+import kotlinx.android.synthetic.main.activity_book_profile.*
 
 class BookProfile : AppCompatActivity() {
 

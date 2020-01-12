@@ -19,6 +19,10 @@ interface BookDao {
     @Query("SELECT * FROM BOOK WHERE id = :id")
     fun getById(id: String): LiveData<Book>
 
+    @Query("SELECT * FROM BOOK WHERE id = :id")
+    fun getByIdInstant(id: String): Book
+
+
     @Query("SELECT * FROM BOOK WHERE id = :id and lastFetch >= (:now - :timeout)")
     fun hasBook(id: String, timeout: Long, now: Long = Calendar.getInstance().timeInMillis): Book?
 

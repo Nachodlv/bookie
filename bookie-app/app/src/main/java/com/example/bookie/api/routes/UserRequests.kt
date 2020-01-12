@@ -14,7 +14,7 @@ class Register(
     override val httpMethod: Int
         get() = Request.Method.POST
 
-    override val params: HashMap<String, String>
+    override val params: HashMap<String, Any>
         get() = hashMapOf(
             "email" to email,
             "password" to password,
@@ -31,7 +31,7 @@ class UserById(private val id: String, token: String) : ApiRoute(token) {
     override val httpMethod: Int
         get() = Request.Method.GET
 
-    override val params: HashMap<String, String>
+    override val params: HashMap<String, Any>
         get() = HashMap()
 
 }

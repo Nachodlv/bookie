@@ -3,6 +3,7 @@ package com.example.bookie.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookie.api.client.BookApiClient
+import com.example.bookie.api.client.BookClient
 import com.example.bookie.dao.BookDao
 import com.example.bookie.models.Book
 import com.example.bookie.repositories.UserRepository.Companion.FRESH_TIMEOUT
@@ -13,12 +14,13 @@ import java.util.concurrent.Executor
 
 class BookRepository constructor(
     private val bookApiClient: BookApiClient,
+    private val bookClient: BookClient,
     private val bookDao: BookDao,
     private val executor: Executor
 ) {
 
     fun searchRecommendation(query: String, completion: (List<Book>) -> Unit) {
-        searchBooks(query, completion, {}, 4)
+        searchBooks(query, completion, {}, 0, 4)
     }
 
 
@@ -26,20 +28,27 @@ class BookRepository constructor(
         query: String,
         completion: (List<Book>) -> Unit,
         error: (String) -> Unit,
-        limitation: Int = 40
+        index: Int,
+        limitation: Int = 10
     ) {
 
         bookApiClient.searchBook(
             query,
             limitation,
+            index,
             { books ->
-                completion(books)
-                executor.execute {
-                    books.forEach { b -> b.lastFetch = Calendar.getInstance().timeInMillis }
-                    bookDao.save(*books.toTypedArray())
-                }
+                books.forEach { b -> b.lastFetch = Calendar.getInstance().timeInMillis }
+                bookClient.getMultipleRatings(books.map { it.id }, { reviews ->
+                    books.forEachIndexed { index, book -> book.review = reviews[index] }
+                    executor.execute { bookDao.save(*books.toTypedArray()) }
+                    completion(books)
+                }, {
+                    executor.execute { bookDao.save(*books.toTypedArray()) }
+                    completion(books)
+                })
             },
-            error)
+            error
+        )
     }
 
     fun getById(id: String): LiveData<RepositoryStatus<Book>> {
@@ -48,20 +57,21 @@ class BookRepository constructor(
         return status
     }
 
+
     fun searchByIsbn(isbn: String): LiveData<RepositoryStatus<Book>> {
         val initStatus = RepositoryStatus.initStatus<Book>()
 
         bookApiClient.searchByIsbn(
             isbn,
             { book ->
-                initStatus.value = RepositoryStatus.Success(book)
                 book.lastFetch = Calendar.getInstance().timeInMillis
-                executor.execute { bookDao.save(book) }
+                getReview(book, initStatus)
             },
             { error -> initStatus.value = RepositoryStatus.Error(error) })
 
         return initStatus
     }
+
 
     private fun refreshBook(bookId: String, status: MutableLiveData<RepositoryStatus<Book>>) {
         // Runs in a background thread.
@@ -70,16 +80,28 @@ class BookRepository constructor(
             val bookExists = bookDao.hasBook(bookId, FRESH_TIMEOUT)
             if (bookExists == null) {
                 // Refreshes the data.
-                bookApiClient.getBookById(bookId, { book ->
-                    executor.execute {
-                        book.lastFetch = Calendar.getInstance().timeInMillis
-                        book.let { bookDao.save(it) }
-                        status.value = RepositoryStatus.Success(book)
-
-                    }
-                }, { error -> GlobalScope.launch { status.postValue(RepositoryStatus.Error(error)) }})
-            } else GlobalScope.launch { status.postValue(RepositoryStatus.Success(bookExists))}
+                bookApiClient.getBookById(
+                    bookId,
+                    { book ->
+                        executor.execute {
+                            book.lastFetch = Calendar.getInstance().timeInMillis
+                            getReview(book, status)
+                        }
+                    },
+                    { error -> GlobalScope.launch { status.postValue(RepositoryStatus.Error(error)) } })
+            } else GlobalScope.launch { status.postValue(RepositoryStatus.Success(bookExists)) }
         }
+    }
+
+    private fun getReview(book: Book, status: MutableLiveData<RepositoryStatus<Book>>) {
+        bookClient.getRating(
+            book.id,
+            { review ->
+                book.review = review
+                executor.execute { book.let { bookDao.save(it) } }
+                GlobalScope.launch { status.postValue(RepositoryStatus.Success(book)) }
+            },
+            { GlobalScope.launch { status.postValue(RepositoryStatus.Success(book)) } })
     }
 
 }

@@ -46,4 +46,11 @@ class SharedPreferencesDao(val context: Context?) {
             context.getString(R.string.shared_preferences), Context.MODE_PRIVATE
         )
 
+    companion object {
+        fun getToken(context: Context): String? {
+            return context.getSharedPreferences(
+                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE
+            )?.getString(context.getString(R.string.login_token), null)
+        }
+    }
 }

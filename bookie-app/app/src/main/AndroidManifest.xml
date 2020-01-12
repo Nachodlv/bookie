@@ -29,6 +29,7 @@
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".utils.SearchableActivity" />
+
         </activity>
         <activity
             android:name=".ui.login.LoginActivity"

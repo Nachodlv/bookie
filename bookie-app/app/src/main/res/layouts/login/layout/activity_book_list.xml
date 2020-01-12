@@ -19,13 +19,13 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme" />
 
-        <EditText
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="@string/book_list" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/feed_container"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="25dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 
