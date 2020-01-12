@@ -91,11 +91,11 @@ class HomeFragment : Fragment() {
                         coverImage, FeedItemType.REVIEW,5F, Date())
                 )
 
-        val myDataset: MutableList<FeedItem> = mutableListOf<FeedItem>().apply { addAll(feedArray.subList(0, 10)) }
+        val myDataSet: MutableList<FeedItem> = mutableListOf<FeedItem>().apply { addAll(feedArray.subList(0, 10)) }
 
         val recList = homeView.findViewById(R.id.feed_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = FeedItemsAdapter(myDataset)
+        val viewAdapter = FeedItemsAdapter(myDataSet)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -110,7 +110,7 @@ class HomeFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataset, feedArray))
+        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, feedArray))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

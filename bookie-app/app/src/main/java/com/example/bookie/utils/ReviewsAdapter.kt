@@ -15,7 +15,7 @@ import java.util.*
 
 
 
-class ReviewsAdapter(private val myDataset: List<ReviewTab>) :
+class ReviewsAdapter(private val myDataSet: List<ReviewTab>) :
         RecyclerView.Adapter<ReviewsAdapter.ReviewCardViewHolder>() {
 
     class ReviewCardViewHolder(val view: View): RecyclerView.ViewHolder(view) {
@@ -36,7 +36,7 @@ class ReviewsAdapter(private val myDataset: List<ReviewTab>) :
     }
 
     override fun onBindViewHolder(holder: ReviewCardViewHolder, position: Int) {
-        val data = myDataset[position]
+        val data = myDataSet[position]
 
         val imageErrorCallback = object : Callback {
             override fun onSuccess() {}
@@ -54,5 +54,5 @@ class ReviewsAdapter(private val myDataset: List<ReviewTab>) :
     }
 
     // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = myDataset.size
+    override fun getItemCount() = myDataSet.size
 }

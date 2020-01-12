@@ -62,11 +62,11 @@ class ProfileReviewsFragment : Fragment() {
                         coverImage, 5.0F, 255, Date())
         )
 
-        val myDataset: MutableList<ReviewTab> = mutableListOf<ReviewTab>().apply { addAll(reviews.subList(0, 10)) }
+        val myDataSet: MutableList<ReviewTab> = mutableListOf<ReviewTab>().apply { addAll(reviews.subList(0, 10)) }
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ReviewsAdapter(myDataset)
+        val viewAdapter = ReviewsAdapter(myDataSet)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -81,6 +81,6 @@ class ProfileReviewsFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataset, reviews))
+        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, reviews))
     }
 }
