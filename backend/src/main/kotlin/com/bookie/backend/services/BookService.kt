@@ -54,24 +54,25 @@ class BookService(val bookDao: BookDao,
 
         val timestamp: Instant = Instant.now()
         val author = Author(user.id!!, user.firstName, user.lastName)
-        val review = Review(score, comment, author, timestamp, ObjectId().toHexString())
 
         val result: Optional<Book> = bookDao.findById(id)
 
         val book: Book
+        val review: Review
         if (result.isPresent) {
             book = result.get()
-            book.reviews.removeIf { item -> item.author?.id == user.id }
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             update(book)
         } else {
             book = Book(id, 0.0)
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             insert(book)
         }
 
-        val testReview = Review(score, comment, null, timestamp, book.id)
-        user.addReview(testReview)
+        val userReview = Review(score, comment, null, timestamp, book.id)
+        user.addReview(userReview)
         userService.update(user)
 
         userService.addFeedItems(review, user, book)
