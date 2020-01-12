@@ -61,6 +61,7 @@ class BookService(val bookDao: BookDao,
         val book: Book
         if (result.isPresent) {
             book = result.get()
+            book.reviews.removeIf { item -> item.author?.id == user.id }
             book.addReview(review)
             update(book)
         } else {

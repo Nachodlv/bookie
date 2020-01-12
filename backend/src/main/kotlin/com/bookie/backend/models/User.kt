@@ -61,7 +61,7 @@ data class User(
      * Adds a review to the user.
      */
     fun addReview(review: Review) {
-        // We could add more checks to make sure he is the author and it is not repeated.
+        reviews.removeIf {item -> item.id == review.id}
         reviews.add(review)
     }
 
