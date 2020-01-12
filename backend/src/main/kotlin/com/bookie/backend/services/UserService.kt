@@ -3,10 +3,7 @@ package com.bookie.backend.services
 import com.bookie.backend.dto.FollowResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
-import com.bookie.backend.models.FeedItem
-import com.bookie.backend.models.Review
-import com.bookie.backend.models.ReviewFeedItem
-import com.bookie.backend.models.User
+import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
@@ -61,7 +58,7 @@ class UserService(val userDao: UserDao,
      * Registers a new user.
      */
     fun registerUser(user: UserDto): User {
-        getByEmail(user.email).ifPresent{throw EmailAlreadyExistsException("Email already exists")}
+        getByEmail(user.email).ifPresent { throw EmailAlreadyExistsException("Email already exists") }
         val newUser = User(
                 user.firstName,
                 user.lastName,
@@ -86,7 +83,7 @@ class UserService(val userDao: UserDao,
 
         if (loggedUser.id == id) throw SelfFollowingException("You can't follow yourself")
 
-        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
+        val followedUser: User = getById(id).orElseThrow { UserNotFoundException("The user to be followed was not found") }
 
         followedUser.addFollower(loggedUser)
         update(loggedUser)
@@ -109,7 +106,7 @@ class UserService(val userDao: UserDao,
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
 
-        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
+        val followedUser: User = getById(id).orElseThrow { UserNotFoundException("The user to be followed was not found") }
 
         followedUser.removeFollower(loggedUser)
         update(loggedUser)
@@ -172,8 +169,7 @@ class UserService(val userDao: UserDao,
      * @param following: A list with the users that the current user follows
      */
     private fun checkFollowing(result: List<FollowResponse>, following: List<FollowResponse>) {
-        result.map{
-            item ->
+        result.map { item ->
             run {
                 if (following.firstOrNull { entry -> entry.id == item.id } !== null) {
                     item.followed = true
@@ -218,19 +214,50 @@ class UserService(val userDao: UserDao,
         throw UserNotFoundException("No user found with the provided id.")
     }
 
-    fun addReviewToFollowers(review: Review, reviewer: User) {
-        val feedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
+    /**
+     * Adds a review feed item to a user's feed.
+     *
+     * This method might also add a book feed item to a user's feed, if certain conditions are met.
+     *
+     * The conditions are the following:
+     * - The review must have a rating equal or greater to 3
+     * - The book's rating must be equal or greater to 3
+     * - The user must not have written a review for the book already
+     */
+    fun addFeedItems(review: Review, reviewer: User, book: Book) {
+        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
 
-        reviewer.followers.forEach{
-            follower -> addFeedItemToUser(feedItem, follower.id)
+        val bookFeedItem: FeedItem = BookFeedItem(book.id, 0, book.rating)
+
+        reviewer.followers.forEach { follower ->
+            run {
+                if (shouldRecommendBook(review, book)) {
+                    addReviewAndBookToFeed(reviewFeedItem, bookFeedItem, follower.id)
+                } else {
+                    addReviewToFeed(reviewFeedItem, follower.id)
+                }
+            }
         }
     }
 
-    private fun addFeedItemToUser(item: FeedItem, id: String?) {
+    private fun addReviewToFeed(review: FeedItem, id: String?) {
         if (id != null) {
             val user = userDao.findById(id).get()
-            user.addFeedItem(item)
+            user.addFeedItem(review)
             update(user)
         }
     }
+
+    private fun addReviewAndBookToFeed(review: FeedItem, book: FeedItem, id: String?) {
+        if (id != null) {
+            val user = userDao.findById(id).get()
+            user.addFeedItem(review)
+            if (user.reviews.firstOrNull{ item -> item.id == book.id } == null) {
+                user.addFeedItem(book)
+            }
+            update(user)
+        }
+    }
+
+    private fun shouldRecommendBook(review: Review, book: Book) = book.rating >= 3.0 && review.rating >= 3
 }

@@ -58,10 +58,6 @@ class BookService(val bookDao: BookDao,
 
         val result: Optional<Book> = bookDao.findById(id)
 
-        val testReview = Review(score, comment, null, timestamp, ObjectId().toHexString())
-        user.addReview(testReview)
-        userService.update(user)
-
         val book: Book
         if (result.isPresent) {
             book = result.get()
@@ -73,7 +69,11 @@ class BookService(val bookDao: BookDao,
             insert(book)
         }
 
-        userService.addReviewToFollowers(review, user)
+        val testReview = Review(score, comment, null, timestamp, book.id)
+        user.addReview(testReview)
+        userService.update(user)
+
+        userService.addFeedItems(review, user, book)
 
         return review
     }
