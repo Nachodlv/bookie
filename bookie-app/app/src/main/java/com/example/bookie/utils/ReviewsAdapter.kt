@@ -66,6 +66,20 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>, private val context
         holder.time.text = DateUtils.getDifference(data.time, Date())
         holder.readMore.text = context?.getString(R.string.read_more)
 
+        if (data.isLiked) {
+            holder.likes.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_thumb_up_green,0)
+            holder.likes.setOnClickListener {
+                val context = context ?: return@setOnClickListener
+                // TODO deslike @Nacho
+            }
+        } else {
+            holder.likes.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ic_thumb_up,0)
+            holder.likes.setOnClickListener {
+                val context = context ?: return@setOnClickListener
+                // TODO like @Nacho
+            }
+        }
+
         if (holder.preview.text.length > 39 * holder.preview.maxLines) {
             holder.readMore.visibility = View.VISIBLE
             holder.readMore.setOnClickListener {

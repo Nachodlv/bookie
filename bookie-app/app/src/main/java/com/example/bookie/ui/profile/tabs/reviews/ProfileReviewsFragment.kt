@@ -30,7 +30,7 @@ class ProfileReviewsFragment : Fragment() {
 
         val reviews: MutableList<ReviewTab> = arrayListOf(
                 ReviewTab("0", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
+                        coverImage, 5.0F, 255, Date(), true),
                 ReviewTab("1", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),
                 ReviewTab("2", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
@@ -40,7 +40,7 @@ class ProfileReviewsFragment : Fragment() {
                 ReviewTab("4", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),
                 ReviewTab("5", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
+                        coverImage, 5.0F, 255, Date(), true),
                 ReviewTab("6", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),
                 ReviewTab("7", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
