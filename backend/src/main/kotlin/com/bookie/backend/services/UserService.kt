@@ -255,15 +255,18 @@ class UserService(val userDao: UserDao,
     }
 
     // Add documentation
-    fun searchUsers(q: String): List<UserData> {
+    fun searchUsers(q: String, token: String): List<UserData> {
         // Should sanitize the query
+        val email = tokenUtil.getUsernameFromToken(token)
+        val user = userDao.findByEmail(email).get()
+
         val spaces = q.contains(" ")
         val query = if (spaces) {
             "(" + q.replace(' ', '|') + ")"
         } else {
             q
         }
-        val result = userDao.findUsersByQueryParameter(query)
+        val result = userDao.findUsersByQueryParameter(query, user.id!!)
         return result.orElse(emptyList())
     }
 

@@ -56,8 +56,9 @@ interface UserDao: MongoRepository<User, String> {
     /**
      * Finds the user's whose firstName or lastName contain the query parameter
      */
-    @Query(value="{ '\$or' : [ { 'firstName' : { '\$regex' : ?0, '\$options' : 'i' } }, { 'lastName' : { '\$regex' : ?0, '\$options' : 'i' } } ] }")
-    fun findUsersByQueryParameter(q: String): Optional<List<UserData>>
+    // Add pagination
+    @Query(value="{ 'followers' : { '\$not' : {'\$elemMatch' : { 'id' : ?1 } } }, '\$or' : [ { 'firstName' : { '\$regex' : ?0, '\$options' : 'i' } }, { 'lastName' : { '\$regex' : ?0, '\$options' : 'i' } } ] }")
+    fun findUsersByQueryParameter(q: String, id: String): Optional<List<UserData>>
 }
 
 interface BookDao: MongoRepository<Book, String> {
