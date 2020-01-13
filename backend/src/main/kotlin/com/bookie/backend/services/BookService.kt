@@ -1,6 +1,7 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.RatingResponse
+import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
@@ -93,10 +94,23 @@ class BookService(val bookDao: BookDao,
     /**
      * Returns the reviews for a specific book.
      */
-    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+    fun getReviews(id: String, page: Int, size: Int, token: String): List<ReviewResponse> {
         val result = bookDao.findReviewsById(id, page * size, size)
+
+        val userId = userService.getByToken(token).get().id // Not very efficient
+
         if (result.isPresent) {
-            return result.get().reviews
+            return result.get().reviews.map{
+                review ->
+                ReviewResponse(
+                        review.rating,
+                        review.comment,
+                        review.author,
+                        review.timestamp,
+                        review.id,
+                        review.likes,
+                        review.likedBy.contains(userId))
+            }
         }
         return emptyList()
     }
