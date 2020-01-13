@@ -254,6 +254,19 @@ class UserService(val userDao: UserDao,
         }
     }
 
+    // Add documentation
+    fun searchUsers(q: String): List<UserData> {
+        // Should sanitize the query
+        val spaces = q.contains(" ")
+        val query = if (spaces) {
+            "(" + q.replace(' ', '|') + ")"
+        } else {
+            q
+        }
+        val result = userDao.findUsersByQueryParameter(query)
+        return result.orElse(emptyList())
+    }
+
     private fun addReviewToFeed(review: FeedItem, id: String?) {
         if (id != null) {
             val user = userDao.findById(id).get()

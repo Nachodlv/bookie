@@ -52,6 +52,12 @@ interface UserDao: MongoRepository<User, String> {
      */
     @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'reviews' : { '\$slice' : [ ?1, ?2 ] } }")
     fun findReviewsById(id: String, skip: Int, limit: Int): Optional<ReviewList>
+
+    /**
+     * Finds the user's whose firstName or lastName contain the query parameter
+     */
+    @Query(value="{ '\$or' : [ { 'firstName' : { '\$regex' : ?0, '\$options' : 'i' } }, { 'lastName' : { '\$regex' : ?0, '\$options' : 'i' } } ] }")
+    fun findUsersByQueryParameter(q: String): Optional<List<UserData>>
 }
 
 interface BookDao: MongoRepository<Book, String> {

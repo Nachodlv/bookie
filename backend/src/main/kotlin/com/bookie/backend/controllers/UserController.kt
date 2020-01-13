@@ -144,4 +144,24 @@ class UserController(private val userService: UserService) {
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
+    /**
+     * Returns a list of users with their first name or last name matching the query parameter
+     *
+     * The result will have the following structure:
+     *
+     * [
+     *     {
+     *         id: String,
+     *         firstName: String,
+     *         lastName: String,
+     *         email: String,
+     *         followerAmount: Int
+     *     }
+     * ]
+     */
+    @GetMapping("/search")
+    fun searchUsersToFollow(@RequestParam(value = "q", required = false, defaultValue = "") q: String): ResponseEntity<List<UserData>> {
+        return ResponseEntity(userService.searchUsers(q), HttpStatus.OK)
+    }
+
 }
