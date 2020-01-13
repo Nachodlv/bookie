@@ -68,6 +68,24 @@ class AuthRepository constructor(
         authClient.recoverPassword(email, completion, error)
     }
 
+    fun changePassword(newPassword: String, token: String): LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+        authClient.changePassword(newPassword,
+            token,
+            { message -> executor.execute { status.postValue(RepositoryStatus.Success(message)) } },
+            { errorMessage ->
+                executor.execute {
+                    status.postValue(
+                        RepositoryStatus.Error(
+                            errorMessage
+                        )
+                    )
+                }
+            })
+
+        return status
+    }
+
     private fun refreshUser(email: String) {
         // Runs in a background thread.
         executor.execute {
