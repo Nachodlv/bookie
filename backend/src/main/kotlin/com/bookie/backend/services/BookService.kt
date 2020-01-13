@@ -11,6 +11,7 @@ import com.bookie.backend.util.exceptions.ReviewNotFoundException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -95,6 +96,8 @@ class BookService(val bookDao: BookDao,
      * Returns the reviews for a specific book.
      */
     fun getReviews(id: String, page: Int, size: Int, token: String): List<ReviewResponse> {
+
+        // This will probably not work
         val result = bookDao.findReviewsById(id, page * size, size)
 
         val userId = userService.getByToken(token).get().id // Not very efficient
@@ -123,7 +126,7 @@ class BookService(val bookDao: BookDao,
         val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
 
         if (user.id != null) {
-            val review = findReviewInBook(book, user.id)
+            val review = findReviewInBook(book.reviews, user.id)
             review.addLike(user.id)
             update(book)
             return review
@@ -140,7 +143,7 @@ class BookService(val bookDao: BookDao,
         val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
 
         if (user.id != null) {
-            val review = findReviewInBook(book, user.id)
+            val review = findReviewInBook(book.reviews, user.id)
             review.removeLike(user.id)
             update(book)
             return review
@@ -149,12 +152,24 @@ class BookService(val bookDao: BookDao,
         }
     }
 
-    private fun findReviewInBook(book: Book, authorId: String): Review {
-        val review: Review? = book.reviews.firstOrNull { review -> review.author?.id == authorId }
+    // This is not very efficient or the best way of doing it.
+    private fun findReviewInBook(reviews: MutableList<Review>, authorId: String): Review {
+        val review: Review? = reviews.firstOrNull { review -> review.author?.id == authorId }
+
         if (review != null) {
+            val index: Int = reviews.indexOf(review) // Get the index of the review
+            val likes = review.likes
+
+            var i = index-1
+            while (i >= 0 && reviews[i].likes < likes) {
+                i--
+            }
+            if (i+1 != index) {
+                reviews.removeAt(index)
+                reviews.add(i+1, review)
+            }
             return review
         }
         throw ReviewNotFoundException("No review found for that book from that author")
     }
-
 }
