@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.UserPreview
 import com.example.bookie.utils.FollowingsAdapter
-import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.OnScrollListenerMock
 import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
@@ -124,7 +124,7 @@ class ProfileFollowingSearchActivity : AppCompatActivity() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, users))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, users))
     }
 
     private fun showError(errorMessage: String) {
