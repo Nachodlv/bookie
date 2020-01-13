@@ -4,8 +4,10 @@ import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
+import com.bookie.backend.util.exceptions.BookNotFoundException
 import com.bookie.backend.util.exceptions.InvalidScoreException
-import org.bson.types.ObjectId
+import com.bookie.backend.util.exceptions.ReviewNotFoundException
+import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -97,6 +99,48 @@ class BookService(val bookDao: BookDao,
             return result.get().reviews
         }
         return emptyList()
+    }
+
+    /**
+     * Adds a like to a review and updates the book it belongs to.
+     */
+    fun addLikeToReview(token: String, bookId: String, authorId: String): Review {
+        val user = userService.getByToken(token).get()
+        val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
+
+        if (user.id != null) {
+            val review = findReviewInBook(book, user.id)
+            review.addLike(user.id)
+            update(book)
+            return review
+        } else {
+            throw UserNotFoundException("User not found") // This should never happen
+        }
+    }
+
+    /**
+     * Removes a like from a review and updates the book it belonged to.
+     */
+    fun removeLikeFromReview(token: String, bookId: String, authorId: String): Review {
+        val user = userService.getByToken(token).get()
+        val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
+
+        if (user.id != null) {
+            val review = findReviewInBook(book, user.id)
+            review.removeLike(user.id)
+            update(book)
+            return review
+        } else {
+            throw UserNotFoundException("User not found") // This should never happen
+        }
+    }
+
+    private fun findReviewInBook(book: Book, authorId: String): Review {
+        val review: Review? = book.reviews.firstOrNull { review -> review.author?.id == authorId }
+        if (review != null) {
+            return review
+        }
+        throw ReviewNotFoundException("No review found for that book from that author")
     }
 
 }
