@@ -8,6 +8,7 @@ import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.ReviewResponse
 import com.example.bookie.models.toObject
 import com.google.gson.Gson
+import org.json.JSONArray
 
 class ReviewClient(ctx: Context?) : ApiClient(ctx) {
 
@@ -49,11 +50,14 @@ class ReviewClient(ctx: Context?) : ApiClient(ctx) {
         val route = GetReviews(bookId, page, size, token)
         performRequest(route) { response ->
             when (response.statusCode) {
-                200 -> completion(
-                    Gson().fromJson(
-                        response.json,
-                        List::class.java
-                    ).map { it.toString().toObject<ReviewResponse>() })
+                200 -> {
+                    val array = JSONArray(response.json)
+                    val reviews = mutableListOf<ReviewResponse>()
+                    for(i in 0 until array.length()) {
+                        reviews.add(array[i].toString().toObject())
+                    }
+                    completion(reviews)
+                }
                 else -> error(response.json)
 
             }

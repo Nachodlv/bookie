@@ -6,6 +6,7 @@ import com.example.bookie.api.client.BookApiClient
 import com.example.bookie.api.client.BookClient
 import com.example.bookie.dao.BookDao
 import com.example.bookie.models.Book
+import com.example.bookie.models.Review
 import com.example.bookie.repositories.UserRepository.Companion.FRESH_TIMEOUT
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 
-@Database(entities = [User::class, Book::class, Review::class], version = 10)
+@Database(entities = [User::class, Book::class, Review::class], version = 11)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

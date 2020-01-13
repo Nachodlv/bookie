@@ -31,10 +31,13 @@ class BookProfile : AppCompatActivity() {
     private val bookRepository: BookRepository by injector.instance()
     private val reviewRepository: ReviewRepository by injector.instance()
 
+    private val pageSize: Int = 10
     private var loaderFragment: LoaderFragment? = LoaderFragment()
-
     private var bookReviewed: Boolean = false
     private var book: Book? = null
+    private var dataSet: MutableList<ReviewTab> = mutableListOf()
+    private var reviewsAdapter: ReviewsAdapter? = null
+    private var recyclerView: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,12 +115,13 @@ class BookProfile : AppCompatActivity() {
                 applicationContext.getString(R.string.rating_required)
             ) else {
                 loaderFragment?.showLoader(submit_button)
-                reviewRepository.postReview(
+                val (bookStatus, reviewStatus) = reviewRepository.postReview(
                     book.id,
                     review_text.text.toString(),
                     review_rating.rating.toInt(),
                     !bookReviewed
-                ).observe(this, Observer<RepositoryStatus<Book>> {
+                )
+                bookStatus.observe(this, Observer<RepositoryStatus<Book>> {
                     when (it) {
                         is RepositoryStatus.Success -> {
                             loaderFragment?.hideLoader(submit_button)
@@ -136,15 +140,28 @@ class BookProfile : AppCompatActivity() {
                         is RepositoryStatus.Loading -> return@Observer
                     }
                 })
+                reviewStatus.observe(this, Observer {
+                    when (it) {
+                        is RepositoryStatus.Success -> {
+                            val index = dataSet.indexOfFirst { r -> r.userId == it.data.userId }
+                            if (index != -1) {
+                                dataSet.removeAt(index)
+                                reviewsAdapter?.notifyItemRemoved(index)
+                            }
+                            dataSet.add(0, it.data.toReviewTab())
+                            reviewsAdapter?.notifyItemInserted(0)
+                            recyclerView?.scrollToPosition(0)
+                        }
+                    }
+                })
 
             }
         }
     }
 
-    fun loadReviews(view: View, book: Book) {
+    private fun loadReviews(view: View, book: Book) {
 
-
-        reviewRepository.getReviews(book.id, 0).observe(this, Observer {
+        reviewRepository.getReviews(book.id, 0, pageSize).observe(this, Observer {
             when (it) {
                 is RepositoryStatus.Success -> loadList(
                     view,
@@ -158,13 +175,17 @@ class BookProfile : AppCompatActivity() {
 
     }
 
-    fun loadList(view: View, book: Book, dataSet: MutableList<ReviewTab>) {
+    private fun loadList(view: View, book: Book, dataSet: MutableList<ReviewTab>) {
 
+        this.dataSet = dataSet
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(applicationContext)
         val viewAdapter = ReviewsAdapter(dataSet, this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
+
+        reviewsAdapter = viewAdapter
+        recyclerView = recList
 
         recList.apply {
             // use this setting to improve performance if you know that changes
@@ -178,13 +199,14 @@ class BookProfile : AppCompatActivity() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(
+        val scrollListener =
             OnScrollListener(
                 viewManager,
                 viewAdapter,
-                dataSet
+                dataSet,
+                pageSize
             ) { index, callback ->
-                reviewRepository.getReviews(book.id, index).observe(this, Observer {
+                reviewRepository.getReviews(book.id, index, pageSize).observe(this, Observer {
                     when (it) {
                         is RepositoryStatus.Success -> callback(it.data.map { r -> r.toReviewTab() })
                         is RepositoryStatus.Error -> {
@@ -194,7 +216,9 @@ class BookProfile : AppCompatActivity() {
                     }
                 })
             }
-        )
+
+        recList.addOnScrollListener(scrollListener)
+
     }
 
 }

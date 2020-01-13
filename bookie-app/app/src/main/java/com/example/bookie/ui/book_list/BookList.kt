@@ -21,6 +21,8 @@ class BookList : AppCompatActivity() {
     private val injector = KodeinInjector()
     private val bookRepository: BookRepository by injector.instance()
 
+    private val pageSize: Int = 10
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_list)
@@ -29,8 +31,6 @@ class BookList : AppCompatActivity() {
 
         setupToolbar()
         searchForBooks()
-
-
     }
 
 
@@ -51,7 +51,7 @@ class BookList : AppCompatActivity() {
         val query = bundle.getString("searchQuery") ?: return
         bookRepository.searchBooks(query, { books ->
             runOnUiThread { buildList(books.map { it.toBookFeed() }.toMutableList(), query)}
-        }, { error -> showError(error) }, 0)
+        }, { error -> showError(error) }, 0, pageSize)
     }
 
 
@@ -77,7 +77,8 @@ class BookList : AppCompatActivity() {
             OnScrollListener(
                 viewManager,
                 viewAdapter,
-                books
+                books,
+                pageSize
             ) { index, callback ->
                 bookRepository.searchBooks(
                     query,
@@ -86,7 +87,8 @@ class BookList : AppCompatActivity() {
                         showError(error)
                         callback(emptyList())
                     },
-                    index
+                    index,
+                    pageSize
                 )
             })
     }

@@ -22,6 +22,6 @@ val reviewModule = Kodein.Module {
     }
 
     bind<ReviewRepository>() with singleton {
-        ReviewRepository(instance(), instance(), instance(), instance())
+        ReviewRepository(instance(), instance(), instance(), instance(), instance())
     }
 }
