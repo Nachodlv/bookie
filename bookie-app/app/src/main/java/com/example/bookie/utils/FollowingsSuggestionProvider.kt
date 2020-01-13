@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
 import com.example.bookie.MyApplication
+import com.example.bookie.models.UserPreview
 import com.example.bookie.repositories.BookRepository
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.instance
@@ -19,7 +20,7 @@ import kotlin.coroutines.resume
 class FollowingsSuggestionProvider : ContentProvider() {
 
     private val injector = KodeinInjector()
-    private val bookRepository: BookRepository by injector.instance()
+//    private val bookRepository: BookRepository by injector.instance()
 //    private val context: Context? = MyApplication.appContext
 
 
@@ -61,7 +62,7 @@ class FollowingsSuggestionProvider : ContentProvider() {
 
     private suspend fun getSuggestions(query: String): List<Array<String>> {
 
-        return suspendCancellableCoroutine { continuation ->
+        /*return suspendCancellableCoroutine { continuation ->
             bookRepository.searchRecommendation(
                 query
             ) { books ->
@@ -75,6 +76,24 @@ class FollowingsSuggestionProvider : ContentProvider() {
                     )
                 })
             }
+        }*/
+
+        val users = arrayListOf(
+                UserPreview("1", "Gianluca", "Scolaro", isFollower = false),
+                UserPreview("2", "Pedro", "Perez", isFollower = true),
+                UserPreview("3", "Jacobo", "Santos de La Virgen de Nazareth Segundo", isFollower = true),
+                UserPreview("4", "Juan", "Carlos", isFollower = true),
+                UserPreview("5", "Bob", isFollower = true))
+
+        return suspendCancellableCoroutine { continuation ->
+            continuation.resume(users.map {
+                arrayOf(
+                        "0",
+                        "0",
+                        "${it.firstName} ${it.lastName}",
+                        it.id
+                )
+            })
         }
 
     }

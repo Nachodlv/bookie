@@ -27,8 +27,9 @@
         </activity>
         <activity
             android:name=".ui.profile.tabs.following.ProfileFollowingSearchActivity"
-            android:label="@string/app_name"
+            android:label="@string/search_activity"
             android:theme="@style/AppTheme.NoActionBar">
+
             <!-- enable the search dialog to send searches to SearchableActivity -->
             <meta-data
                 android:name="android.app.default_searchable"

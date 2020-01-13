@@ -50,6 +50,7 @@
     <string name="search_hint_dialog">Search for a user</string>
 
     <!--FOLLOWING SEARCH-->
+    <string name="search_activity">Search for new users</string>
     <string name="find_new_users">Find new users</string>
 
     <!--ERRORS-->

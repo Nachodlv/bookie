@@ -4,16 +4,17 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.bookie.ui.profile.tabs.following.ProfileFollowingSearchActivity
 
 class FollowingsSearchableActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.search)
         handleIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
         setIntent(intent)
         handleIntent(intent)
     }
@@ -34,12 +35,22 @@ class FollowingsSearchableActivity : AppCompatActivity() {
     }
 
     private fun doSearch(query: String) {
-        print("Hello")
-        // TODO go to search result
+        val intent = Intent(this, ProfileFollowingSearchActivity::class.java)
+        val bundle = Bundle()
+        bundle.putString("searchQuery", query)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
     private fun getById(id: String) {
         //TODO get book by id
+
+        /*
+        val intent = Intent(this, BookProfile::class.java)
+        val bundle = Bundle()
+        bundle.putString("bookId", id)
+        intent.putExtras(bundle)
+        startActivity(intent)*/
     }
 
 

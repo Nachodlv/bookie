@@ -3,15 +3,9 @@ package com.example.bookie.utils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
-import com.example.bookie.models.*
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
-import java.util.*
 
 
 
