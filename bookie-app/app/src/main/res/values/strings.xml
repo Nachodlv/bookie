@@ -67,6 +67,7 @@
     <string name="book_list">Book list</string>
 
 <!--    BOOK PROFILE-->
+    <string name="title_book_profile">Book Details</string>
     <string name="write_review">Did you read it? Write a review!</string>
     <string name="submit_review">Submit</string>
     <string name="edit_review">Edit</string>

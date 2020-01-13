@@ -15,10 +15,7 @@ import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
 import com.example.bookie.ui.loader.LoaderFragment
-import com.example.bookie.utils.OnScrollListener
-import com.example.bookie.utils.ReviewsAdapter
-import com.example.bookie.utils.SnackbarUtil
-import com.example.bookie.utils.TextValidator
+import com.example.bookie.utils.*
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance

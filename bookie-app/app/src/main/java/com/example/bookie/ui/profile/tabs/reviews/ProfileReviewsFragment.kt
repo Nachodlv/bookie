@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
-import com.example.bookie.models.FeedItem
 import com.example.bookie.models.ReviewTab
-import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.OnScrollListenerMock
 import com.example.bookie.utils.ReviewsAdapter
 import java.util.*
@@ -31,7 +29,7 @@ class ProfileReviewsFragment : Fragment() {
         val coverImage = "http://books.google.com/books/content?id=zaRoX10_UsMC&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE70-WOhpalNjXmQHvsBr3kHikU9KUEtIHzSrFk2W_ehR0VaKktBtXXFLm3pOr0EVxAoTg4-jhTA1hhz-xp3cEgA7_dC2TVawKxbILkmbmwj-Gw-K0bhIj76mAZfuB1Yusj2AdrkF&source=gbs_api"
 
         val reviews: MutableList<ReviewTab> = arrayListOf(
-                ReviewTab("0", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
+                ReviewTab("0", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),
                 ReviewTab("1", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
                         coverImage, 5.0F, 255, Date()),

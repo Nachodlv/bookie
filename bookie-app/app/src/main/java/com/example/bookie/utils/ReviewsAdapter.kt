@@ -56,7 +56,7 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>, private val context
         )
         else if (currentContext != null) holder.bookImage.setImageDrawable(
             currentContext.getDrawable(
-                R.drawable.cast_album_art_placeholder_large
+                R.drawable.ic_account_circle_large
             )
         )
         holder.bookTitle.text = data.title
@@ -64,19 +64,19 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>, private val context
         holder.ratingBar.rating = data.rating
         holder.likes.text = data.likes.toString()
         holder.time.text = DateUtils.getDifference(data.time, Date())
+        holder.readMore.text = context?.getString(R.string.read_more)
 
-        val maxLines = holder.preview.maxLines
         if (holder.preview.text.length > 39 * holder.preview.maxLines) {
             holder.readMore.visibility = View.VISIBLE
             holder.readMore.setOnClickListener {
                 val context = context?:return@setOnClickListener
-                holder.readMore.maxLines =
-                    if (holder.readMore.maxLines == maxLines) {
+                holder.preview.maxLines =
+                    if (holder.readMore.text == context.getString(R.string.read_more)) {
                         holder.readMore.text = context.getString(R.string.read_less)
                         Integer.MAX_VALUE
                     } else {
                         holder.readMore.text = context.getString(R.string.read_more)
-                        maxLines
+                        3
                     }
             }
         } else {

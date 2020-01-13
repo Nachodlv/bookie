@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".ui.book_profile.BookProfile"
-            android:label=""></activity>
+            android:label="@string/title_book_profile"></activity>
         <activity android:name=".ui.book_list.BookList"></activity>
         <activity
             android:name=".MainActivity"
