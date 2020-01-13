@@ -35,3 +35,18 @@ class UserById(private val id: String, token: String) : ApiRoute(token) {
         get() = HashMap()
 
 }
+
+class UserReviews(
+    private val id: String,
+    private val page: Int,
+    private val size: Int,
+    token: String
+) : ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/reviews/$id?page=$page&size=$size"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
+
+}

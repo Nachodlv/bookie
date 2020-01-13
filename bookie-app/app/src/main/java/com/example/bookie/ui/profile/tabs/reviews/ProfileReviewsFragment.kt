@@ -5,65 +5,57 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
-import com.example.bookie.models.FeedItem
 import com.example.bookie.models.ReviewTab
+import com.example.bookie.repositories.RepositoryStatus
+import com.example.bookie.repositories.UserRepository
 import com.example.bookie.utils.OnScrollListener
-import com.example.bookie.utils.OnScrollListenerMock
 import com.example.bookie.utils.ReviewsAdapter
-import java.util.*
+import com.example.bookie.utils.SnackbarUtil
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
+
 
 class ProfileReviewsFragment : Fragment() {
+
+    private val injector = KodeinInjector()
+    private val userRepository: UserRepository by injector.instance()
+
+    private var userId: String? = null
+    private val pageSize = 10
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        userId = arguments?.getString("userId")
         return inflater.inflate(R.layout.fragment_reviews_tab, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //TODO get from backend
+        injector.inject(appKodein())
 
-        val coverImage = "http://books.google.com/books/content?id=zaRoX10_UsMC&printsec=frontcover&img=1&zoom=5&edge=curl&imgtk=AFLRE70-WOhpalNjXmQHvsBr3kHikU9KUEtIHzSrFk2W_ehR0VaKktBtXXFLm3pOr0EVxAoTg4-jhTA1hhz-xp3cEgA7_dC2TVawKxbILkmbmwj-Gw-K0bhIj76mAZfuB1Yusj2AdrkF&source=gbs_api"
+        loadReviews(view)
 
-        val reviews: MutableList<ReviewTab> = arrayListOf(
-                ReviewTab("0", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("1", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("2", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("3", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("4", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("5", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("6", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("7", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("9", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("10", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("11", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("12", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("13", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("14", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date()),
-                ReviewTab("15", "0", "The Fellowship of the Ring 1", "This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend. This a review. I kinda liked it. Idk sue me. 5/7 would recommend.This a review. I kinda liked it. Idk sue me. 5/7 would recommend",
-                        coverImage, 5.0F, 255, Date())
-        )
+    }
 
-        val myDataSet: MutableList<ReviewTab> = mutableListOf<ReviewTab>().apply { addAll(reviews.subList(0, 10)) }
+    private fun loadReviews(view: View) {
+        val userId = this.userId ?: return
+        userRepository.getUserReviews(userId, 0, pageSize).observe(viewLifecycleOwner, Observer {
+            when (it) {
+                is RepositoryStatus.Success -> loadList(view, it.data.map { r -> r.toReviewTab() })
+                is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
+            }
+        })
+    }
+
+    private fun loadList(view: View, reviews: List<ReviewTab>) {
+        val myDataSet: MutableList<ReviewTab> = reviews.toMutableList()
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
@@ -82,6 +74,24 @@ class ProfileReviewsFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, reviews))
+        recList.addOnScrollListener(
+            OnScrollListener(
+                viewManager,
+                viewAdapter,
+                myDataSet,
+                pageSize
+            ) { index, callback ->
+                val userId = this.userId
+                if (userId != null)
+                    userRepository.getUserReviews(userId, index, pageSize).observe(
+                        viewLifecycleOwner,
+                        Observer {
+                            when (it) {
+                                is RepositoryStatus.Success -> callback(it.data.map { r -> r.toReviewTab() })
+                                is RepositoryStatus.Error -> callback(emptyList())
+                            }
+                        })
+            }
+        )
     }
 }

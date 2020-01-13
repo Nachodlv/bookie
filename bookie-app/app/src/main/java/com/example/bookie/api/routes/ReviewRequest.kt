@@ -26,10 +26,10 @@ class GetReviews(
     token: String
 ) : ApiRoute(token) {
     override val url: String
-        get() = "$baseUrl/book/reviews/$bookId"
+        get() = "$baseUrl/book/reviews/$bookId?page=$page&size=$size"
     override val httpMethod: Int
         get() = Request.Method.GET
     override val params: HashMap<String, Any>
-        get() = hashMapOf("page" to page, "size" to size)
+        get() = hashMapOf()
 
 }

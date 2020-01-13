@@ -2,10 +2,13 @@ package com.example.bookie.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.example.bookie.api.client.UserClient
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.dao.UserDao
+import com.example.bookie.models.Review
 import com.example.bookie.models.User
+import com.example.bookie.models.UserReviewResponse
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
@@ -24,16 +27,38 @@ class UserRepository constructor(
     private val userDao: UserDao,
     private val sharedPreferencesDao: SharedPreferencesDao
 ) {
-    private val status: MutableLiveData<RepositoryStatus<User>> by lazy {
-        val list = MutableLiveData<RepositoryStatus<User>>()
-        list.value = RepositoryStatus.Loading()
-        list
-    }
+
 
     fun getUser(userId: String): LiveData<RepositoryStatus<User>> {
-        refreshUser(userId)
+        val status = RepositoryStatus.initStatus<User>()
+        refreshUser(userId, status)
         // Returns a LiveData object directly from the database.
         return status
+    }
+
+    fun getUserReviews(
+        userId: String,
+        index: Int,
+        size: Int
+    ): LiveData<RepositoryStatus<List<Review>>> {
+        val status = RepositoryStatus.initStatus<List<UserReviewResponse>>()
+        userClient.getUserReviews(userId, index / size, size, {
+            executor.execute {
+                status.postValue(RepositoryStatus.Success(it))
+            }
+        }, { executor.execute { status.postValue(RepositoryStatus.Error(it)) } })
+        return Transformations.switchMap(getUser(userId)) { userStatus ->
+            Transformations.map(status) { reviewStatus ->
+                if (reviewStatus is RepositoryStatus.Success && userStatus is RepositoryStatus.Success) {
+                    RepositoryStatus.Success(reviewStatus.data.map { it.toReview(userStatus.data) }) as RepositoryStatus<List<Review>>
+                } else if (reviewStatus is RepositoryStatus.Error) {
+                    RepositoryStatus.Error(reviewStatus.error)
+                } else if (userStatus is RepositoryStatus.Error) {
+                    RepositoryStatus.Error(userStatus.error)
+                } else RepositoryStatus.Loading()
+            }
+        }
+
     }
 
     fun registerUser(
@@ -47,25 +72,22 @@ class UserRepository constructor(
         userClient.registerUser(email, password, name, lastName, completion, onError)
     }
 
-    private fun refreshUser(userId: String) {
+    private fun refreshUser(userId: String, status: MutableLiveData<RepositoryStatus<User>>) {
         // Runs in a background thread.
         executor.execute {
             // Check if user data was fetched recently.
             val userExists = userDao.hasUser(userId, FRESH_TIMEOUT)
             if (userExists == null) {
                 // Refreshes the data.
-                userClient.getUserById(userId) { user, error ->
-                    run {
-                        if (user != null) {
-                            user.let { userDao.save(it) }
-                            status.value = RepositoryStatus.Success(user)
-                        } else {
-                            status.value = RepositoryStatus.Error(error)
-                        }
-
+                userClient.getUserById(userId, { user ->
+                    executor.execute {
+                        user.let { userDao.save(it) }
+                        status.postValue(RepositoryStatus.Success(user))
                     }
-                }
-            } else status.value = RepositoryStatus.Success(userExists)
+                }, {
+                    executor.execute { status.postValue(RepositoryStatus.Error(it)) }
+                })
+            } else status.postValue(RepositoryStatus.Success(userExists))
         }
     }
 

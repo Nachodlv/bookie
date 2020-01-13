@@ -5,17 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bookie.R
 import com.example.bookie.models.User
 import com.example.bookie.models.UserPreview
+import com.example.bookie.repositories.AuthRepository
+import com.example.bookie.repositories.RepositoryStatus
+import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.profile.header.ProfileHeaderFragment
 import com.example.bookie.ui.profile.header.ProfileHeaderViewModel
-import com.example.bookie.ui.profile.tabs.reviews.ProfileReviewsFragment
+import com.example.bookie.utils.SnackbarUtil
 import com.example.bookie.utils.ViewPagerAdapter
-import com.github.salomonbrys.kodein.android.androidSupportFragmentScope
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -29,12 +34,21 @@ class ProfileFragment : Fragment() {
     private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var viewPager: ViewPager2
 
+    private val injector = KodeinInjector()
+    private val userRepository: UserRepository by injector.instance()
+    private val authRepository: AuthRepository by injector.instance()
+
+    private var privateProfile = true //TODO modify
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        injector.inject(appKodein())
 
         profileHeaderViewModel = activity?.run {
             ViewModelProvider(this).get(ProfileHeaderViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
+
     }
 
     override fun onCreateView(
@@ -88,15 +102,29 @@ class ProfileFragment : Fragment() {
         parentFragmentManager.beginTransaction()
                 .add(R.id.header_container, fragment).commit()
 
-        //TODO get values from session/backend
-        val user = User("17", "gianluca.scolaro@gmail.com", "Gianni", "Scolaro", 1976127012)
-        val followers = 321
 
+        val userId = "42"
+
+        val observer = Observer<RepositoryStatus<User>> {
+            when(it) {
+                is RepositoryStatus.Success -> buildTabs(view, it.data)
+                is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
+            }
+        }
+
+        if(privateProfile)
+            authRepository.getUserLoggedIn().observe(viewLifecycleOwner, observer)
+        else
+            userRepository.getUser(userId).observe(viewLifecycleOwner, observer)
+
+    }
+
+    private fun buildTabs(view: View, user: User) {
         profileHeaderViewModel.storeUser(user)
-        profileHeaderViewModel.storeFollowers(followers)
+        profileHeaderViewModel.storeFollowers(user.followerAmount)
 
         // View page and tabs initialization
-        viewPagerAdapter = ViewPagerAdapter(this)
+        viewPagerAdapter = ViewPagerAdapter(this, user.id)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = viewPagerAdapter
 
@@ -109,5 +137,7 @@ class ProfileFragment : Fragment() {
                 else -> "OutOfBounds $position"
             }
         }.attach()
+
+        activity?.supportFragmentManager?.findFragmentById(R.id.fragment_loader)
     }
 }
