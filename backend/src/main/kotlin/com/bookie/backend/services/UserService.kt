@@ -255,7 +255,7 @@ class UserService(val userDao: UserDao,
     }
 
     // Add documentation
-    fun searchUsers(q: String, token: String): List<UserData> {
+    fun searchUsers(q: String, token: String, pageable: Pageable): List<UserData> {
         // Should sanitize the query
         val email = tokenUtil.getUsernameFromToken(token)
         val user = userDao.findByEmail(email).get()
@@ -266,7 +266,7 @@ class UserService(val userDao: UserDao,
         } else {
             q
         }
-        val result = userDao.findUsersByQueryParameter(query, user.id!!)
+        val result = userDao.findUsersByQueryParameter(query, user.id!!, pageable)
         return result.orElse(emptyList())
     }
 

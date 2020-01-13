@@ -161,11 +161,12 @@ class UserController(private val userService: UserService) {
      */
     @GetMapping("/search")
     fun searchUsersToFollow(@RequestParam(value = "q", required = false, defaultValue = "") q: String,
-                            @RequestHeader headers: Map<String, String>): ResponseEntity<List<UserData>> {
+                            @RequestHeader headers: Map<String, String>,
+                            pageable: Pageable): ResponseEntity<List<UserData>> {
         val token = headers["authorization"]?.substring(7)
 
         return if (token != null) {
-            ResponseEntity(userService.searchUsers(q, token), HttpStatus.OK)
+            ResponseEntity(userService.searchUsers(q, token, pageable), HttpStatus.OK)
         } else {
             ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
