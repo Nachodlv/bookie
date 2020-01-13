@@ -2,23 +2,25 @@ package com.example.bookie.api.client
 
 import android.content.Context
 import com.example.bookie.R
+import com.example.bookie.api.routes.BookById
 import com.example.bookie.api.routes.IsbnSearch
-import com.example.bookie.api.routes.SearchRecommendation
+import com.example.bookie.api.routes.BookSearch
 import com.example.bookie.models.Book
 import com.example.bookie.models.toObject
 import org.json.JSONArray
 import org.json.JSONObject
 
 class BookApiClient(ctx: Context?) : ApiClient(ctx) {
-    fun searchRecommendation(
+    fun searchBook(
         query: String,
         limitation: Int,
+        index: Int,
         completion: (books: List<Book>) -> Unit,
         error: (errorMessage: String) -> Unit
     ) {
         if (ctx == null) return
 
-        val route = SearchRecommendation(query, limitation)
+        val route = BookSearch(query, limitation, index)
         this.performRequest(route) { response ->
             when (response.statusCode) {
                 200 -> {
@@ -54,6 +56,21 @@ class BookApiClient(ctx: Context?) : ApiClient(ctx) {
         }
     }
 
+    fun getBookById(id: String, completion: (book: Book) -> Unit, error: (errorMessage: String) -> Unit) {
+        if(ctx == null) return
+
+        val route = BookById(id)
+        this.performRequest(route) {response ->
+            when(response.statusCode) {
+                200 -> {
+                    val books = fromJsonToBooks(response.json)
+                    if(books.isNotEmpty()) completion(books[0])
+                    else error(ctx.getString(R.string.default_error))
+                } else -> error(ctx.getString(R.string.default_error))
+            }
+        }
+
+    }
 
     private fun fromJsonToBooks(json: String): List<Book> {
         val jsonObject = JSONObject(json)

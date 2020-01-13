@@ -14,6 +14,7 @@ import com.example.bookie.models.UserPreview
 import com.example.bookie.ui.profile.ProfileViewModel
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.OnScrollListenerMock
 import kotlinx.android.synthetic.main.fragment_followings_tab.*
 
 class ProfileFollowersFragment : Fragment() {
@@ -60,6 +61,6 @@ class ProfileFollowersFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, followers))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, followers))
     }
 }

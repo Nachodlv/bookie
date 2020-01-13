@@ -62,4 +62,16 @@
     <string name="code_detected">Code detected. Searching for the book</string>
     <string name="start_scanning">Looking for the book…</string>
     <string name="no_book_found">No book found with that code</string>
+
+<!--    BOOK LIST-->
+    <string name="book_list">Book list</string>
+
+<!--    BOOK PROFILE-->
+    <string name="write_review">Did you read it? Write a review!</string>
+    <string name="submit_review">Submit</string>
+    <string name="edit_review">Edit</string>
+    <string name="rating_required">Please rate the review</string>
+    <string name="successful_review">Review submitted!</string>
+    <string name="read_more">Read more…</string>
+    <string name="read_less">Read less</string>
 </resources>

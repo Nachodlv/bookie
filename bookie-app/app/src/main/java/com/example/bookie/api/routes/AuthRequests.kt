@@ -13,7 +13,7 @@ class Login(var email: String, var password: String) :
         get() = Request.Method.POST
 
 
-    override val params: HashMap<String, String>
+    override val params: HashMap<String, Any>
         get() = hashMapOf("email" to email, "password" to password)
 
 }
@@ -25,7 +25,7 @@ class UserLogged(token: String) : ApiRoute(token) {
     override val httpMethod: Int
         get() = Request.Method.GET
 
-    override val params: HashMap<String, String>
+    override val params: HashMap<String, Any>
         get() = HashMap()
 
 }

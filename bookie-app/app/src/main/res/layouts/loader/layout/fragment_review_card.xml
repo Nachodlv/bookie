@@ -5,24 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/book-card"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="25dp"
-    android:paddingTop="25dp"
-    android:paddingRight="25dp"
-    android:paddingBottom="0dp">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/book_card_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFAFA"
-        app:cardBackgroundColor="#F0FFFF">
+        app:cardBackgroundColor="#F0FFFF"
+        app:cardElevation="10dp"
+        app:cardUseCompatPadding="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/card_constraint"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="15dp">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/book_image"
@@ -38,14 +35,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:textSize="18sp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:scrollHorizontally="true"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="The Fellowship of the Ring"/>
+                tools:text="The Fellowship of the Ring" />
 
             <TextView
                 android:id="@+id/preview"
@@ -54,16 +51,32 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:ellipsize="end"
-                android:maxLines="1"
+                android:maxLines="5"
                 android:scrollHorizontally="true"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
                 app:layout_constraintTop_toBottomOf="@+id/book_title"
-                tools:text="This is a very good book. I would recommend it to anyone."
-                />
+                tools:text="This is a very good book. I would recommend it to anyone. This is a very good book. I would recommend it to anyone. This is a very good book. I would recommend it to anyone. This is a very good book. I would recommend it to anyone. This is a very good book. I would recommend it to anyone." />
 
             <!--Rating bar only for visualization, user cant interact with it.-->
+
+            <TextView
+                android:id="@+id/read_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:scrollHorizontally="true"
+                android:textColor="#2465F5"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.437"
+                app:layout_constraintStart_toEndOf="@+id/rating_bar"
+                app:layout_constraintTop_toBottomOf="@+id/preview"
+                tools:text="@string/read_more" />
+
             <RatingBar
                 android:id="@+id/rating_bar"
                 style="?android:attr/ratingBarStyleSmall"
@@ -84,38 +97,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="48dp"
+                android:layout_marginBottom="5dp"
                 android:drawableEnd="@drawable/ic_thumb_up"
                 android:drawablePadding="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/rating_bar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/book_image"
-                tools:text="244"/>
+                tools:text="244" />
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="2 hours ago"/>
+                app:layout_constraintTop_toBottomOf="@+id/read_more"
+                tools:text="2 hours ago" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginTop="160dp"
-            android:background="#D3D3D3">
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:background="#D3D3D3" />
 
     </androidx.cardview.widget.CardView>
 </FrameLayout>

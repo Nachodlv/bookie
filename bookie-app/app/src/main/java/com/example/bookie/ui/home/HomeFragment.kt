@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.models.*
 import com.example.bookie.utils.FeedItemsAdapter
 import com.example.bookie.utils.OnScrollListener
+import com.example.bookie.utils.OnScrollListenerMock
 
 class HomeFragment : Fragment() {
 
@@ -34,68 +35,68 @@ class HomeFragment : Fragment() {
 
         val feedArray: MutableList<FeedItem> = arrayListOf(
                 BookFeed("0", "The Fellowship of the Ring 1", "JRR Tolkien",
-                coverImage, FeedItemType.BOOK,5.0F),
+                coverImage, 5.0F),
                 BookFeed("1", "Jesus our lord, Bible Study 2", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("2", "The Fellowship of the Ring 3", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("3", "The Fellowship of the Ring 4", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("4", "The Fellowship of the Ring 5", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("5", "Jesus our lord, Bible Study 6", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("6", "The Fellowship of the Ring 7", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("7", "The Fellowship of the Ring 8", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("8", "The Fellowship of the Ring 9", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("9", "Jesus our lord, Bible Study 10", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("10", "The Fellowship of the Ring 11", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("11", "The Fellowship of the Ring 12", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("12", "The Fellowship of the Ring 13", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("13", "Jesus our lord, Bible Study 14", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("14", "The Fellowship of the Ring 15", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("15", "The Fellowship of the Ring 16", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("16", "The Fellowship of the Ring 17", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("17", "Jesus our lord, Bible Study 18", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("18", "The Fellowship of the Ring 19", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("19", "The Fellowship of the Ring 20", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("20", "The Fellowship of the Ring 21", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("21", "Jesus our lord, Bible Study 22", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("22", "The Fellowship of the Ring 23", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("23", "The Fellowship of the Ring 24", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date()),
+                        coverImage,5F, Date()),
                 BookFeed("24", "The Fellowship of the Ring 25", "JRR Tolkien",
-                        coverImage, FeedItemType.BOOK,5.0F),
+                        coverImage, 5.0F),
                 BookFeed("25", "Jesus our lord, Bible Study 26", "Charles R. Swindoll",
-                        coverImage, FeedItemType.BOOK,3.5F),
+                        coverImage, 3.5F),
                 FollowerComment("26", "The Fellowship of the Ring 27", "Eduardo",
-                        coverImage, FeedItemType.COMMENT,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
+                        coverImage,"I loved this review, really helpful and enjoyable. Thank you!", Date()),
                 FollowerReview("27", "The Fellowship of the Ring 28", "Eduardo",
-                        coverImage, FeedItemType.REVIEW,5F, Date())
+                        coverImage,5F, Date())
                 )
 
         val myDataSet: MutableList<FeedItem> = mutableListOf<FeedItem>().apply { addAll(feedArray.subList(0, 10)) }
 
         val recList = homeView.findViewById(R.id.feed_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = FeedItemsAdapter(myDataSet)
+        val viewAdapter = FeedItemsAdapter(myDataSet, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -110,7 +111,7 @@ class HomeFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListener(viewManager, viewAdapter, myDataSet, feedArray))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, feedArray))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

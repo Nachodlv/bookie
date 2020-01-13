@@ -11,7 +11,7 @@ abstract class ApiRoute(
 
     abstract val httpMethod: Int
 
-    abstract val params: HashMap<String, String>
+    abstract val params: HashMap<String, Any>
 
     val headers: HashMap<String, String>
         get() {

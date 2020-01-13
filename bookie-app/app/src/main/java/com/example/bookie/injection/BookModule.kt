@@ -2,6 +2,7 @@ package com.example.bookie.injection
 
 import com.example.bookie.MyApplication
 import com.example.bookie.api.client.BookApiClient
+import com.example.bookie.api.client.BookClient
 import com.example.bookie.dao.AppDatabase
 import com.example.bookie.dao.BookDao
 import com.example.bookie.repositories.BookRepository
@@ -21,7 +22,11 @@ val bookModule = Kodein.Module {
         BookApiClient(MyApplication.appContext)
     }
 
+    bind<BookClient>() with singleton {
+        BookClient(MyApplication.appContext)
+    }
+
     bind<BookRepository>() with singleton {
-        BookRepository(instance(), instance(), instance())
+        BookRepository(instance(), instance(), instance(), instance())
     }
 }
