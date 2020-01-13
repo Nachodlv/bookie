@@ -30,6 +30,8 @@ dependencies {
 
 	implementation("com.fasterxml.jackson.core:jackson-core:2.10.1")
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.10.1")
+	
+	implementation("org.springframework.boot:spring-boot-starter-mail:2.2.2.RELEASE")
 }
 
 tasks.withType<Test> {

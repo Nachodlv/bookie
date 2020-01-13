@@ -1,16 +1,17 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.RatingResponse
-import com.bookie.backend.models.Author
-import com.bookie.backend.models.Book
-import com.bookie.backend.models.Review
-import com.bookie.backend.models.User
+import com.bookie.backend.dto.ReviewResponse
+import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
+import com.bookie.backend.util.exceptions.BookNotFoundException
 import com.bookie.backend.util.exceptions.InvalidScoreException
-import org.bson.types.ObjectId
+import com.bookie.backend.util.exceptions.ReviewNotFoundException
+import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -57,24 +58,28 @@ class BookService(val bookDao: BookDao,
 
         val timestamp: Instant = Instant.now()
         val author = Author(user.id!!, user.firstName, user.lastName)
-        val review = Review(score, comment, author, timestamp, ObjectId().toHexString())
 
         val result: Optional<Book> = bookDao.findById(id)
 
-        val testReview = Review(score, comment, null, timestamp, ObjectId().toHexString())
-        user.addReview(testReview)
-        userService.update(user)
-
         val book: Book
+        val review: Review
         if (result.isPresent) {
             book = result.get()
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             update(book)
         } else {
             book = Book(id, 0.0)
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             insert(book)
         }
+
+        val userReview = Review(score, comment, null, timestamp, book.id)
+        user.addReview(userReview)
+        userService.update(user)
+
+        userService.addFeedItems(review, user, book)
 
         return review
     }
@@ -90,12 +95,81 @@ class BookService(val bookDao: BookDao,
     /**
      * Returns the reviews for a specific book.
      */
-    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+    fun getReviews(id: String, page: Int, size: Int, token: String): List<ReviewResponse> {
+
+        // This will probably not work
         val result = bookDao.findReviewsById(id, page * size, size)
+
+        val userId = userService.getByToken(token).get().id // Not very efficient
+
         if (result.isPresent) {
-            return result.get().reviews
+            return result.get().reviews.map{
+                review ->
+                ReviewResponse(
+                        review.rating,
+                        review.comment,
+                        review.author,
+                        review.timestamp,
+                        review.id,
+                        review.likes,
+                        review.likedBy.contains(userId))
+            }
         }
         return emptyList()
     }
 
+    /**
+     * Adds a like to a review and updates the book it belongs to.
+     */
+    fun addLikeToReview(token: String, bookId: String, authorId: String): Review {
+        val user = userService.getByToken(token).get()
+        val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
+
+        if (user.id != null) {
+            val review = findReviewInBook(book.reviews, user.id)
+            review.addLike(user.id)
+            update(book)
+            return review
+        } else {
+            throw UserNotFoundException("User not found") // This should never happen
+        }
+    }
+
+    /**
+     * Removes a like from a review and updates the book it belonged to.
+     */
+    fun removeLikeFromReview(token: String, bookId: String, authorId: String): Review {
+        val user = userService.getByToken(token).get()
+        val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
+
+        if (user.id != null) {
+            val review = findReviewInBook(book.reviews, user.id)
+            review.removeLike(user.id)
+            update(book)
+            return review
+        } else {
+            throw UserNotFoundException("User not found") // This should never happen
+        }
+    }
+
+    // This is not very efficient or the best way of doing it.
+    private fun findReviewInBook(reviews: MutableList<Review>, authorId: String): Review {
+        val review: Review? = reviews.firstOrNull { review -> review.author?.id == authorId }
+
+        if (review != null) {
+            val index: Int = reviews.indexOf(review) // Get the index of the review
+            val likes = review.likes
+
+            var i = index-1
+            while (i >= 0 && reviews[i].likes < likes) {
+                i--
+            }
+            if (i+1 != index) {
+                reviews.removeAt(index)
+                reviews.add(i+1, review)
+            }
+            return review
+        }
+        throw ReviewNotFoundException("No review found for that book from that author")
+    }
 }

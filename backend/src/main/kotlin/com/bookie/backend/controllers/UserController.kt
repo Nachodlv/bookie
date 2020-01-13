@@ -4,10 +4,12 @@ import com.bookie.backend.dto.AnonymousReview
 import com.bookie.backend.dto.RegisterResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
+import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.Review
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -121,6 +123,53 @@ class UserController(private val userService: UserService) {
         val result: List<AnonymousReview> = userService.getReviews(id, page, size)
                 .map{review -> AnonymousReview(review)}
         return ResponseEntity(result, HttpStatus.OK)
+    }
+
+    /**
+     * Returns a the current user's feed
+     */
+    @GetMapping("/feed")
+    fun getUserFeed(@RequestHeader headers: Map<String, String>,
+                    @RequestParam(value = "size", required = false, defaultValue = "10") size: Int): ResponseEntity<List<FeedItem>> {
+
+        val token = headers["authorization"]?.substring(7)
+
+        if (token != null) {
+            return try {
+                ResponseEntity(userService.getFeed(token, size), HttpStatus.OK)
+            } catch (e: UserNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
+
+    /**
+     * Returns a list of users with their first name or last name matching the query parameter
+     *
+     * The result will have the following structure:
+     *
+     * [
+     *     {
+     *         id: String,
+     *         firstName: String,
+     *         lastName: String,
+     *         email: String,
+     *         followerAmount: Int
+     *     }
+     * ]
+     */
+    @GetMapping("/search")
+    fun searchUsersToFollow(@RequestParam(value = "q", required = false, defaultValue = "") q: String,
+                            @RequestHeader headers: Map<String, String>,
+                            pageable: Pageable): ResponseEntity<List<UserData>> {
+        val token = headers["authorization"]?.substring(7)
+
+        return if (token != null) {
+            ResponseEntity(userService.searchUsers(q, token, pageable), HttpStatus.OK)
+        } else {
+            ResponseEntity(HttpStatus.UNAUTHORIZED)
+        }
     }
 
 }
