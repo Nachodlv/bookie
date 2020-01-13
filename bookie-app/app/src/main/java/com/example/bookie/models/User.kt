@@ -47,13 +47,14 @@ data class UserReviewResponse(
         Calendar.getInstance().timeInMillis
     )
 }
-/*
-*
-//From JSON
-val json = "..."
-val object = json.toObject<User>()
 
-// To JSON
-val json = object.toJSON()
-*
-* */
+data class UserFollower(
+    @SerializedName("id") val id: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("followed") val followed: Boolean
+) : JSONConvertable {
+    fun toUserPreview(isFollower: Boolean): UserPreview =
+        UserPreview(id, firstName, lastName, isFollower, followed)
+
+}

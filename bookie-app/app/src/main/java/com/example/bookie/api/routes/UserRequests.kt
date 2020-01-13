@@ -48,5 +48,33 @@ class UserReviews(
         get() = Request.Method.GET
     override val params: HashMap<String, Any>
         get() = hashMapOf()
+}
+
+class UserFollowers(
+    private val id: String,
+    private val page: Int,
+    private val size: Int,
+    token: String
+) : ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/followers/$id?page=$page&size$size"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
+}
+
+class UserFollowing(
+    private val id: String,
+    private val page: Int,
+    private val size: Int,
+    token: String
+): ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/following/$id?page=$page&size$size"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
 
 }
