@@ -2,6 +2,7 @@ package com.bookie.backend.services
 
 import com.bookie.backend.dto.*
 import com.bookie.backend.models.Book
+import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query

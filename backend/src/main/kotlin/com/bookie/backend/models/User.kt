@@ -9,13 +9,18 @@ data class User(
         val firstName: String,
         val lastName: String,
         val email: String,
-        val password: String,
+        var password: String,
         @Id val id: String? = null,
         val roles: List<String> = emptyList(),
         var followerAmount: Int = 0,
         val followers: MutableList<Follower> = mutableListOf(),
         val following: MutableList<Follower> = mutableListOf(),
-        val reviews: MutableList<Review> = mutableListOf()) {
+        val reviews: MutableList<Review> = mutableListOf(),
+        var feed: List<FeedItem> = emptyList()) {
+
+    companion object {
+        const val MAX_FEED_SIZE = 50
+    }
 
     /**
      * Adds a follower to the user and increments its follower count by one.
@@ -56,7 +61,7 @@ data class User(
      * Adds a review to the user.
      */
     fun addReview(review: Review) {
-        // We could add more checks to make sure he is the author and it is not repeated.
+        reviews.removeIf {item -> item.id == review.id}
         reviews.add(review)
     }
 
@@ -68,5 +73,23 @@ data class User(
     private fun removeFollowing(following: User) {
         val oldFollowing = Follower(following.firstName, following.lastName, following.id)
         this.following.remove(oldFollowing)
+    }
+
+    /**
+     * Adds an item to the user's feed.
+     */
+    fun addFeedItem(item: FeedItem) {
+        if (this.feed.size >= MAX_FEED_SIZE) {
+            this.feed = this.feed.drop(1).plus(item)
+        } else this.feed = this.feed.plus(item)
+    }
+
+    /**
+     * Returns the last 'amount' elements from the feed, removing them from it.
+     */
+    fun getLatestFeedItems(amount: Int): List<FeedItem> {
+        val result: List<FeedItem> = this.feed.takeLast(amount)
+        this.feed = this.feed.dropLast(amount)
+        return result
     }
 }
