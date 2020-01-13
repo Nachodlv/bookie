@@ -254,7 +254,13 @@ class UserService(val userDao: UserDao,
         }
     }
 
-    // Add documentation
+    /**
+     * Searches for users whose firstName, lastName or a combination of both match with the query parameter.
+     * The users in the result are not already followed by the current user.
+     *
+     * @param q: The query parameter
+     * @param token: The token of the currently logged in user.
+     */
     fun searchUsers(q: String, token: String, pageable: Pageable): List<UserData> {
         // Should sanitize the query
         val email = tokenUtil.getUsernameFromToken(token)
