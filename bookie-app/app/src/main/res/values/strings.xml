@@ -12,6 +12,8 @@
     <string name="login_button">Login</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="forgot_password">Forgot your password?</string>
+    <string name="recover_password">Recover password</string>
+    <string name="email_sent">An email was sent to your email</string>
     <string name="register">Register</string>
     <string name="empty_input">The input can not be empty</string>
     <string name="login_successful">The login was made successfully</string>

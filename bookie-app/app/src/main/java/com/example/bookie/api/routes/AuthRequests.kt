@@ -29,3 +29,13 @@ class UserLogged(token: String) : ApiRoute(token) {
         get() = HashMap()
 
 }
+
+class RecoverPassword(private val email: String) : ApiRoute() {
+    override val url: String
+        get() = "$baseUrl/requestPasswordReset"
+    override val httpMethod: Int
+        get() = Request.Method.PUT
+    override val params: HashMap<String, Any>
+        get() = hashMapOf("email" to email) //To change initializer of created properties use File | Settings | File Templates.
+
+}

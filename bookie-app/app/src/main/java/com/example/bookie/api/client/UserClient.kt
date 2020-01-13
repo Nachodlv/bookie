@@ -2,7 +2,6 @@ package com.example.bookie.api.client
 
 import android.content.Context
 import com.example.bookie.R
-import com.example.bookie.api.routes.Login
 import com.example.bookie.api.routes.Register
 import com.example.bookie.api.routes.UserById
 import com.example.bookie.models.User
@@ -21,7 +20,7 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         lastName: String,
         completion: (message: String) -> Unit,
         onError: (errorCode: Int, message: String) -> Unit
-        ) {
+    ) {
         if (ctx == null) return
         val route = Register(email, password, firstName, lastName)
         this.performRequest(route) { response ->
