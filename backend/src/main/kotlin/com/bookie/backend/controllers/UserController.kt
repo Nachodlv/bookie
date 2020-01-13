@@ -1,14 +1,13 @@
 package com.bookie.backend.controllers
 
-import com.bookie.backend.dto.AnonymousReview
-import com.bookie.backend.dto.RegisterResponse
-import com.bookie.backend.dto.UserData
-import com.bookie.backend.dto.UserDto
+import com.bookie.backend.dto.*
 import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.Review
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
+import com.bookie.backend.util.exceptions.BookNotFoundException
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.ReviewNotFoundException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -171,5 +170,4 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
     }
-
 }

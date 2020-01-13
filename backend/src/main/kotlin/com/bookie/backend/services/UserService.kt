@@ -1,14 +1,13 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
-import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
-import com.bookie.backend.util.exceptions.SelfFollowingException
-import com.bookie.backend.util.exceptions.UserNotFoundException
+import com.bookie.backend.util.exceptions.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
