@@ -147,7 +147,7 @@ class BookService(val bookDao: BookDao,
         val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
 
         if (user.id != null) {
-            val review = findReviewInBook(book.reviews, user.id)
+            val review = findReviewInBook(book.reviews, authorId)
             review.addLike(user.id)
             update(book)
             return review
@@ -164,7 +164,7 @@ class BookService(val bookDao: BookDao,
         val book = getById(bookId).orElseThrow{throw BookNotFoundException("No book found with the provided id")}
 
         if (user.id != null) {
-            val review = findReviewInBook(book.reviews, user.id)
+            val review = findReviewInBook(book.reviews, authorId)
             review.removeLike(user.id)
             update(book)
             return review
