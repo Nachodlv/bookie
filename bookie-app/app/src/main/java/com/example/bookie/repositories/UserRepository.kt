@@ -24,6 +24,7 @@ class UserRepository constructor(
     // Simple in-memory cache. Details omitted for brevity.
     private val executor: Executor,
     private val userDao: UserDao,
+    private val bookRepository: BookRepository,
     private val sharedPreferencesDao: SharedPreferencesDao
 ) {
 
@@ -137,6 +138,51 @@ class UserRepository constructor(
             { completion(it.map { u -> u.toUserPreview(false) }) },
             error
         )
+    }
+
+    fun getFeed(size: Int = 10): LiveData<RepositoryStatus<List<FeedItem>>> {
+        val feedResponse = RepositoryStatus.initStatus<List<FeedResponse>>()
+        val mediator = MediatorLiveData<RepositoryStatus<List<FeedItem>>>()
+        val feedItems: MutableList<FeedItem> = mutableListOf()
+        userClient.getFeed(size, { feed ->
+            feed.forEach {
+                when (it) {
+                    is BookFeedResponse -> addFeedItem(mediator, feedItems, it.id) { b ->
+                        b.toBookFeed()
+                    }
+
+                    is ReviewFeedResponse ->
+                        addFeedItem(mediator, feedItems, it.id) { b ->
+                            it.toFollowerReview(b)
+                        }
+                }
+            }
+        }, { executor.execute { feedResponse.postValue(RepositoryStatus.Error(it)) } })
+        return mediator
+    }
+
+    private fun addFeedItem(
+        mediator: MediatorLiveData<RepositoryStatus<List<FeedItem>>>,
+        feedItems: MutableList<FeedItem>,
+        bookId: String,
+        convert: (book: Book) -> FeedItem
+    ) {
+        mediator.addSource(bookRepository.getById(bookId)) { bookStatus ->
+            when (bookStatus) {
+                is RepositoryStatus.Success -> {
+                    feedItems.add(convert(bookStatus.data))
+                    executor.execute { mediator.postValue(RepositoryStatus.Success(feedItems)) }
+                }
+                is RepositoryStatus.Error ->
+                    executor.execute {
+                        mediator.postValue(
+                            RepositoryStatus.Error(
+                                bookStatus.error
+                            )
+                        )
+                    }
+            }
+        }
     }
 
     private fun refreshUser(userId: String, status: MutableLiveData<RepositoryStatus<User>>) {

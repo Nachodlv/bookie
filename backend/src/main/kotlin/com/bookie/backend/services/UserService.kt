@@ -1,14 +1,14 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.AnonymousReview
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
 import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
-import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
-import com.bookie.backend.util.exceptions.SelfFollowingException
-import com.bookie.backend.util.exceptions.UserNotFoundException
+import com.bookie.backend.util.exceptions.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -205,10 +205,13 @@ class UserService(val userDao: UserDao,
     /**
      * Returns the reviews written by a specific user.
      */
-    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+    fun getReviews(id: String, page: Int, size: Int, token: String): List<AnonymousReview> {
+        val userId = getByToken(token).get().id
+
         val result = userDao.findReviewsById(id, page * size, size)
         if (result.isPresent) {
             return result.get().reviews
+                    .map{review -> AnonymousReview(review, review.likedBy.contains(userId)) }
         }
         return emptyList()
     }
@@ -239,7 +242,7 @@ class UserService(val userDao: UserDao,
      * - The user must not have written a review for the book already
      */
     fun addFeedItems(review: Review, reviewer: User, book: Book) {
-        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
+        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating, review.author!!)
 
         val bookFeedItem: FeedItem = BookFeedItem(book.id, 0, book.rating)
 

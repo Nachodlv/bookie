@@ -1,6 +1,8 @@
 package com.example.bookie.repositories
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import com.example.bookie.api.client.ReviewClient
 import com.example.bookie.dao.ReviewDao
@@ -69,4 +71,53 @@ class ReviewRepository(
         return status
     }
 
+    fun likeReview(bookId: String, userId: String): LiveData<RepositoryStatus<String>> {
+        return likeOrUnLikeReview(bookId, userId, true)
+    }
+
+    fun unLikeReview(bookId: String, userId: String): LiveData<RepositoryStatus<String>> {
+        return likeOrUnLikeReview(bookId, userId, false)
+    }
+
+    private fun likeOrUnLikeReview(
+        bookId: String,
+        userId: String,
+        isLike: Boolean
+    ): LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+
+        reviewClient.likeReview(
+            bookId,
+            userId,
+            isLike,
+            { executor.execute { status.postValue(RepositoryStatus.Success("")) } },
+            { error -> executor.execute { status.postValue(RepositoryStatus.Error(error)) } })
+
+        return status
+    }
+
+    fun getReviewLoggedUser(bookId: String): LiveData<RepositoryStatus<Review?>> {
+
+        val user = authRepository.getUserLoggedIn()
+        val mediator = MediatorLiveData<RepositoryStatus<Review?>>()
+        mediator.addSource(user) {
+            if (it is RepositoryStatus.Success) {
+                executor.execute {
+                    val review =
+                        reviewDao.hasReview(bookId, it.data.id, UserRepository.FRESH_TIMEOUT)
+                    if (review == null) {
+                        reviewClient.getReviewOfLoggedUser(bookId,
+                            { executor.execute { mediator.postValue(RepositoryStatus.Success(it?.toReview())) } },
+                            { executor.execute { mediator.postValue(RepositoryStatus.Error(it)) } })
+                    } else {
+                        mediator.postValue(RepositoryStatus.Success(review))
+                    }
+                }
+            } else if (it is RepositoryStatus.Error) {
+                executor.execute { mediator.postValue(RepositoryStatus.Error(it.error)) }
+            }
+        }
+
+        return mediator
+    }
 }

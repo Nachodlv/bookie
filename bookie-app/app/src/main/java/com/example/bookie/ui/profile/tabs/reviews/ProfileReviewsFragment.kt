@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.ReviewTab
+import com.example.bookie.utils.OnScrollListenerMock
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.UserRepository
 import com.example.bookie.utils.OnScrollListener
@@ -59,7 +60,7 @@ class ProfileReviewsFragment : Fragment() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ReviewsAdapter(myDataSet, context, false)
+        val viewAdapter = ReviewsAdapter(myDataSet, context, viewLifecycleOwner, false)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {

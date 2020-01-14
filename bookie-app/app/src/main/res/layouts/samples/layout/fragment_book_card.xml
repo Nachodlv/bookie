@@ -27,7 +27,7 @@
                 android:id="@+id/book_image"
                 android:layout_width="127dp"
                 android:layout_height="132dp"
-                android:contentDescription="Book cover image"
+                android:contentDescription="@string/book_content_desc"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -38,10 +38,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                android:text="The Fellowship of the Ring"
                 android:textSize="18sp"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="The Fellowship of the Ring"
+                />
 
             <TextView
                 android:id="@+id/book_author"
@@ -50,10 +51,11 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
                 android:ellipsize="end"
-                android:text="JRR Tolkien"
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toBottomOf="@+id/book_title" />
+                app:layout_constraintTop_toBottomOf="@+id/book_title"
+                tools:text="JRR Tolkien"
+                />
 
             <!--Rating bar only for visualization, user cant interact with it.-->
             <RatingBar

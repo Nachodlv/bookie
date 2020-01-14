@@ -1,14 +1,13 @@
 package com.bookie.backend.controllers
 
-import com.bookie.backend.dto.AnonymousReview
-import com.bookie.backend.dto.RegisterResponse
-import com.bookie.backend.dto.UserData
-import com.bookie.backend.dto.UserDto
+import com.bookie.backend.dto.*
 import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.Review
 import com.bookie.backend.models.User
 import com.bookie.backend.services.UserService
+import com.bookie.backend.util.exceptions.BookNotFoundException
 import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
+import com.bookie.backend.util.exceptions.ReviewNotFoundException
 import com.bookie.backend.util.exceptions.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -127,10 +126,16 @@ class UserController(private val userService: UserService) {
     @GetMapping("/reviews/{id}")
     fun getUserReviews(@PathVariable id: String,
                        @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
-                       @RequestParam(value = "size",required = false, defaultValue = "10") size: Int): ResponseEntity<List<AnonymousReview>> {
-        val result: List<AnonymousReview> = userService.getReviews(id, page, size)
-                .map{review -> AnonymousReview(review)}
-        return ResponseEntity(result, HttpStatus.OK)
+                       @RequestParam(value = "size",required = false, defaultValue = "10") size: Int,
+                       @RequestHeader headers: Map<String, String>): ResponseEntity<List<AnonymousReview>> {
+
+        val token = headers["authorization"]?.substring(7)
+
+        if (token != null) {
+            val result: List<AnonymousReview> = userService.getReviews(id, page, size, token)
+            return ResponseEntity(result, HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
     /**
@@ -179,5 +184,4 @@ class UserController(private val userService: UserService) {
             ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
     }
-
 }
