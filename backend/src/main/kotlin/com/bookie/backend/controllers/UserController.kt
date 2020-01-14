@@ -88,14 +88,22 @@ class UserController(private val userService: UserService) {
      * Returns the data of the currently logged in user.
      */
     @GetMapping("/current")
-    fun getCurrentUser(@RequestHeader headers: Map<String, String>): Optional<User> {
+    fun getCurrentUser(@RequestHeader headers: Map<String, String>): ResponseEntity<UserData> {
 
         val token = headers["authorization"]?.substring(7)
 
         return if (token != null) {
-            userService.getByToken(token)
+            val user = userService.getByToken(token).get()
+            val userData = UserData(
+                    user.id!!,
+                    user.firstName,
+                    user.lastName,
+                    user.email,
+                    user.followerAmount
+            )
+            ResponseEntity(userData, HttpStatus.OK)
         } else {
-            Optional.empty() // This could be handled better, but token cannot be null because the method wouldn't be executed in that case.
+            ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
     }
 
