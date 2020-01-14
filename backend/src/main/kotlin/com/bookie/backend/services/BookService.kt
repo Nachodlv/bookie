@@ -119,6 +119,27 @@ class BookService(val bookDao: BookDao,
     }
 
     /**
+     * Returns the review that the current user wrote for the specified book
+     */
+    fun getReviewForBook(token: String, bookId: String): ReviewResponse {
+        val user = userService.getByToken(token).get()
+        val book = getById(bookId).orElseThrow { throw BookNotFoundException("No book found with the provided id") }
+
+        val review: Review? = book.reviews.find { review -> review.author?.id == user.id }
+        if (review != null) {
+            return ReviewResponse(
+                    review.rating,
+                    review.comment,
+                    review.author,
+                    review.timestamp,
+                    review.id,
+                    review.likes,
+                    review.likedBy.contains(user.id))
+        }
+        throw ReviewNotFoundException("No review found for that book by that author")
+    }
+
+    /**
      * Adds a like to a review and updates the book it belongs to.
      */
     fun addLikeToReview(token: String, bookId: String, authorId: String): Review {

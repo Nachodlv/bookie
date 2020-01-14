@@ -43,7 +43,7 @@ class BookProfile : AppCompatActivity() {
         injector.inject(appKodein())
 
         setupToolbar()
-        getBook(review_text.rootView)
+        getBookId(review_text.rootView)
         submit_button.setOnClickListener { onSubmitReview(it) }
 
         val fragment: Fragment? = supportFragmentManager.findFragmentById(R.id.fragment_loader)
@@ -64,9 +64,14 @@ class BookProfile : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
-    private fun getBook(view: View) {
+    private fun getBookId(view: View) {
         val bundle = intent.extras ?: return
         val bookId = bundle.getString("bookId") ?: return
+        getBook(view, bookId)
+        loadCurrentReview(bookId)
+    }
+
+    private fun getBook(view: View, bookId: String) {
 
         bookRepository.getById(bookId).observe(this, Observer {
             when (it) {
@@ -77,6 +82,20 @@ class BookProfile : AppCompatActivity() {
                 }
                 is RepositoryStatus.Loading -> return@Observer
                 is RepositoryStatus.Error -> setError(it.error)
+            }
+        })
+    }
+
+    private fun loadCurrentReview(bookId: String) {
+        reviewRepository.getReviewLoggedUser(bookId).observe(this, Observer {
+            when(it) {
+                is RepositoryStatus.Success -> {
+                    val book = it.data?:return@Observer
+                    review_text.setText(book.comment)
+                    review_rating.rating = book.score.toFloat()
+                    submit_button.text = applicationContext.getText(R.string.edit_review)
+                    bookReviewed = true
+                }
             }
         })
     }
@@ -142,11 +161,12 @@ class BookProfile : AppCompatActivity() {
                         is RepositoryStatus.Success -> {
                             val index = dataSet.indexOfFirst { r -> r.userId == it.data.userId }
                             if (index != -1) {
-                                dataSet.removeAt(index)
-                                reviewsAdapter?.notifyItemRemoved(index)
+                                dataSet[index] = it.data.toReviewTab()
+                                reviewsAdapter?.notifyItemChanged(index)
+                            } else {
+                                dataSet.add(0, it.data.toReviewTab())
+                                reviewsAdapter?.notifyItemInserted(0)
                             }
-                            dataSet.add(0, it.data.toReviewTab())
-                            reviewsAdapter?.notifyItemInserted(0)
                             recyclerView?.scrollToPosition(0)
                         }
                     }

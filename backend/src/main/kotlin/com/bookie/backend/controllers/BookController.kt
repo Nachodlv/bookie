@@ -6,7 +6,9 @@ import com.bookie.backend.dto.RatingResponse
 import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.models.Review
 import com.bookie.backend.services.BookService
+import com.bookie.backend.util.exceptions.BookNotFoundException
 import com.bookie.backend.util.exceptions.InvalidScoreException
+import com.bookie.backend.util.exceptions.ReviewNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -121,6 +123,26 @@ class BookController(private val bookService: BookService) {
 
         if (token != null) {
             return ResponseEntity(bookService.getReviews(id, page, size, token), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
+
+    /**
+     * Returns the review that the current user wrote for the specified book (in case it exists).
+     */
+    @GetMapping("/review/{id}")
+    fun getReviewForBook(@PathVariable id: String,
+                         @RequestHeader headers: Map<String, String>): ResponseEntity<ReviewResponse> {
+        val token = headers["authorization"]?.substring(7)
+
+        if (token != null) {
+            return try {
+                ResponseEntity(bookService.getReviewForBook(token, id), HttpStatus.OK)
+            } catch (e1: BookNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            } catch (e2: ReviewNotFoundException) {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
