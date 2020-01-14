@@ -57,7 +57,6 @@ class BookProfile : AppCompatActivity() {
         val bundle = intent.extras ?: return
         val bookId = bundle.getString("bookId") ?: return
         getBook(view, bookId)
-        loadCurrentReview(bookId)
     }
 
     private fun getBook(view: View, bookId: String) {
@@ -71,20 +70,6 @@ class BookProfile : AppCompatActivity() {
                 }
                 is RepositoryStatus.Loading -> return@Observer
                 is RepositoryStatus.Error -> setError(it.error)
-            }
-        })
-    }
-
-    private fun loadCurrentReview(bookId: String) {
-        reviewRepository.getReviewLoggedUser(bookId).observe(this, Observer {
-            when(it) {
-                is RepositoryStatus.Success -> {
-                    val book = it.data?:return@Observer
-                    review_text.setText(book.comment)
-                    review_rating.rating = book.score.toFloat()
-                    submit_button.text = applicationContext.getText(R.string.edit_review)
-                    bookReviewed = true
-                }
             }
         })
     }

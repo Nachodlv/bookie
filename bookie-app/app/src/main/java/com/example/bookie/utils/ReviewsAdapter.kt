@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -31,14 +32,15 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
+class ReviewsAdapter(private val myDataSet: MutableList<ReviewTab>,
                      private val context: Context?,
                      private val lifecycleOwner: LifecycleOwner,
                      private val isInBookProfile: Boolean) :
-    RecyclerView.Adapter<ReviewsAdapter.ReviewCardViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val injector = KodeinInjector()
     private val reviewRepository: ReviewRepository by injector.instance()
+    private var bookReviewed = false
 
     class HeaderViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val reviewText: TextView = view.findViewById(R.id.review_text)
@@ -67,18 +69,18 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
         viewType: Int
     ): RecyclerView.ViewHolder {
         injector.inject(appKodein)
-        when(viewType) {
+        return when(viewType) {
             0 -> {
                 val view = LayoutInflater.from(parent.context)
                         .inflate(R.layout.fragment_book_profile_header, parent, false)
 
-                return HeaderViewHolder(view)
+                HeaderViewHolder(view)
             }
             1 -> {
                 val view = LayoutInflater.from(parent.context)
                         .inflate(R.layout.fragment_review_card, parent, false)
 
-                return ReviewCardViewHolder(view)
+                ReviewCardViewHolder(view)
             }
             else -> throw Exception("Invalid ReviewTab type")
         }
@@ -88,7 +90,7 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val data = myDataSet[position]
 
-        if (position == 0 && data.image == null) {
+        if (position == 0 && isInBookProfile) {
             handleHeader(holder as HeaderViewHolder, data as EmptyReviewTab)
         } else {
             handleBody(holder as ReviewCardViewHolder, data)
@@ -102,9 +104,11 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
         setBookData(holder, data.book)
 
         val currentContext = context as AppCompatActivity
-        val fragment: Fragment? = currentContext.supportFragmentManager.findFragmentById(R.id.fragment_loader)
+        val fragment = currentContext.supportFragmentManager.findFragmentById(R.id.fragment_loader)
         loaderFragment = fragment as LoaderFragment?
         loaderFragment?.hideLoader(holder.submitButton)
+
+        loadCurrentReview(holder, data.book.id, currentContext)
 
         holder.submitButton.setOnClickListener { onSubmitReview(it, data.book, holder, loaderFragment, currentContext) }
     }
@@ -128,11 +132,23 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
 
     }
 
+    private fun loadCurrentReview(holder: HeaderViewHolder, bookId: String, currentContext: AppCompatActivity) {
+        reviewRepository.getReviewLoggedUser(bookId).observe(currentContext, Observer {
+            when(it) {
+                is RepositoryStatus.Success -> {
+                    val book = it.data?:return@Observer
+                    holder.reviewText.text = book.comment
+                    holder.reviewRating.rating = book.score.toFloat()
+                    holder.submitButton.text = currentContext.getText(R.string.edit_review)
+                    bookReviewed = true
+                }
+            }
+        })
+    }
+
     private fun onSubmitReview(view: View, book: Book, holder: HeaderViewHolder, loaderFragment: LoaderFragment?, currentContext: AppCompatActivity) {
 
         val reviewRepository = reviewRepository ?: return
-
-        var bookReviewed = false
 
         val recyclerView = currentContext.findViewById<RecyclerView>(R.id.reviews_container)
 
@@ -223,7 +239,6 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
             setUnLikeListener(holder, data)
         }
 
-        val maxLines = holder.preview.maxLines
         if (holder.preview.text.length > 39 * holder.preview.maxLines) {
             holder.readMore.visibility = View.VISIBLE
             holder.readMore.setOnClickListener {
@@ -245,7 +260,7 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = myDataSet.size
 
-    override fun getItemViewType(position: Int): Int = if (position == 0 && myDataSet[position].image == null) 0 else 1
+    override fun getItemViewType(position: Int): Int = if (position == 0 && isInBookProfile) 0 else 1
 
     private fun setUnLikeListener(holder: ReviewCardViewHolder, data: ReviewTab) {
         holder.likes.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_thumb_up, 0)
