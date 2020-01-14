@@ -1,6 +1,7 @@
 package com.example.bookie.api.routes
 
 import com.android.volley.Request
+import com.google.android.gms.common.api.Api
 
 class ReviewPost(
     private val bookId: String,
@@ -46,5 +47,15 @@ class LikeReview(
         get() = Request.Method.POST
     override val params: HashMap<String, Any>
         get() = hashMapOf("bookId" to bookId, "userId" to userId)
+
+}
+
+class UserLoggedReview(private val bookId: String, token: String): ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/book/review/$bookId"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
 
 }

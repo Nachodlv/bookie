@@ -4,22 +4,20 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.Book
+import com.example.bookie.models.EmptyReviewTab
 import com.example.bookie.models.ReviewTab
 import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
-import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.*
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_book_profile.*
 
 class BookProfile : AppCompatActivity() {
@@ -29,9 +27,6 @@ class BookProfile : AppCompatActivity() {
     private val reviewRepository: ReviewRepository by injector.instance()
 
     private val pageSize: Int = 10
-    private var loaderFragment: LoaderFragment? = LoaderFragment()
-    private var bookReviewed: Boolean = false
-    private var book: Book? = null
     private var dataSet: MutableList<ReviewTab> = mutableListOf()
     private var reviewsAdapter: ReviewsAdapter? = null
     private var recyclerView: RecyclerView? = null
@@ -43,13 +38,7 @@ class BookProfile : AppCompatActivity() {
         injector.inject(appKodein())
 
         setupToolbar()
-        getBook(review_text.rootView)
-        submit_button.setOnClickListener { onSubmitReview(it) }
-
-        val fragment: Fragment? = supportFragmentManager.findFragmentById(R.id.fragment_loader)
-        loaderFragment = fragment as LoaderFragment?
-        loaderFragment?.hideLoader(submit_button)
-
+        getBookId(reviews_container.rootView)
     }
 
     private fun setupToolbar() {
@@ -64,15 +53,19 @@ class BookProfile : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
-    private fun getBook(view: View) {
+    private fun getBookId(view: View) {
         val bundle = intent.extras ?: return
         val bookId = bundle.getString("bookId") ?: return
+        getBook(view, bookId)
+    }
+
+    private fun getBook(view: View, bookId: String) {
 
         bookRepository.getById(bookId).observe(this, Observer {
             when (it) {
                 is RepositoryStatus.Success -> {
-                    book = it.data
-                    setBookData(it.data)
+//                    book = it.data
+                    // setBookData(it.data)
                     runOnUiThread { loadReviews(view, it.data) }
                 }
                 is RepositoryStatus.Loading -> return@Observer
@@ -81,79 +74,8 @@ class BookProfile : AppCompatActivity() {
         })
     }
 
-    private fun setBookData(book: Book) {
-
-        book_title.text = book.title
-        book_author.text = book.authors?.reduce { a, b -> "$a, $b" } ?: ""
-        Picasso.get().load(book.imageLinks?.thumbnail)
-            .into(book_image)
-        book_categories.text = book.categories?.reduce { a, b -> "$a, $b" } ?: ""
-        if (book.review != null) {
-            rating_bar.visibility = View.VISIBLE
-            reviews_quantity.visibility = View.VISIBLE
-            rating_bar.rating = book.review?.rating ?: 0f
-            reviews_quantity.text = "(${book.review?.reviewAmount ?: 0})"
-        } else {
-            reviews_quantity.visibility = View.GONE
-            rating_bar.visibility = View.GONE
-        }
-
-    }
-
     private fun setError(errorMessage: String) {
-        SnackbarUtil.showSnackbar(book_title.rootView, errorMessage)
-    }
-
-    private fun onSubmitReview(view: View) {
-        val book = book ?: return
-        if (!TextValidator.hasErrors(review_text)) {
-            if (review_rating.rating == 0f) SnackbarUtil.showSnackbar(
-                view,
-                applicationContext.getString(R.string.rating_required)
-            ) else {
-                loaderFragment?.showLoader(submit_button)
-                val (bookStatus, reviewStatus) = reviewRepository.postReview(
-                    book.id,
-                    review_text.text.toString(),
-                    review_rating.rating.toInt(),
-                    !bookReviewed
-                )
-                bookStatus.observe(this, Observer<RepositoryStatus<Book>> {
-                    when (it) {
-                        is RepositoryStatus.Success -> {
-                            loaderFragment?.hideLoader(submit_button)
-                            submit_button.text = applicationContext.getText(R.string.edit_review)
-                            bookReviewed = true
-                            SnackbarUtil.showSnackbar(
-                                view,
-                                applicationContext.getString(R.string.successful_review)
-                            )
-                            setBookData(it.data)
-                        }
-                        is RepositoryStatus.Error -> {
-                            loaderFragment?.hideLoader(submit_button)
-                            SnackbarUtil.showSnackbar(view, it.error)
-                        }
-                        is RepositoryStatus.Loading -> return@Observer
-                    }
-                })
-                reviewStatus.observe(this, Observer {
-                    when (it) {
-                        is RepositoryStatus.Success -> {
-                            val index = dataSet.indexOfFirst { r -> r.userId == it.data.userId }
-                            if (index != -1) {
-                                dataSet.removeAt(index)
-                                reviewsAdapter?.notifyItemRemoved(index)
-                            }
-                            dataSet.add(0, it.data.toReviewTab())
-                            reviewsAdapter?.notifyItemInserted(0)
-                            recyclerView?.scrollToPosition(0)
-                        }
-                    }
-                })
-
-            }
-        }
+        SnackbarUtil.showSnackbar(reviews_container.rootView, errorMessage)
     }
 
     private fun loadReviews(view: View, book: Book) {
@@ -168,12 +90,11 @@ class BookProfile : AppCompatActivity() {
                 is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
             }
         })
-
-
     }
 
     private fun loadList(view: View, book: Book, dataSet: MutableList<ReviewTab>) {
 
+        dataSet.add(0, EmptyReviewTab(book))
         this.dataSet = dataSet
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
