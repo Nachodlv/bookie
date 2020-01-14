@@ -11,9 +11,9 @@
         android:id="@+id/book_card_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFAFA"
         android:divider="@android:color/transparent"
-        app:cardBackgroundColor="#F0FFFF"
+        android:theme="@style/CustomCardView"
+        app:cardBackgroundColor="@color/colorSecondaryLight"
         app:cardElevation="10dp"
         app:cardUseCompatPadding="true">
 
@@ -59,6 +59,7 @@
             <RatingBar
                 android:id="@+id/rating_bar"
                 style="?android:attr/ratingBarStyleSmall"
+                android:theme="@style/CustomRatingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="48dp"

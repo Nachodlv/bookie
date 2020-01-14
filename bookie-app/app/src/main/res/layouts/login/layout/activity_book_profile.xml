@@ -15,17 +15,15 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
+            android:minHeight="?attr/actionBarSize"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/book_card_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFAFA"
             android:divider="@android:color/transparent"
-            app:cardBackgroundColor="#F0FFFF"
+            android:theme="@style/CustomCardView"
+            app:cardBackgroundColor="@color/colorSecondaryLight"
             app:cardElevation="10dp"
             app:cardUseCompatPadding="true">
 
@@ -91,6 +89,7 @@
 
                     <RatingBar
                         android:id="@+id/rating_bar"
+                        android:theme="@style/CustomRatingBar"
                         style="?android:attr/ratingBarStyleSmall"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
@@ -118,9 +117,9 @@
             android:id="@+id/review_container"
             android:layout_width="match_parent"
             android:layout_height="195dp"
-            android:background="#FFFAFA"
             android:divider="@android:color/transparent"
-            app:cardBackgroundColor="#F0FFFF"
+            android:theme="@style/CustomCardView"
+            app:cardBackgroundColor="@color/colorSecondaryLight"
             app:cardElevation="10dp"
             app:cardUseCompatPadding="true">
 
@@ -144,6 +143,7 @@
 
                 <RatingBar
                     android:id="@+id/review_rating"
+                    android:theme="@style/CustomRatingBar"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
                     android:layout_marginTop="20dp"
