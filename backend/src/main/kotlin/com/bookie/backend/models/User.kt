@@ -62,7 +62,7 @@ data class User(
      */
     fun addReview(review: Review) {
         reviews.removeIf {item -> item.id == review.id}
-        reviews.add(review)
+        reviews.add(0, review)
     }
 
     private fun addFollowing(following: User) {

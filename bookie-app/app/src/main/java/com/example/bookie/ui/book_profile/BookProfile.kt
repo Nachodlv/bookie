@@ -15,10 +15,7 @@ import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
 import com.example.bookie.ui.loader.LoaderFragment
-import com.example.bookie.utils.OnScrollListener
-import com.example.bookie.utils.ReviewsAdapter
-import com.example.bookie.utils.SnackbarUtil
-import com.example.bookie.utils.TextValidator
+import com.example.bookie.utils.*
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
@@ -199,7 +196,7 @@ class BookProfile : AppCompatActivity() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(applicationContext)
-        val viewAdapter = ReviewsAdapter(dataSet, this)
+        val viewAdapter = ReviewsAdapter(dataSet, this, this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         reviewsAdapter = viewAdapter

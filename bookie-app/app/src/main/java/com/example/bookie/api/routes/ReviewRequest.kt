@@ -35,6 +35,21 @@ class GetReviews(
 
 }
 
+class LikeReview(
+    private val bookId: String,
+    private val userId: String,
+    private val isLike: Boolean,
+    token: String
+) : ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/review/${if(isLike) "like" else "unlike"}"
+    override val httpMethod: Int
+        get() = Request.Method.POST
+    override val params: HashMap<String, Any>
+        get() = hashMapOf("bookId" to bookId, "userId" to userId)
+
+}
+
 class UserLoggedReview(private val bookId: String, token: String): ApiRoute(token) {
     override val url: String
         get() = "$baseUrl/book/review/$bookId"

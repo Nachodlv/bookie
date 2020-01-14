@@ -118,10 +118,16 @@ class UserController(private val userService: UserService) {
     @GetMapping("/reviews/{id}")
     fun getUserReviews(@PathVariable id: String,
                        @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
-                       @RequestParam(value = "size",required = false, defaultValue = "10") size: Int): ResponseEntity<List<AnonymousReview>> {
-        val result: List<AnonymousReview> = userService.getReviews(id, page, size)
-                .map{review -> AnonymousReview(review)}
-        return ResponseEntity(result, HttpStatus.OK)
+                       @RequestParam(value = "size",required = false, defaultValue = "10") size: Int,
+                       @RequestHeader headers: Map<String, String>): ResponseEntity<List<AnonymousReview>> {
+
+        val token = headers["authorization"]?.substring(7)
+
+        if (token != null) {
+            val result: List<AnonymousReview> = userService.getReviews(id, page, size, token)
+            return ResponseEntity(result, HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 
     /**

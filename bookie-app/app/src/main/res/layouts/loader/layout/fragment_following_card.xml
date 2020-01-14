@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp">
 
+            <!--230dp-->
             <TextView
                 android:id="@+id/name"
                 android:layout_width="0dp"

@@ -7,14 +7,14 @@ import com.example.bookie.models.User
 
 class ProfileHeaderViewModel : ViewModel() {
 
-    val user = MutableLiveData<User>()
+    private val _user = MutableLiveData<User>()
     private val _followers = MutableLiveData<Int>()
 
-//    val user: LiveData<User> = _user
+    val user: LiveData<User> = _user
     val followers: LiveData<Int> = _followers
 
-    fun storeUser(data: User) {
-        user.value = data
+    fun storeUser(user: User) {
+        _user.value = user
     }
 
     fun storeFollowers(amount: Int) {

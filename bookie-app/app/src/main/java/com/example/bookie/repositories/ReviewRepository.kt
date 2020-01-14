@@ -71,6 +71,31 @@ class ReviewRepository(
         return status
     }
 
+    fun likeReview(bookId: String, userId: String): LiveData<RepositoryStatus<String>> {
+        return likeOrUnLikeReview(bookId, userId, true)
+    }
+
+    fun unLikeReview(bookId: String, userId: String): LiveData<RepositoryStatus<String>> {
+        return likeOrUnLikeReview(bookId, userId, false)
+    }
+
+    private fun likeOrUnLikeReview(
+        bookId: String,
+        userId: String,
+        isLike: Boolean
+    ): LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+
+        reviewClient.likeReview(
+            bookId,
+            userId,
+            isLike,
+            { executor.execute { status.postValue(RepositoryStatus.Success("")) } },
+            { error -> executor.execute { status.postValue(RepositoryStatus.Error(error)) } })
+
+        return status
+    }
+
     fun getReviewLoggedUser(bookId: String): LiveData<RepositoryStatus<Review?>> {
 
         val user = authRepository.getUserLoggedIn()
@@ -95,5 +120,4 @@ class ReviewRepository(
 
         return mediator
     }
-
 }

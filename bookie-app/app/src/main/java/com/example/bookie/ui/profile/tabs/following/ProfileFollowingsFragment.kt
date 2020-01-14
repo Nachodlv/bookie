@@ -1,15 +1,19 @@
 package com.example.bookie.ui.profile.tabs.following
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
+import com.example.bookie.models.UserPreview
+import com.example.bookie.ui.profile.ProfileViewModel
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
+import kotlinx.android.synthetic.main.fragment_followings_tab.*
 import com.example.bookie.utils.OnScrollListenerMock
 
 class ProfileFollowingsFragment : Fragment() {
@@ -23,29 +27,24 @@ class ProfileFollowingsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        //TODO get from backend
 
-        val followings: MutableList<String> = arrayListOf(
-                "Gianluca Scolaro",
-                "Pedro Perez",
-                "Jacobo Santos de La Virgen de Nazareth Segundo",
-                "Juan Carlos",
-                "Bob",
-                "Gianluca Scolaro 2",
-                "Gianluca Scolaro 3",
-                "Gianluca Scolaro 4",
-                "Gianluca Scolaro 5",
-                "Gianluca Scolaro 6",
-                "Gianluca Scolaro 7",
-                "Gianluca Scolaro 8",
-                "Gianluca Scolaro 9",
-                "Gianluca Scolaro 10",
-                "Gianluca Scolaro 11",
-                "Gianluca Scolaro 12",
-                "Gianluca Scolaro 13",
-                "Gianluca Scolaro 14"
-        )
+        val profileViewModel = activity?.run {
+            ViewModelProvider(this).get(ProfileViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
 
+        profileViewModel.users.observe(viewLifecycleOwner,
+                Observer<MutableList<UserPreview>> {
+                    users ->
+                        setUpRecyclerView(view,
+                                users.filter { user -> user.isFollowedByMe }.map { user -> "${user.firstName} ${user.lastName}" }.toMutableList()
+                        )
+                })
+
+        // Add listener to search button
+        search_button.setOnClickListener { goToFollowingSearchView() }
+    }
+
+    private fun setUpRecyclerView(view: View, followings: MutableList<String>){
         val myDataSet: MutableList<String> = mutableListOf<String>().apply { addAll(followings.subList(0, 10)) }
 
         val recList = view.findViewById(R.id.followings_container) as RecyclerView
@@ -66,5 +65,10 @@ class ProfileFollowingsFragment : Fragment() {
         }
 
         recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, followings))
+    }
+
+    private fun goToFollowingSearchView() {
+        val intent = Intent(this.context, ProfileFollowingSearchActivity::class.java)
+        startActivity(intent)
     }
 }

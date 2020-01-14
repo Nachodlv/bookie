@@ -22,6 +22,14 @@ data class UserRegisterForm(
     @SerializedName("password") val password: String = ""
 ) : JSONConvertable
 
+data class UserPreview(
+        @SerializedName("id") val id: String = "",
+        @SerializedName("firstName") val firstName: String = "",
+        @SerializedName("lastName") val lastName: String = "",
+        @SerializedName("isFollower") val isFollower: Boolean = false,
+        @SerializedName("isFollowedByMe") val isFollowedByMe: Boolean = false
+) : JSONConvertable
+
 /*
 *
 //From JSON

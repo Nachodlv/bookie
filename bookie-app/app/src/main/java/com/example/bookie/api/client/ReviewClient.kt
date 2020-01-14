@@ -3,12 +3,12 @@ package com.example.bookie.api.client
 import android.content.Context
 import com.example.bookie.R
 import com.example.bookie.api.routes.GetReviews
+import com.example.bookie.api.routes.LikeReview
 import com.example.bookie.api.routes.ReviewPost
 import com.example.bookie.api.routes.UserLoggedReview
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.ReviewResponse
 import com.example.bookie.models.toObject
-import com.google.gson.Gson
 import org.json.JSONArray
 
 class ReviewClient(ctx: Context?) : ApiClient(ctx) {
@@ -54,13 +54,35 @@ class ReviewClient(ctx: Context?) : ApiClient(ctx) {
                 200 -> {
                     val array = JSONArray(response.json)
                     val reviews = mutableListOf<ReviewResponse>()
-                    for(i in 0 until array.length()) {
+                    for (i in 0 until array.length()) {
                         reviews.add(array[i].toString().toObject())
                     }
                     completion(reviews)
                 }
                 else -> error(response.json)
 
+            }
+        }
+    }
+
+    fun likeReview(
+        bookId: String,
+        userId: String,
+        isLike: Boolean,
+        completion: () -> Unit,
+        error: (String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = LikeReview(bookId, userId, isLike, token)
+        performRequest(route) { response ->
+            when (response.statusCode) {
+                200 -> completion()
+                else -> error(ctx.getString(R.string.default_error))
             }
         }
     }

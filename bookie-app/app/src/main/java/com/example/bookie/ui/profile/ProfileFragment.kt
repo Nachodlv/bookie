@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.bookie.R
 import com.example.bookie.models.User
+import com.example.bookie.models.UserPreview
 import com.example.bookie.ui.profile.header.ProfileHeaderFragment
 import com.example.bookie.ui.profile.header.ProfileHeaderViewModel
 import com.example.bookie.ui.profile.tabs.reviews.ProfileReviewsFragment
@@ -41,8 +42,41 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        profileViewModel =
+        profileViewModel = activity?.run {
             ViewModelProvider(this).get(ProfileViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
+
+        //TODO get from backend, will only return users who follow me or/and who I follow. With pagination.
+
+        val users: MutableList<UserPreview> = arrayListOf(
+                UserPreview("1", "Gianluca", "Scolaro", isFollower = false, isFollowedByMe = true),
+                UserPreview("2", "Pedro", "Perez", isFollower = true, isFollowedByMe = true),
+                UserPreview("3", "Jacobo", "Santos de La Virgen de Nazareth Segundo", isFollower = true, isFollowedByMe = false),
+                UserPreview("4", "Juan", "Carlos", isFollower = true, isFollowedByMe = true),
+                UserPreview("5", "Bob", isFollower = true, isFollowedByMe = false),
+                UserPreview("6", "Gianluca", "Scolaro 2", isFollower = true, isFollowedByMe = true),
+                UserPreview("7", "Gianluca", "Scolaro 3", isFollower = true, isFollowedByMe = false),
+                UserPreview("8", "Gianluca", "Scolaro 4", isFollower = false, isFollowedByMe = true),
+                UserPreview("9", "Gianluca", "Scolaro 5", isFollower = true, isFollowedByMe = true),
+                UserPreview("10", "Gianluca", "Scolaro 6", isFollower = false, isFollowedByMe = true),
+                UserPreview("11", "Gianluca", "Scolaro 7", isFollower = true, isFollowedByMe = true),
+                UserPreview("12", "Gianluca", "Scolaro 8", isFollower = true, isFollowedByMe = false),
+                UserPreview("13", "Gianluca", "Scolaro 9", isFollower = false, isFollowedByMe = true),
+                UserPreview("14", "Gianluca", "Scolaro 10", isFollower = true, isFollowedByMe = true),
+                UserPreview("15", "Gianluca", "Scolaro 11", isFollower = true, isFollowedByMe = false),
+                UserPreview("16", "Gianluca", "Scolaro 12", isFollower = false, isFollowedByMe = true),
+                UserPreview("17", "Gianluca", "Scolaro 13", isFollower = true, isFollowedByMe = false),
+                UserPreview("18", "Gianluca", "Scolaro 14", isFollower = true, isFollowedByMe = true),
+                UserPreview("19", "Gianluca", "Scolaro 15", isFollower = true, isFollowedByMe = true),
+                UserPreview("20", "Gianluca", "Scolaro 16", isFollower = true, isFollowedByMe = false),
+                UserPreview("21", "Gianluca", "Scolaro 17", isFollower = true, isFollowedByMe = false),
+                UserPreview("22", "Gianluca", "Scolaro 18", isFollower = false, isFollowedByMe = true),
+                UserPreview("23", "Gianluca", "Scolaro 19", isFollower = true, isFollowedByMe = true),
+                UserPreview("24", "Gianluca", "Scolaro 20", isFollower = true, isFollowedByMe = true)
+        )
+
+        profileViewModel.storeUser(users)
+
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 

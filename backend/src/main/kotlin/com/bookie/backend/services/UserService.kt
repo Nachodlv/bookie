@@ -1,5 +1,6 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.AnonymousReview
 import com.bookie.backend.dto.FollowResponse
 import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.dto.UserData
@@ -204,10 +205,13 @@ class UserService(val userDao: UserDao,
     /**
      * Returns the reviews written by a specific user.
      */
-    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+    fun getReviews(id: String, page: Int, size: Int, token: String): List<AnonymousReview> {
+        val userId = getByToken(token).get().id
+
         val result = userDao.findReviewsById(id, page * size, size)
         if (result.isPresent) {
             return result.get().reviews
+                    .map{review -> AnonymousReview(review, review.likedBy.contains(userId)) }
         }
         return emptyList()
     }
