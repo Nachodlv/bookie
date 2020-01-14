@@ -188,11 +188,18 @@ class UserService(val userDao: UserDao,
             run {
                 if (following.firstOrNull { entry -> entry.id == item.id } !== null) {
                     item.followed = true
-                    print("test")
                 }
             }
         }
 
+    }
+
+    /**
+     * Checks if the current user follows a specific user.
+     */
+    fun checkSpecificFollowing(token: String, id: String): Boolean {
+        val user = getByToken(token).get()
+        return user.following.firstOrNull { entry -> entry.id == id } !== null
     }
 
     /**

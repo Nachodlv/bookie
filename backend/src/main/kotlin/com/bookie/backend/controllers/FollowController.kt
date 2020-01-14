@@ -160,4 +160,17 @@ class FollowController(private val userService: UserService) {
         }
         return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
+
+    /**
+     * Checks if the currently logged in user follows a specific user.
+     */
+    @GetMapping("/checkFollowing/{id}")
+    fun checkFollowing(@PathVariable id: String,
+                       @RequestHeader headers: Map<String, String>) : ResponseEntity<Boolean> {
+        val token = headers["authorization"]?.substring(7)
+        if (token !== null) {
+            return ResponseEntity(userService.checkSpecificFollowing(token, id), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
 }
