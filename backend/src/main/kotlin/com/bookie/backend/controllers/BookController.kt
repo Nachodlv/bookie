@@ -3,6 +3,7 @@ package com.bookie.backend.controllers
 import com.bookie.backend.dto.RatingRequest
 import com.bookie.backend.dto.ReviewRequest
 import com.bookie.backend.dto.RatingResponse
+import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.models.Review
 import com.bookie.backend.services.BookService
 import com.bookie.backend.util.exceptions.InvalidScoreException
@@ -101,15 +102,26 @@ class BookController(private val bookService: BookService) {
      *         firstName: String,
      *         lastName: String
      *     },
-     *     timestamp: Instant
+     *     timestamp: Instant,
+     *     likes: Int,
+     *     liked: Boolean
      * }
      *
      * If there are no reviews for the book, an empty list is returned.
+     *
+     * This route returns information on whether the current user has liked each review or not.
+     * This information is shown in the liked attribute.
      */
     @GetMapping("/reviews/{id}")
     fun getReviews(@PathVariable id: String,
                    @RequestParam(value = "page", required = false, defaultValue = "0") page: Int,
-                   @RequestParam(value = "size",required = false, defaultValue = "10") size: Int): ResponseEntity<List<Review>> {
-        return ResponseEntity(bookService.getReviews(id, page, size), HttpStatus.OK)
+                   @RequestParam(value = "size",required = false, defaultValue = "10") size: Int,
+                   @RequestHeader headers: Map<String, String>): ResponseEntity<List<ReviewResponse>> {
+        val token = headers["authorization"]?.substring(7)
+
+        if (token != null) {
+            return ResponseEntity(bookService.getReviews(id, page, size, token), HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
 }
