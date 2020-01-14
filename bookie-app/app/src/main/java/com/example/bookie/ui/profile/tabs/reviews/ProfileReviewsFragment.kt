@@ -59,7 +59,7 @@ class ProfileReviewsFragment : Fragment() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = ReviewsAdapter(myDataSet, context)
+        val viewAdapter = ReviewsAdapter(myDataSet, context, false)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {

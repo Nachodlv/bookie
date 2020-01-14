@@ -7,10 +7,7 @@ import androidx.lifecycle.Transformations
 import com.example.bookie.api.client.UserClient
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.dao.UserDao
-import com.example.bookie.models.Review
-import com.example.bookie.models.User
-import com.example.bookie.models.UserPreview
-import com.example.bookie.models.UserReviewResponse
+import com.example.bookie.models.*
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
@@ -81,13 +78,7 @@ class UserRepository constructor(
     ): LiveData<RepositoryStatus<List<UserPreview>>> {
         val followers = RepositoryStatus.initStatus<List<UserPreview>>()
         userClient.getUserFollowers(userId, index / size, size, { userFollowers ->
-            executor.execute {
-                followers.postValue(RepositoryStatus.Success(userFollowers.map {
-                    it.toUserPreview(
-                        true
-                    )
-                }))
-            }
+            completionFollowers(followers, userFollowers, true)
         }, { executor.execute { followers.postValue(RepositoryStatus.Error(it)) } })
         return followers
     }
@@ -99,14 +90,8 @@ class UserRepository constructor(
     ): LiveData<RepositoryStatus<List<UserPreview>>> {
         val following = RepositoryStatus.initStatus<List<UserPreview>>()
         userClient.getUserFollowing(userId, index / size, size, { userFollowing ->
-            executor.execute {
-                following.postValue(RepositoryStatus.Success(userFollowing.map {
-                    it.toUserPreview(
-                        false
-                    )
-                }))
-            }
-        }, { executor.execute { following.postValue(RepositoryStatus.Error(it)) } })
+            completionFollowers(following, userFollowing, false)
+        }, { defaultError(it, following) })
         return following
     }
 
@@ -118,10 +103,42 @@ class UserRepository constructor(
         val followers = getUserFollowers(userId, index, size)
         val following = getUserFollowing(userId, index, size)
         val mediator = MediatorLiveData<RepositoryStatus<List<UserPreview>>>()
-        mediator.addSource(followers) {value -> mediator.setValue(value)}
-        mediator.addSource(following) {value -> mediator.setValue(value)}
+        mediator.addSource(followers) { value -> mediator.setValue(value) }
+        mediator.addSource(following) { value -> mediator.setValue(value) }
         return mediator
     }
+
+    fun searchUser(
+        query: String,
+        index: Int,
+        size: Int
+    ): LiveData<RepositoryStatus<List<UserPreview>>> {
+        val users = RepositoryStatus.initStatus<List<UserPreview>>()
+        userClient.searchUser(
+            query,
+            index / size,
+            size,
+            { completionFollowers(users, it, false) },
+            { defaultError(it, users) })
+        return users
+    }
+
+    fun searchUserWithCallbacks(
+        query: String,
+        index: Int,
+        size: Int,
+        completion: (List<UserPreview>) -> Unit,
+        error: (String) -> Unit
+    ) {
+        userClient.searchUser(
+            query,
+            index / size,
+            size,
+            { completion(it.map { u -> u.toUserPreview(false) }) },
+            error
+        )
+    }
+
     private fun refreshUser(userId: String, status: MutableLiveData<RepositoryStatus<User>>) {
         // Runs in a background thread.
         executor.execute {
@@ -135,13 +152,31 @@ class UserRepository constructor(
                         status.postValue(RepositoryStatus.Success(user))
                     }
                 }, {
-                    executor.execute { status.postValue(RepositoryStatus.Error(it)) }
+                    defaultError(it, status)
                 })
             } else status.postValue(RepositoryStatus.Success(userExists))
         }
     }
 
     companion object {
-        val FRESH_TIMEOUT = TimeUnit.DAYS.toMillis(1)
+        val FRESH_TIMEOUT = TimeUnit.SECONDS.toMillis(10) //TODO CHANGE!!!!
+    }
+
+    private fun <T> defaultError(error: String, status: MutableLiveData<RepositoryStatus<T>>) {
+        executor.execute { status.postValue(RepositoryStatus.Error(error)) }
+    }
+
+    private fun completionFollowers(
+        status: MutableLiveData<RepositoryStatus<List<UserPreview>>>,
+        followers: List<UserFollower>,
+        isFollower: Boolean
+    ) {
+        executor.execute {
+            status.postValue(RepositoryStatus.Success(followers.map {
+                it.toUserPreview(
+                    isFollower
+                )
+            }))
+        }
     }
 }

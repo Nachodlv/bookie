@@ -131,6 +131,23 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         getFollowers(ctx, route, completion, error)
     }
 
+    fun searchUser(
+        query: String,
+        page: Int,
+        size: Int,
+        completion: (users: List<UserFollower>) -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = UserSearch(query, page, size, token)
+        getFollowers(ctx, route, completion, error)
+    }
+
     private fun getFollowers(
         context: Context,
         route: ApiRoute,

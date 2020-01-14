@@ -78,3 +78,13 @@ class UserFollowing(
         get() = hashMapOf()
 
 }
+
+class UserSearch(private val query: String, private val page: Int, private val size: Int, token: String): ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/search?q=$query&page=$page&size=$size"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
+
+}
