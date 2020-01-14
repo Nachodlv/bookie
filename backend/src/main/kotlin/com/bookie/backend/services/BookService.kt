@@ -1,10 +1,7 @@
 package com.bookie.backend.services
 
 import com.bookie.backend.dto.RatingResponse
-import com.bookie.backend.models.Author
-import com.bookie.backend.models.Book
-import com.bookie.backend.models.Review
-import com.bookie.backend.models.User
+import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
 import com.bookie.backend.util.exceptions.InvalidScoreException
@@ -57,24 +54,28 @@ class BookService(val bookDao: BookDao,
 
         val timestamp: Instant = Instant.now()
         val author = Author(user.id!!, user.firstName, user.lastName)
-        val review = Review(score, comment, author, timestamp, ObjectId().toHexString())
 
         val result: Optional<Book> = bookDao.findById(id)
 
-        val testReview = Review(score, comment, null, timestamp, ObjectId().toHexString())
-        user.addReview(testReview)
-        userService.update(user)
-
         val book: Book
+        val review: Review
         if (result.isPresent) {
             book = result.get()
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             update(book)
         } else {
             book = Book(id, 0.0)
+            review = Review(score, comment, author, timestamp, book.id)
             book.addReview(review)
             insert(book)
         }
+
+        val userReview = Review(score, comment, null, timestamp, book.id)
+        user.addReview(userReview)
+        userService.update(user)
+
+        userService.addFeedItems(review, user, book)
 
         return review
     }

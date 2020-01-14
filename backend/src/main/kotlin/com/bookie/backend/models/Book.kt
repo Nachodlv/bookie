@@ -17,12 +17,22 @@ data class Book(
      * Adds a new review to the
      */
     fun addReview(review: Review) {
-        recalculateRating(review.rating.toDouble())
+        val oldReview: Review? = this.reviews.find { item -> review.author?.id == item.author?.id }
+        if (oldReview != null) {
+            removeRating(oldReview.rating.toDouble())
+            this.reviews.remove(oldReview)
+        }
+        addRating(review.rating.toDouble())
         this.reviews.add(review)
+    }
+
+    private fun addRating(rating: Double) {
+        this.rating = (this.rating * reviewAmount + rating ) / (reviewAmount+1)
         this.reviewAmount++
     }
 
-    private fun recalculateRating(rating: Double) {
-        this.rating = ( this.rating * reviewAmount + rating ) / (reviewAmount+1)
+    private fun removeRating(rating: Double) {
+        this.rating = (this.rating * reviewAmount - rating) / (reviewAmount-1)
+        this.reviewAmount--
     }
 }

@@ -29,6 +29,8 @@ class WebSecurityConfiguration(
                 .permitAll()
                 .antMatchers("/login")
                 .permitAll()
+                .antMatchers("/requestPasswordChange")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
