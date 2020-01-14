@@ -34,7 +34,9 @@ data class UserReviewResponse(
     @SerializedName("id") val id: String,
     @SerializedName("comment") val comment: String,
     @SerializedName("rating") val rating: Int,
-    @SerializedName("timestamp") val timestamp: Date
+    @SerializedName("timestamp") val timestamp: Date,
+    @SerializedName("likes") val likes: Int,
+    @SerializedName("liked") val liked: Boolean
 ) : JSONConvertable {
     fun toReview(user: User): Review = Review(
         id,
@@ -44,7 +46,9 @@ data class UserReviewResponse(
         comment,
         rating,
         timestamp,
-        Calendar.getInstance().timeInMillis
+        Calendar.getInstance().timeInMillis,
+        likes,
+        liked
     )
 }
 
