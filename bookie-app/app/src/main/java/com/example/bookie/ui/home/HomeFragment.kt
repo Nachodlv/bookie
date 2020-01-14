@@ -23,7 +23,7 @@ class HomeFragment : Fragment() {
 
     private val injector = KodeinInjector()
     private val userRepository: UserRepository by injector.instance()
-    private val pageSize: Int = 1
+    private val pageSize: Int = 10
 
     override fun onCreateView(
         inflater: LayoutInflater,
