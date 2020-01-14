@@ -3,7 +3,7 @@ package com.example.bookie.models
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
-data class ReviewTab(
+open class ReviewTab(
         @SerializedName("id") val id: String,
         val userId: String,
         @SerializedName("title") val title: String,
@@ -13,3 +13,6 @@ data class ReviewTab(
         @SerializedName("likes") val likes: Int,
         @SerializedName("time") val time: Date
 ) : JSONConvertable
+
+class EmptyReviewTab(@SerializedName("book") val book: Book
+) : ReviewTab("", "", "", "", null, 0f, 0, Date())
