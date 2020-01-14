@@ -93,7 +93,8 @@ class BookProfile : AppCompatActivity() {
                     val book = it.data?:return@Observer
                     review_text.setText(book.comment)
                     review_rating.rating = book.score.toFloat()
-
+                    submit_button.text = applicationContext.getText(R.string.edit_review)
+                    bookReviewed = true
                 }
             }
         })
@@ -160,11 +161,12 @@ class BookProfile : AppCompatActivity() {
                         is RepositoryStatus.Success -> {
                             val index = dataSet.indexOfFirst { r -> r.userId == it.data.userId }
                             if (index != -1) {
-                                dataSet.removeAt(index)
-                                reviewsAdapter?.notifyItemRemoved(index)
+                                dataSet[index] = it.data.toReviewTab()
+                                reviewsAdapter?.notifyItemChanged(index)
+                            } else {
+                                dataSet.add(0, it.data.toReviewTab())
+                                reviewsAdapter?.notifyItemInserted(0)
                             }
-                            dataSet.add(0, it.data.toReviewTab())
-                            reviewsAdapter?.notifyItemInserted(0)
                             recyclerView?.scrollToPosition(0)
                         }
                     }
