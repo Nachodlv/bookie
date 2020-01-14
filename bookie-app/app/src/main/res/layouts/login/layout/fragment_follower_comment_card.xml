@@ -26,7 +26,7 @@
                 android:id="@+id/book_image"
                 android:layout_width="127dp"
                 android:layout_height="132dp"
-                android:contentDescription="Book cover image"
+                android:contentDescription="@string/book_content_desc"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -37,10 +37,11 @@
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:text="Eduardo commented on review of..."
                 android:textSize="17sp"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Eduardo commented on review of..."
+                />
 
             <TextView
                 android:id="@+id/book_title"
@@ -51,10 +52,11 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:scrollHorizontally="true"
-                android:text="The Fellowship of the Ring"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toBottomOf="@+id/event_desc" />
+                app:layout_constraintTop_toBottomOf="@+id/event_desc"
+                tools:text="The Fellowship of the Ring"
+                />
 
             <TextView
                 android:id="@+id/comment_preview"
@@ -65,19 +67,21 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:scrollHorizontally="true"
-                android:text="I found this review really helpful and enjoyable, thank you!"
                 app:layout_constraintStart_toEndOf="@+id/book_image"
-                app:layout_constraintTop_toBottomOf="@+id/book_title" />
+                app:layout_constraintTop_toBottomOf="@+id/book_title"
+                tools:text="I found this review really helpful and enjoyable, thank you!"
+                />
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="2dp"
-                android:text="2 hours ago"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="2 hours ago"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
