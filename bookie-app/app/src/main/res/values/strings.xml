@@ -75,4 +75,6 @@
     <string name="successful_review">Review submitted!</string>
     <string name="read_more">Read more…</string>
     <string name="read_less">Read less</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
 </resources>

@@ -104,3 +104,13 @@ class FollowUser(private val userId: String, private val follow: Boolean, token:
         get() = hashMapOf("userId" to userId)
 
 }
+
+class IsUserFollwed(private val userId: String, token: String): ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/checkFollowing/$userId"
+    override val httpMethod: Int
+        get() = Request.Method.GET
+    override val params: HashMap<String, Any>
+        get() = hashMapOf()
+
+}

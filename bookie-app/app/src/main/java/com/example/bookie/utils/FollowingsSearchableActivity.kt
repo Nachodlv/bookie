@@ -4,6 +4,7 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.bookie.ui.profile.PublicProfile
 import com.example.bookie.ui.profile.tabs.following.ProfileFollowingSearchActivity
 
 class FollowingsSearchableActivity : AppCompatActivity() {
@@ -43,14 +44,11 @@ class FollowingsSearchableActivity : AppCompatActivity() {
     }
 
     private fun getById(id: String) {
-        //TODO get book by id
-
-        /*
-        val intent = Intent(this, BookProfile::class.java)
+        val intent = Intent(this, PublicProfile::class.java)
         val bundle = Bundle()
-        bundle.putString("bookId", id)
+        bundle.putString("userId", id)
         intent.putExtras(bundle)
-        startActivity(intent)*/
+        startActivity(intent)
     }
 
 

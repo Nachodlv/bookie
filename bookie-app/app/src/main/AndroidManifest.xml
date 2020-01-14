@@ -18,9 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".ui.book_profile.BookProfile"
-            android:label="@string/title_book_profile"></activity>
-        <activity android:name=".ui.book_list.BookList"></activity>
+        <activity android:name=".ui.profile.PublicProfile"></activity>
+        <activity
+            android:name=".ui.book_profile.BookProfile"
+            android:label="@string/title_book_profile" />
+        <activity android:name=".ui.book_list.BookList" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -30,7 +32,6 @@
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".utils.SearchableActivity" />
-
         </activity>
         <activity
             android:name=".ui.profile.tabs.following.ProfileFollowingSearchActivity"
@@ -78,6 +79,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable_followings" />
         </activity>
+
         <provider
             android:name=".utils.SuggestionProvider"
             android:authorities="com.example.bookie.utils.SuggestionProvider">
@@ -86,9 +88,10 @@
                 android:readPermission="android.permission.GLOBAL_SEARCH" />
         </provider>
         <provider
-            android:authorities="com.example.bookie.utils.FollowingsSuggestionProvider"
-            android:name=".utils.FollowingsSuggestionProvider">
-            <path-permission android:pathPrefix="/search_suggest_query"
+            android:name=".utils.FollowingsSuggestionProvider"
+            android:authorities="com.example.bookie.utils.FollowingsSuggestionProvider">
+            <path-permission
+                android:pathPrefix="/search_suggest_query"
                 android:readPermission="android.permission.GLOBAL_SEARCH" />
         </provider>
         <provider

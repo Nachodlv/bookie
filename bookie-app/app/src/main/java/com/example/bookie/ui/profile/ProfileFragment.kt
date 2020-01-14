@@ -38,7 +38,6 @@ class ProfileFragment : Fragment() {
 
     private var privateProfile = true //TODO modify
     private var userId: String? = null
-    private val pageSize = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +95,7 @@ class ProfileFragment : Fragment() {
         profileHeaderViewModel.storeFollowers(user.followerAmount)
 
         // View page and tabs initialization
-        viewPagerAdapter = ViewPagerAdapter(this, user.id)
+        viewPagerAdapter = ViewPagerAdapter(this, user.id, privateProfile)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = viewPagerAdapter
 
@@ -117,19 +116,7 @@ class ProfileFragment : Fragment() {
 
         activity?.supportFragmentManager?.findFragmentById(R.id.fragment_loader)
 
-        getFollowers(view, user.id)
     }
 
-    private fun getFollowers(view: View, userId: String) {
-        userRepository.getUserFollowersAndFolowing(userId, 0, pageSize)
-            .observe(viewLifecycleOwner, Observer {
-                when (it) {
-                    is RepositoryStatus.Success -> profileViewModel.storeUser(it.data.toMutableList())
-                    is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(
-                        view,
-                        it.error
-                    )
-                }
-            })
-    }
+
 }

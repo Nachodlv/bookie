@@ -139,6 +139,16 @@ class UserRepository constructor(
         )
     }
 
+    fun isFollowed(userId: String): LiveData<RepositoryStatus<Boolean>> {
+        val status = RepositoryStatus.initStatus<Boolean>()
+        userClient.isFollowed(
+            userId,
+            { executor.execute { status.postValue(RepositoryStatus.Success(it)) } },
+            { executor.execute { status.postValue(RepositoryStatus.Error(it)) } })
+
+        return status
+    }
+
     fun followUser(userId: String): LiveData<RepositoryStatus<String>> {
         return followOrUnFollowUser(userId, true)
     }

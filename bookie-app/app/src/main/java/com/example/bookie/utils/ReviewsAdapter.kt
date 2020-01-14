@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.MyApplication
 import com.example.bookie.MyApplication.Companion.appKodein
@@ -18,18 +18,21 @@ import com.example.bookie.R
 import com.example.bookie.models.ReviewTab
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
+import com.example.bookie.ui.book_profile.BookProfile
+import com.example.bookie.ui.profile.PublicProfile
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.instance
-import com.example.bookie.ui.book_profile.BookProfile
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
-                     private val context: Context?,
-                     private val lifecycleOwner: LifecycleOwner,
-                     private val isInBookProfile: Boolean) :
+class ReviewsAdapter(
+    private val myDataSet: List<ReviewTab>,
+    private val context: Context?,
+    private val lifecycleOwner: LifecycleOwner,
+    private val isInBookProfile: Boolean
+) :
     RecyclerView.Adapter<ReviewsAdapter.ReviewCardViewHolder>() {
 
     private val injector = KodeinInjector()
@@ -83,11 +86,14 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
         holder.time.text = DateUtils.getDifference(data.time, Date())
         holder.readMore.text = context?.getString(R.string.read_more)
 
-        if(!isInBookProfile) {
-            holder.bookTitle.setOnClickListener { goToBookProfile(data.id) }
-            holder.preview.setOnClickListener { goToBookProfile(data.id) }
-            holder.bookImage.setOnClickListener { goToBookProfile(data.id) }
-        }
+        val listener =
+            if (isInBookProfile) View.OnClickListener { goToPublicProfile(data.userId) } else View.OnClickListener {
+                goToBookProfile(data.id)
+            }
+
+        holder.bookTitle.setOnClickListener(listener)
+        holder.preview.setOnClickListener(listener)
+        holder.bookImage.setOnClickListener(listener)
 
         if (data.isLiked) {
             setLikeListener(holder, data)
@@ -157,10 +163,19 @@ class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
     }
 
     private fun goToBookProfile(bookId: String) {
-        val currentContext = context?: return
+        val currentContext = context ?: return
         val intent = Intent(currentContext, BookProfile::class.java)
         val bundle = Bundle()
         bundle.putString("bookId", bookId)
+        intent.putExtras(bundle)
+        ContextCompat.startActivity(currentContext, intent, bundle)
+    }
+
+    private fun goToPublicProfile(userId: String) {
+        val currentContext = context ?: return
+        val intent = Intent(currentContext, PublicProfile::class.java)
+        val bundle = Bundle()
+        bundle.putString("userId", userId)
         intent.putExtras(bundle)
         ContextCompat.startActivity(currentContext, intent, bundle)
     }
