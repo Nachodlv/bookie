@@ -2,8 +2,8 @@ package com.bookie.backend.services
 
 import com.bookie.backend.dto.*
 import com.bookie.backend.models.Book
-import com.bookie.backend.models.FeedItem
 import com.bookie.backend.models.User
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 import java.util.*
@@ -52,6 +52,13 @@ interface UserDao: MongoRepository<User, String> {
      */
     @Query(value="{ 'id' : ?0 }", fields="{ 'id' : 0, 'reviews' : { '\$slice' : [ ?1, ?2 ] } }")
     fun findReviewsById(id: String, skip: Int, limit: Int): Optional<ReviewList>
+
+    /**
+     * Finds the user's whose firstName or lastName contain the query parameter
+     */
+    // Add pagination
+    @Query(value="{ 'followers' : { '\$not' : {'\$elemMatch' : { 'id' : ?1 } } }, '\$or' : [ { 'firstName' : { '\$regex' : ?0, '\$options' : 'i' } }, { 'lastName' : { '\$regex' : ?0, '\$options' : 'i' } } ] }")
+    fun findUsersByQueryParameter(q: String, id: String, pageable: Pageable): Optional<List<UserData>>
 }
 
 interface BookDao: MongoRepository<Book, String> {

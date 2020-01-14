@@ -254,6 +254,28 @@ class UserService(val userDao: UserDao,
         }
     }
 
+    /**
+     * Searches for users whose firstName, lastName or a combination of both match with the query parameter.
+     * The users in the result are not already followed by the current user.
+     *
+     * @param q: The query parameter
+     * @param token: The token of the currently logged in user.
+     */
+    fun searchUsers(q: String, token: String, pageable: Pageable): List<UserData> {
+        // Should sanitize the query
+        val email = tokenUtil.getUsernameFromToken(token)
+        val user = userDao.findByEmail(email).get()
+
+        val spaces = q.contains(" ")
+        val query = if (spaces) {
+            "(" + q.replace(' ', '|') + ")"
+        } else {
+            q
+        }
+        val result = userDao.findUsersByQueryParameter(query, user.id!!, pageable)
+        return result.orElse(emptyList())
+    }
+
     private fun addReviewToFeed(review: FeedItem, id: String?) {
         if (id != null) {
             val user = userDao.findById(id).get()
