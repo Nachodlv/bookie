@@ -6,18 +6,16 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.example.bookie.R
 import java.util.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.models.*
-import com.example.bookie.utils.MyAdapter
+import com.example.bookie.utils.FeedItemsAdapter
+import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.OnScrollListenerMock
 
 class HomeFragment : Fragment() {
-
-    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,8 +23,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
         val homeView = inflater.inflate(R.layout.fragment_home, container, false)
         getFeed(homeView)
         return homeView
@@ -96,11 +92,11 @@ class HomeFragment : Fragment() {
                         coverImage,5F, Date())
                 )
 
-        val myDataset: MutableList<FeedItem> = mutableListOf<FeedItem>().apply { addAll(feedArray.subList(0, 10)) }
+        val myDataSet: MutableList<FeedItem> = mutableListOf<FeedItem>().apply { addAll(feedArray.subList(0, 10)) }
 
         val recList = homeView.findViewById(R.id.feed_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = MyAdapter(myDataset, context)
+        val viewAdapter = FeedItemsAdapter(myDataSet, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -115,7 +111,7 @@ class HomeFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataset, feedArray))
+        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, feedArray))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

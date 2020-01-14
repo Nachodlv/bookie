@@ -23,7 +23,7 @@ class BookController(private val bookService: BookService) {
      * {
      *     id: String,
      *     comment: String,
-     *     score: String
+     *     score: Int
      * }
      *
      * Where id is the id of the book, comment is the text entered by the user and score is a value from 1 to 5
@@ -50,7 +50,7 @@ class BookController(private val bookService: BookService) {
      * {
      *     id: String,
      *     rating: Double,
-     *     amountOfReviews: Int
+     *     reviewAmount: Int
      * }
      *
      * If there are no reviews for book, the score returned will be 0

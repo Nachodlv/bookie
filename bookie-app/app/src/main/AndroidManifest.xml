@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".BookProfile"></activity>
+        <activity android:name=".ui.book_profile.BookProfile"
+            android:label=""></activity>
         <activity android:name=".ui.book_list.BookList"></activity>
         <activity
             android:name=".MainActivity"
@@ -30,6 +31,16 @@
                 android:name="android.app.default_searchable"
                 android:value=".utils.SearchableActivity" />
 
+        </activity>
+        <activity
+            android:name=".ui.profile.tabs.following.ProfileFollowingSearchActivity"
+            android:label="@string/search_activity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!-- enable the search dialog to send searches to SearchableActivity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".utils.FollowingsSearchableActivity" />
         </activity>
         <activity
             android:name=".ui.login.LoginActivity"
@@ -56,12 +67,28 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+        <activity
+            android:name=".utils.FollowingsSearchableActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable_followings" />
+        </activity>
         <provider
             android:name=".utils.SuggestionProvider"
             android:authorities="com.example.bookie.utils.SuggestionProvider">
             <path-permission
                 android:pathPrefix="/search_suggest_query"
+                android:readPermission="android.permission.GLOBAL_SEARCH" />
+        </provider>
+        <provider
+            android:authorities="com.example.bookie.utils.FollowingsSuggestionProvider"
+            android:name=".utils.FollowingsSuggestionProvider">
+            <path-permission android:pathPrefix="/search_suggest_query"
                 android:readPermission="android.permission.GLOBAL_SEARCH" />
         </provider>
         <provider

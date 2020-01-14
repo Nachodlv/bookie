@@ -20,7 +20,7 @@ interface BookDao {
     fun getById(id: String): LiveData<Book>
 
     @Query("SELECT * FROM BOOK WHERE id = :id")
-    fun getByIdInstant(id: String): Book
+    fun getByIdInstant(id: String): Book?
 
 
     @Query("SELECT * FROM BOOK WHERE id = :id and lastFetch >= (:now - :timeout)")
