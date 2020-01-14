@@ -242,7 +242,7 @@ class UserService(val userDao: UserDao,
      * - The user must not have written a review for the book already
      */
     fun addFeedItems(review: Review, reviewer: User, book: Book) {
-        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
+        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating, review.author!!)
 
         val bookFeedItem: FeedItem = BookFeedItem(book.id, 0, book.rating)
 

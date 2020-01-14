@@ -28,6 +28,7 @@ val userModule = Kodein.Module {
             instance(),
             instance(),
             instance(),
+            instance(),
             instance()
         )
     }
