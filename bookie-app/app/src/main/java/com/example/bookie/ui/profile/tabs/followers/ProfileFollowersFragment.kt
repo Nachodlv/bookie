@@ -11,23 +11,37 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.UserPreview
+import com.example.bookie.repositories.RepositoryStatus
+import com.example.bookie.repositories.UserRepository
 import com.example.bookie.ui.profile.ProfileViewModel
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.OnScrollListenerMock
+import com.github.salomonbrys.kodein.KodeinInjector
+import com.github.salomonbrys.kodein.android.appKodein
+import com.github.salomonbrys.kodein.instance
 import kotlinx.android.synthetic.main.fragment_followings_tab.*
 
 class ProfileFollowersFragment : Fragment() {
+
+    private val injector = KodeinInjector()
+    private val userRepository: UserRepository by injector.instance()
+
+    private var userId: String? = null
+    private val pageSize = 10
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        userId = arguments?.getString("userId")
+
         return inflater.inflate(R.layout.fragment_followers_tab, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        injector.inject(appKodein())
 
         val profileViewModel = activity?.run {
             ViewModelProvider(this).get(ProfileViewModel::class.java)
@@ -42,11 +56,10 @@ class ProfileFollowersFragment : Fragment() {
     }
 
     private fun setUpRecyclerView(view: View, followers: MutableList<String>){
-        val myDataSet: MutableList<String> = mutableListOf<String>().apply { addAll(followers.subList(0, 10)) }
 
         val recList = view.findViewById(R.id.followers_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = FollowingsAdapter(myDataSet)
+        val viewAdapter = FollowingsAdapter(followers)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -61,6 +74,23 @@ class ProfileFollowersFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        recList.addOnScrollListener(OnScrollListenerMock(viewManager, viewAdapter, myDataSet, followers))
+        recList.addOnScrollListener(
+            OnScrollListener(
+                viewManager,
+                viewAdapter,
+                followers,
+                pageSize
+            ) { index, callback ->
+                val userId = userId
+                if (userId != null) {
+                    userRepository.getUserFollowers(userId, index, pageSize)
+                        .observe(viewLifecycleOwner, Observer {
+                            when (it) {
+                                is RepositoryStatus.Success -> callback(it.data.map { p -> "${p.firstName} ${p.lastName}" })
+                                is RepositoryStatus.Error -> callback(emptyList())
+                            }
+                        })
+                }
+            })
     }
 }

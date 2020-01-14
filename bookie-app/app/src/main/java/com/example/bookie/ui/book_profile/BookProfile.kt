@@ -178,7 +178,7 @@ class BookProfile : AppCompatActivity() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(applicationContext)
-        val viewAdapter = ReviewsAdapter(dataSet, this, this)
+        val viewAdapter = ReviewsAdapter(dataSet, this, this, true)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         reviewsAdapter = viewAdapter
