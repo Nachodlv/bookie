@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.bookie.R
 import com.example.bookie.api.routes.GetReviews
 import com.example.bookie.api.routes.ReviewPost
+import com.example.bookie.api.routes.UserLoggedReview
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.ReviewResponse
 import com.example.bookie.models.toObject
@@ -60,6 +61,27 @@ class ReviewClient(ctx: Context?) : ApiClient(ctx) {
                 }
                 else -> error(response.json)
 
+            }
+        }
+    }
+
+    fun getReviewOfLoggedUser(
+        bookId: String,
+        completion: (review: ReviewResponse?) -> Unit,
+        error: (error: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = UserLoggedReview(bookId,token)
+        performRequest(route){
+            when(it.statusCode){
+                200 -> completion(it.json.toObject())
+                404 -> completion(null)
+                else -> error(it.json)
             }
         }
     }
