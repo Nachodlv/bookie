@@ -16,7 +16,9 @@ data class ReviewResponse(
     @SerializedName("rating") val rating: Int,
     @SerializedName("id") val id: String,
     @SerializedName("timestamp") val timestamp: Date,
-    @SerializedName("author") val author: Author
+    @SerializedName("author") val author: Author,
+    @SerializedName("likes") val likes: Int,
+    @SerializedName("liked") val liked: Boolean
 
 ) : JSONConvertable {
 
@@ -29,7 +31,9 @@ data class ReviewResponse(
             comment,
             rating,
             timestamp,
-            Calendar.getInstance().timeInMillis
+            Calendar.getInstance().timeInMillis,
+            likes,
+            liked
         )
     }
 }
@@ -43,7 +47,9 @@ data class Review(
     val comment: String,
     val score: Int,
     val timestamp: Date,
-    val lastFetch: Long = Calendar.getInstance().timeInMillis
+    val lastFetch: Long = Calendar.getInstance().timeInMillis,
+    val likes: Int,
+    val liked: Boolean
 ) {
     fun toReviewTab(): ReviewTab {
         return ReviewTab(
@@ -53,8 +59,9 @@ data class Review(
             comment,
             null,
             score.toFloat(),
-            0,
-            timestamp
+            likes,
+            timestamp,
+            liked
         )
     }
 }

@@ -1,19 +1,19 @@
 package com.bookie.backend.services
 
+import com.bookie.backend.dto.AnonymousReview
 import com.bookie.backend.dto.FollowResponse
+import com.bookie.backend.dto.ReviewResponse
 import com.bookie.backend.dto.UserData
 import com.bookie.backend.dto.UserDto
-import com.bookie.backend.models.Review
-import com.bookie.backend.models.User
+import com.bookie.backend.models.*
 import com.bookie.backend.util.BasicCrud
 import com.bookie.backend.util.JwtTokenUtil
-import com.bookie.backend.util.exceptions.EmailAlreadyExistsException
-import com.bookie.backend.util.exceptions.SelfFollowingException
-import com.bookie.backend.util.exceptions.UserNotFoundException
+import com.bookie.backend.util.exceptions.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -58,13 +58,27 @@ class UserService(val userDao: UserDao,
      * Registers a new user.
      */
     fun registerUser(user: UserDto): User {
-        getByEmail(user.email).ifPresent{throw EmailAlreadyExistsException("Email already exists")}
+        getByEmail(user.email).ifPresent { throw EmailAlreadyExistsException("Email already exists") }
         val newUser = User(
                 user.firstName,
                 user.lastName,
                 user.email,
                 passwordEncoder.encode(user.password))
         return userDao.insert(newUser.apply {}) // Is the apply necessary?
+    }
+
+    fun resetUserPassword(token: String, newPassword: String) {
+        val email = tokenUtil.getUsernameFromToken(token)
+        changeUserPassword(email, newPassword)
+    }
+
+    /**
+     * Changes a user's password to the one provided as method parameter.
+     */
+    fun changeUserPassword(email: String, newPassword: String) {
+        val user: User = getByEmail(email).orElseThrow{ throw UserNotFoundException("No user with that id was found.") }
+        user.password = passwordEncoder.encode(newPassword)
+        update(user)
     }
 
     /**
@@ -83,7 +97,7 @@ class UserService(val userDao: UserDao,
 
         if (loggedUser.id == id) throw SelfFollowingException("You can't follow yourself")
 
-        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
+        val followedUser: User = getById(id).orElseThrow { UserNotFoundException("The user to be followed was not found") }
 
         followedUser.addFollower(loggedUser)
         update(loggedUser)
@@ -106,7 +120,7 @@ class UserService(val userDao: UserDao,
         val email = tokenUtil.getUsernameFromToken(token)
         val loggedUser: User = getByEmail(email).get()
 
-        val followedUser: User = getById(id).orElseThrow{UserNotFoundException("The user to be followed was not found")}
+        val followedUser: User = getById(id).orElseThrow { UserNotFoundException("The user to be followed was not found") }
 
         followedUser.removeFollower(loggedUser)
         update(loggedUser)
@@ -169,8 +183,7 @@ class UserService(val userDao: UserDao,
      * @param following: A list with the users that the current user follows
      */
     private fun checkFollowing(result: List<FollowResponse>, following: List<FollowResponse>) {
-        result.map{
-            item ->
+        result.map { item ->
             run {
                 if (following.firstOrNull { entry -> entry.id == item.id } !== null) {
                     item.followed = true
@@ -192,11 +205,98 @@ class UserService(val userDao: UserDao,
     /**
      * Returns the reviews written by a specific user.
      */
-    fun getReviews(id: String, page: Int, size: Int): List<Review> {
+    fun getReviews(id: String, page: Int, size: Int, token: String): List<AnonymousReview> {
+        val userId = getByToken(token).get().id
+
         val result = userDao.findReviewsById(id, page * size, size)
         if (result.isPresent) {
             return result.get().reviews
+                    .map{review -> AnonymousReview(review, review.likedBy.contains(userId)) }
         }
         return emptyList()
     }
+
+    /**
+     * Returns a user's feed.
+     */
+    fun getFeed(token: String, size: Int): List<FeedItem> {
+
+        val email = tokenUtil.getUsernameFromToken(token)
+        val user: Optional<User> = userDao.findByEmail(email)
+        if (user.isPresent) {
+            val result = user.get().getLatestFeedItems(size)
+            update(user.get())
+            return result
+        }
+        throw UserNotFoundException("No user found with the provided id.")
+    }
+
+    /**
+     * Adds a review feed item to a user's feed.
+     *
+     * This method might also add a book feed item to a user's feed, if certain conditions are met.
+     *
+     * The conditions are the following:
+     * - The review must have a rating equal or greater to 3
+     * - The book's rating must be equal or greater to 3
+     * - The user must not have written a review for the book already
+     */
+    fun addFeedItems(review: Review, reviewer: User, book: Book) {
+        val reviewFeedItem: FeedItem = ReviewFeedItem(review.id, 2, Instant.now(), review.rating)
+
+        val bookFeedItem: FeedItem = BookFeedItem(book.id, 0, book.rating)
+
+        reviewer.followers.forEach { follower ->
+            run {
+                if (shouldRecommendBook(review, book)) {
+                    addReviewAndBookToFeed(reviewFeedItem, bookFeedItem, follower.id)
+                } else {
+                    addReviewToFeed(reviewFeedItem, follower.id)
+                }
+            }
+        }
+    }
+
+    /**
+     * Searches for users whose firstName, lastName or a combination of both match with the query parameter.
+     * The users in the result are not already followed by the current user.
+     *
+     * @param q: The query parameter
+     * @param token: The token of the currently logged in user.
+     */
+    fun searchUsers(q: String, token: String, pageable: Pageable): List<UserData> {
+        // Should sanitize the query
+        val email = tokenUtil.getUsernameFromToken(token)
+        val user = userDao.findByEmail(email).get()
+
+        val spaces = q.contains(" ")
+        val query = if (spaces) {
+            "(" + q.replace(' ', '|') + ")"
+        } else {
+            q
+        }
+        val result = userDao.findUsersByQueryParameter(query, user.id!!, pageable)
+        return result.orElse(emptyList())
+    }
+
+    private fun addReviewToFeed(review: FeedItem, id: String?) {
+        if (id != null) {
+            val user = userDao.findById(id).get()
+            user.addFeedItem(review)
+            update(user)
+        }
+    }
+
+    private fun addReviewAndBookToFeed(review: FeedItem, book: FeedItem, id: String?) {
+        if (id != null) {
+            val user = userDao.findById(id).get()
+            user.addFeedItem(review)
+            if (user.reviews.firstOrNull{ item -> item.id == book.id } == null) {
+                user.addFeedItem(book)
+            }
+            update(user)
+        }
+    }
+
+    private fun shouldRecommendBook(review: Review, book: Book) = book.rating >= 3.0 && review.rating >= 3
 }

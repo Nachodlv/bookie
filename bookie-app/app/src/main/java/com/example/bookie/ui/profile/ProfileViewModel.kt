@@ -13,6 +13,6 @@ class ProfileViewModel : ViewModel() {
     val users: LiveData<MutableList<UserPreview>> = _users
 
     fun storeUser(users: MutableList<UserPreview>) {
-        _users.value = users
+        _users.postValue(users)
     }
 }

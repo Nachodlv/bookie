@@ -3,11 +3,13 @@ package com.example.bookie.ui.book_list
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
 import com.example.bookie.models.BookFeed
 import com.example.bookie.repositories.BookRepository
+import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.utils.FeedItemsAdapter
 import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.SnackbarUtil

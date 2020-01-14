@@ -2,6 +2,8 @@ package com.example.bookie.utils
 
 import android.content.Context
 import androidx.lifecycle.Observer
+import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,26 +11,34 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.MyApplication
+import com.example.bookie.MyApplication.Companion.appKodein
 import com.example.bookie.R
 import com.example.bookie.models.Book
 import com.example.bookie.models.EmptyReviewTab
 import com.example.bookie.models.ReviewTab
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
-import com.example.bookie.ui.loader.LoaderFragment
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.instance
+import com.example.bookie.ui.loader.LoaderFragment
+import com.example.bookie.ui.book_profile.BookProfile
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class ReviewsAdapter(private val myDataSet: MutableList<ReviewTab>, private val context: Context?, private val reviewRepository: ReviewRepository? = null) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ReviewsAdapter(private val myDataSet: List<ReviewTab>,
+                     private val context: Context?,
+                     private val lifecycleOwner: LifecycleOwner,
+                     private val isInBookProfile: Boolean) :
+    RecyclerView.Adapter<ReviewsAdapter.ReviewCardViewHolder>() {
+
+    private val injector = KodeinInjector()
+    private val reviewRepository: ReviewRepository by injector.instance()
 
     class HeaderViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         val reviewText: TextView = view.findViewById(R.id.review_text)
@@ -56,7 +66,7 @@ class ReviewsAdapter(private val myDataSet: MutableList<ReviewTab>, private val 
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-
+        injector.inject(appKodein)
         when(viewType) {
             0 -> {
                 val view = LayoutInflater.from(parent.context)
@@ -201,10 +211,23 @@ class ReviewsAdapter(private val myDataSet: MutableList<ReviewTab>, private val 
         holder.time.text = DateUtils.getDifference(data.time, Date())
         holder.readMore.text = context?.getString(R.string.read_more)
 
+        if(!isInBookProfile) {
+            holder.bookTitle.setOnClickListener { goToBookProfile(data.id) }
+            holder.preview.setOnClickListener { goToBookProfile(data.id) }
+            holder.bookImage.setOnClickListener { goToBookProfile(data.id) }
+        }
+
+        if (data.isLiked) {
+            setLikeListener(holder, data)
+        } else {
+            setUnLikeListener(holder, data)
+        }
+
+        val maxLines = holder.preview.maxLines
         if (holder.preview.text.length > 39 * holder.preview.maxLines) {
             holder.readMore.visibility = View.VISIBLE
             holder.readMore.setOnClickListener {
-                val context = context?:return@setOnClickListener
+                val context = context ?: return@setOnClickListener
                 holder.preview.maxLines =
                         if (holder.readMore.text == context.getString(R.string.read_more)) {
                             holder.readMore.text = context.getString(R.string.read_less)
@@ -223,4 +246,52 @@ class ReviewsAdapter(private val myDataSet: MutableList<ReviewTab>, private val 
     override fun getItemCount() = myDataSet.size
 
     override fun getItemViewType(position: Int): Int = if (position == 0 && myDataSet[position].image == null) 0 else 1
+
+    private fun setUnLikeListener(holder: ReviewCardViewHolder, data: ReviewTab) {
+        holder.likes.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_thumb_up, 0)
+        holder.likes.setOnClickListener {
+            setLikeListener(holder, data)
+            data.likes++
+            holder.likes.text = data.likes.toString()
+            reviewRepository.likeReview(data.id, data.userId)
+                .observe(lifecycleOwner, androidx.lifecycle.Observer {
+                    if (it is RepositoryStatus.Error) {
+                        data.likes--
+                        holder.likes.text = data.likes.toString()
+                        setUnLikeListener(holder, data)
+                    }
+                })
+        }
+    }
+
+    private fun setLikeListener(holder: ReviewCardViewHolder, data: ReviewTab) {
+        holder.likes.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            R.drawable.ic_thumb_up_green,
+            0
+        )
+        holder.likes.setOnClickListener {
+            setUnLikeListener(holder, data)
+            data.likes--
+            holder.likes.text = data.likes.toString()
+            reviewRepository.unLikeReview(data.id, data.userId)
+                .observe(lifecycleOwner, androidx.lifecycle.Observer {
+                    if (it is RepositoryStatus.Error) {
+                        data.likes++
+                        holder.likes.text = data.likes.toString()
+                        setLikeListener(holder, data)
+                    }
+                })
+        }
+    }
+
+    private fun goToBookProfile(bookId: String) {
+        val currentContext = context?: return
+        val intent = Intent(currentContext, BookProfile::class.java)
+        val bundle = Bundle()
+        bundle.putString("bookId", bookId)
+        intent.putExtras(bundle)
+        ContextCompat.startActivity(currentContext, intent, bundle)
+    }
 }

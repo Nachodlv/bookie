@@ -10,8 +10,10 @@ open class ReviewTab(
         @SerializedName("preview") val preview: String,
         @SerializedName("image") val image: String?,
         @SerializedName("rating") val rating: Float,
-        @SerializedName("likes") val likes: Int,
-        @SerializedName("time") val time: Date
+        @SerializedName("likes") var likes: Int,
+        @SerializedName("time") val time: Date,
+        @SerializedName("isLiked") val isLiked: Boolean = false
+
 ) : JSONConvertable
 
 class EmptyReviewTab(@SerializedName("book") val book: Book

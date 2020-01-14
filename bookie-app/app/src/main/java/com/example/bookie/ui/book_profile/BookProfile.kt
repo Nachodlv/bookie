@@ -38,7 +38,7 @@ class BookProfile : AppCompatActivity() {
         injector.inject(appKodein())
 
         setupToolbar()
-        getBook(reviews_container.rootView)
+        getBookId(reviews_container.rootView)
     }
 
     private fun setupToolbar() {
@@ -53,9 +53,14 @@ class BookProfile : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
-    private fun getBook(view: View) {
+    private fun getBookId(view: View) {
         val bundle = intent.extras ?: return
         val bookId = bundle.getString("bookId") ?: return
+        getBook(view, bookId)
+        loadCurrentReview(bookId)
+    }
+
+    private fun getBook(view: View, bookId: String) {
 
         bookRepository.getById(bookId).observe(this, Observer {
             when (it) {
@@ -66,6 +71,20 @@ class BookProfile : AppCompatActivity() {
                 }
                 is RepositoryStatus.Loading -> return@Observer
                 is RepositoryStatus.Error -> setError(it.error)
+            }
+        })
+    }
+
+    private fun loadCurrentReview(bookId: String) {
+        reviewRepository.getReviewLoggedUser(bookId).observe(this, Observer {
+            when(it) {
+                is RepositoryStatus.Success -> {
+                    val book = it.data?:return@Observer
+                    review_text.setText(book.comment)
+                    review_rating.rating = book.score.toFloat()
+                    submit_button.text = applicationContext.getText(R.string.edit_review)
+                    bookReviewed = true
+                }
             }
         })
     }
@@ -95,7 +114,7 @@ class BookProfile : AppCompatActivity() {
 
         val recList = view.findViewById(R.id.reviews_container) as RecyclerView
         val viewManager = LinearLayoutManager(applicationContext)
-        val viewAdapter = ReviewsAdapter(dataSet, this, reviewRepository)
+        val viewAdapter = ReviewsAdapter(dataSet, this, this, true)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         reviewsAdapter = viewAdapter
