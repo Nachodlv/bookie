@@ -89,9 +89,9 @@ class UserSearch(private val query: String, private val page: Int, private val s
 
 }
 
-class UserFeed(private val page: Int, private val size: Int, token: String): ApiRoute(token) {
+class UserFeed(private val size: Int, token: String): ApiRoute(token) {
     override val url: String
-        get() = "$baseUrl/user/feed?page=$page&size=$size"
+        get() = "$baseUrl/user/feed?size=$size"
     override val httpMethod: Int
         get() = Request.Method.GET
     override val params: HashMap<String, Any>

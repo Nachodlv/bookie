@@ -32,25 +32,36 @@ class FollowerReview(
     id: String,
     title: String,
     author: String,
-    image: String,
+    image: String?,
     @SerializedName("rating") val rating: Float,
     @SerializedName("time") val time: Date
 ) : FeedItem(id, title, author, image, FeedItemType.REVIEW)
 
-sealed class FeedResponse(
-    @SerializedName("id") val id: String
-) : JSONConvertable
+sealed class FeedResponse: JSONConvertable {
+    abstract val id: String
+}
 
 class BookFeedResponse(
-    id: String,
+    override val id: String,
     @SerializedName("rating") val rating: Float
-) : FeedResponse(id)
+) : FeedResponse()
 
 class ReviewFeedResponse(
-    id: String,
+    override val id: String,
     @SerializedName("time") val time: Date,
-    @SerializedName("rating") val rating: Float
-) : FeedResponse(id)
+    @SerializedName("rating") val rating: Float,
+    @SerializedName("author") val author: Author
+) : FeedResponse() {
+    fun toFollowerReview(book: Book): FollowerReview =
+        FollowerReview(
+            id,
+            book.title,
+            "${author.firstName} ${author.lastName}",
+            book.imageLinks?.thumbnail,
+            rating,
+            time
+        )
+}
 
 enum class FeedItemType(val id: Int) {
     BOOK(0), COMMENT(1), REVIEW(2)

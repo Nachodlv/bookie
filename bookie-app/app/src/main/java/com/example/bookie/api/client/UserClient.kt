@@ -6,6 +6,8 @@ import com.example.bookie.api.routes.*
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.*
 import org.json.JSONArray
+import org.json.JSONObject
+import java.lang.Exception
 
 
 class UserClient(ctx: Context?) : ApiClient(ctx) {
@@ -146,7 +148,6 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
     }
 
     fun getFeed(
-        page: Int,
         size: Int,
         completion: (feed: List<FeedResponse>) -> Unit,
         error: (errorMessage: String) -> Unit
@@ -157,10 +158,23 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
             error(ctx.getString(R.string.default_error))
             return
         }
-        val route = UserFeed(page, size, token)
+        val route = UserFeed(size, token)
         performRequest(route) {
-            when(it.statusCode) {
-                200 -> completion(getModelsFromArray(it.json))
+            when (it.statusCode) {
+                200 -> {
+                    val array = JSONArray(it.json)
+                    val reviews = mutableListOf<FeedResponse>()
+                    for (i in 0 until array.length()) {
+                        reviews.add(
+                            when (JSONObject(array[i].toString())["type"] as Int) {
+                                FeedItemType.REVIEW.id -> array[i].toString().toObject<ReviewFeedResponse>()
+                                FeedItemType.BOOK.id -> array[i].toString().toObject<BookFeedResponse>()
+                                else -> throw Exception()
+                            }
+                        )
+                    }
+                    completion(reviews)
+                }
                 else -> error(it.json)
             }
         }
@@ -188,7 +202,7 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         }
     }
 
-    private inline fun <reified T: JSONConvertable> getModelsFromArray(json: String): List<T> {
+    private inline fun <reified T : JSONConvertable> getModelsFromArray(json: String): List<T> {
         val array = JSONArray(json)
         val models = mutableListOf<T>()
         for (i in 0 until array.length()) {
