@@ -38,22 +38,30 @@ class ProfileHeaderFragment : Fragment() {
         val followersTextView = view.findViewById<TextView>(R.id.followers)
 
         profileHeaderViewModel.user.observe(viewLifecycleOwner,
-                Observer<User> {
-                    user -> run {
-                    nameTextView.text = "${user.firstName} ${user.lastName}"
-                    emailTextView.text = user.email
-                }
-                }
+            Observer<User> { user ->
+                nameTextView.text = "${user.firstName} ${user.lastName}"
+                emailTextView.text = user.email
+
+            }
         )
 
         profileHeaderViewModel.followers.observe(viewLifecycleOwner,
-                Observer<Int> {
-                    followers -> followersTextView.text = "$followers followers"
-                }
+            Observer<Int> { followers ->
+                followersTextView.text = "$followers followers"
+            }
         )
 
         arguments?.takeIf { it.containsKey("allow_follow") }?.apply {
             followButton.visibility = if (getBoolean("allow_follow")) View.VISIBLE else View.GONE
         }
+
+
     }
+
+
+    private fun addFollowListener(user: User, button: Button) {
+
+    }
+
+
 }

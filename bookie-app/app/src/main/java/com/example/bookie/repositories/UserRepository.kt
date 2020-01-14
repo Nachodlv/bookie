@@ -139,6 +139,27 @@ class UserRepository constructor(
         )
     }
 
+    fun followUser(userId: String): LiveData<RepositoryStatus<String>> {
+        return followOrUnFollowUser(userId, true)
+    }
+
+    fun unFollowUser(userId: String): LiveData<RepositoryStatus<String>> {
+        return followOrUnFollowUser(userId, false)
+    }
+
+    private fun followOrUnFollowUser(userId: String, follow: Boolean):
+            LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+
+        userClient.followUser(
+            userId,
+            follow,
+            { executor.execute { status.postValue(RepositoryStatus.Success("")) } },
+            { executor.execute { status.postValue(RepositoryStatus.Error(it)) } })
+
+        return status
+    }
+
     private fun refreshUser(userId: String, status: MutableLiveData<RepositoryStatus<User>>) {
         // Runs in a background thread.
         executor.execute {

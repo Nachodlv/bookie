@@ -170,5 +170,26 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         }
     }
 
+    fun followUser(
+        userId: String,
+        follow: Boolean,
+        completion: () -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = FollowUser(userId, follow, token)
+        performRequest(route) {
+            when(it.statusCode) {
+                200 -> completion()
+                else -> error(it.json)
+            }
+        }
+    }
+
 
 }

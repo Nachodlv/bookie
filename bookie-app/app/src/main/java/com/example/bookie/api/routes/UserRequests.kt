@@ -69,7 +69,7 @@ class UserFollowing(
     private val page: Int,
     private val size: Int,
     token: String
-): ApiRoute(token) {
+) : ApiRoute(token) {
     override val url: String
         get() = "$baseUrl/user/following/$id?page=$page&size$size"
     override val httpMethod: Int
@@ -79,12 +79,28 @@ class UserFollowing(
 
 }
 
-class UserSearch(private val query: String, private val page: Int, private val size: Int, token: String): ApiRoute(token) {
+class UserSearch(
+    private val query: String,
+    private val page: Int,
+    private val size: Int,
+    token: String
+) : ApiRoute(token) {
     override val url: String
         get() = "$baseUrl/user/search?q=$query&page=$page&size=$size"
     override val httpMethod: Int
         get() = Request.Method.GET
     override val params: HashMap<String, Any>
         get() = hashMapOf()
+
+}
+
+class FollowUser(private val userId: String, private val follow: Boolean, token: String) :
+    ApiRoute(token) {
+    override val url: String
+        get() = "$baseUrl/user/${if(follow) "follow" else "unfollow"}"
+    override val httpMethod: Int
+        get() = Request.Method.POST
+    override val params: HashMap<String, Any>
+        get() = hashMapOf("userId" to userId)
 
 }

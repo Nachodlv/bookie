@@ -37,13 +37,16 @@ class ProfileFragment : Fragment() {
     private val authRepository: AuthRepository by injector.instance()
 
     private var privateProfile = true //TODO modify
-    private val userId = "42"
+    private var userId: String? = null
     private val pageSize = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         injector.inject(appKodein())
+
+        userId = arguments?.getString("userId")
+        privateProfile = userId == null
 
         profileHeaderViewModel = activity?.run {
             ViewModelProvider(this).get(ProfileHeaderViewModel::class.java)
@@ -66,7 +69,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val fragment = ProfileHeaderFragment()
         fragment.arguments = Bundle().apply {
-            putBoolean("allow_follow", false)
+            putBoolean("allow_follow", !privateProfile)
         }
         parentFragmentManager.beginTransaction()
             .add(R.id.header_container, fragment).commit()
@@ -81,8 +84,10 @@ class ProfileFragment : Fragment() {
 
         if (privateProfile)
             authRepository.getUserLoggedIn().observe(viewLifecycleOwner, observer)
-        else
+        else {
+            val userId = userId ?: return
             userRepository.getUser(userId).observe(viewLifecycleOwner, observer)
+        }
 
     }
 
@@ -96,11 +101,16 @@ class ProfileFragment : Fragment() {
         viewPager.adapter = viewPagerAdapter
 
         val tabLayout: TabLayout = view.findViewById(R.id.tab_layout)
+
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when (position) {
+            tab.text = if (privateProfile) when (position) {
                 0 -> "Reviews"
                 1 -> "Following"
                 2 -> "Followers"
+                else -> "OutOfBounds $position"
+            }
+            else when (position) {
+                0 -> "Reviews"
                 else -> "OutOfBounds $position"
             }
         }.attach()

@@ -1,6 +1,7 @@
 package com.example.bookie.ui.scan
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -17,6 +19,7 @@ import com.example.bookie.R
 import com.example.bookie.models.Book
 import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
+import com.example.bookie.ui.book_profile.BookProfile
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
@@ -122,7 +125,14 @@ class ScanFragment : Fragment() {
     private fun observeSearchResult(result: LiveData<RepositoryStatus<Book>>) {
         result.observe(this, Observer {
             when (it) {
-                is RepositoryStatus.Success -> showToast("Your book is called ${it.data.title}")
+                is RepositoryStatus.Success -> {
+                    val context = context?:return@Observer
+                    val intent = Intent(context, BookProfile::class.java)
+                    val bundle = Bundle()
+                    bundle.putString("bookId", it.data.id)
+                    intent.putExtras(bundle)
+                    ContextCompat.startActivity(context, intent, bundle)
+                }
                 is RepositoryStatus.Loading -> return@Observer
                 is RepositoryStatus.Error -> {
                     previousIsbn = null
