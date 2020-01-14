@@ -30,7 +30,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.058" />
+                app:layout_constraintVertical_bias="0.058"
+                tools:srcCompat="@tools:sample/avatars"/>
 
             <TextView
                 android:id="@+id/book_title"
@@ -59,6 +60,7 @@
                 android:id="@+id/book_categories"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="15dp"
                 android:ellipsize="end"
                 android:textSize="16sp"
@@ -69,6 +71,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="15dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toEndOf="@+id/book_image"

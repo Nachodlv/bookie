@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,12 +14,10 @@ import com.example.bookie.models.ReviewTab
 import com.example.bookie.repositories.BookRepository
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.ReviewRepository
-import com.example.bookie.ui.loader.LoaderFragment
 import com.example.bookie.utils.*
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_book_profile.*
 
 class BookProfile : AppCompatActivity() {
@@ -30,7 +27,6 @@ class BookProfile : AppCompatActivity() {
     private val reviewRepository: ReviewRepository by injector.instance()
 
     private val pageSize: Int = 10
-//    private var book: Book? = null
     private var dataSet: MutableList<ReviewTab> = mutableListOf()
     private var reviewsAdapter: ReviewsAdapter? = null
     private var recyclerView: RecyclerView? = null
