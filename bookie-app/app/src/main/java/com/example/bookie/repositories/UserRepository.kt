@@ -24,6 +24,7 @@ class UserRepository constructor(
     // Simple in-memory cache. Details omitted for brevity.
     private val executor: Executor,
     private val userDao: UserDao,
+    private val bookRepository: BookRepository,
     private val sharedPreferencesDao: SharedPreferencesDao
 ) {
 
@@ -138,6 +139,16 @@ class UserRepository constructor(
             error
         )
     }
+
+//    fun getFeed(index: Int = 0, size: Int = 10): LiveData<RepositoryStatus<List<FeedItem>>> {
+//        val feedResponse = RepositoryStatus.initStatus<List<FeedResponse>>()
+//        userClient.getFeed(index/size, size, {feed ->
+//            executor.execute {
+//                feedResponse.postValue(RepositoryStatus.Success(feed))
+//            }
+//        }, {executor.execute { feedResponse.postValue(RepositoryStatus.Error(it)) }})
+////        val feed = Transformations.switchMap(feedResponse, )
+//    }
 
     private fun refreshUser(userId: String, status: MutableLiveData<RepositoryStatus<User>>) {
         // Runs in a background thread.

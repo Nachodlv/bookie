@@ -4,10 +4,7 @@ import android.content.Context
 import com.example.bookie.R
 import com.example.bookie.api.routes.*
 import com.example.bookie.dao.SharedPreferencesDao
-import com.example.bookie.models.User
-import com.example.bookie.models.UserFollower
-import com.example.bookie.models.UserReviewResponse
-import com.example.bookie.models.toObject
+import com.example.bookie.models.*
 import org.json.JSONArray
 
 
@@ -148,6 +145,27 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         getFollowers(ctx, route, completion, error)
     }
 
+    fun getFeed(
+        page: Int,
+        size: Int,
+        completion: (feed: List<FeedResponse>) -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = UserFeed(page, size, token)
+        performRequest(route) {
+            when(it.statusCode) {
+                200 -> completion(getModelsFromArray(it.json))
+                else -> error(it.json)
+            }
+        }
+    }
+
     private fun getFollowers(
         context: Context,
         route: ApiRoute,
@@ -170,5 +188,13 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         }
     }
 
+    private inline fun <reified T: JSONConvertable> getModelsFromArray(json: String): List<T> {
+        val array = JSONArray(json)
+        val models = mutableListOf<T>()
+        for (i in 0 until array.length()) {
+            models.add(array[i].toString().toObject())
+        }
+        return models
+    }
 
 }
