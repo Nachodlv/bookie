@@ -3,13 +3,14 @@ package com.example.bookie.ui.book_list
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookie.MyApplication
 import com.example.bookie.R
 import com.example.bookie.models.BookFeed
 import com.example.bookie.repositories.BookRepository
-import com.example.bookie.utils.MyAdapter
+import com.example.bookie.repositories.RepositoryStatus
+import com.example.bookie.utils.FeedItemsAdapter
 import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
@@ -22,6 +23,8 @@ class BookList : AppCompatActivity() {
     private val injector = KodeinInjector()
     private val bookRepository: BookRepository by injector.instance()
 
+    private val pageSize: Int = 10
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_list)
@@ -30,8 +33,6 @@ class BookList : AppCompatActivity() {
 
         setupToolbar()
         searchForBooks()
-
-
     }
 
 
@@ -52,14 +53,14 @@ class BookList : AppCompatActivity() {
         val query = bundle.getString("searchQuery") ?: return
         bookRepository.searchBooks(query, { books ->
             runOnUiThread { buildList(books.map { it.toBookFeed() }.toMutableList(), query)}
-        }, { error -> showError(error) }, 0)
+        }, { error -> showError(error) }, 0, pageSize)
     }
 
 
     private fun buildList(books: MutableList<BookFeed>, query: String) {
         val recList = findViewById<RecyclerView>(R.id.feed_container)
         val viewManager = LinearLayoutManager(applicationContext)
-        val viewAdapter = MyAdapter(books, this)
+        val viewAdapter = FeedItemsAdapter(books, this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -78,7 +79,8 @@ class BookList : AppCompatActivity() {
             OnScrollListener(
                 viewManager,
                 viewAdapter,
-                books
+                books,
+                pageSize
             ) { index, callback ->
                 bookRepository.searchBooks(
                     query,
@@ -87,7 +89,8 @@ class BookList : AppCompatActivity() {
                         showError(error)
                         callback(emptyList())
                     },
-                    index
+                    index,
+                    pageSize
                 )
             })
     }

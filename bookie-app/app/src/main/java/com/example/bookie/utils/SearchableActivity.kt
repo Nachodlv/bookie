@@ -4,7 +4,7 @@ import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.bookie.BookProfile
+import com.example.bookie.ui.book_profile.BookProfile
 import com.example.bookie.ui.book_list.BookList
 
 class SearchableActivity : AppCompatActivity() {

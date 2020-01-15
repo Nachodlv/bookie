@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:focusable="false"
-            android:text="@string/register" />
+            android:text="@string/register"/>
 
         <fragment
             android:id="@+id/fragment_loader"
@@ -79,8 +79,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+        android:minHeight="?attr/actionBarSize" />
 </FrameLayout>
 

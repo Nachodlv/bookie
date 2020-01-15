@@ -2,11 +2,10 @@ package com.example.bookie.utils
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookie.models.FeedItem
 
 
-class OnScrollListenerMock<T>(
-    private val layoutManager: LinearLayoutManager, private val adapter: MyAdapter,
+class OnScrollListenerMock<T, F: RecyclerView.ViewHolder>(
+    private val layoutManager: LinearLayoutManager, private val adapter: RecyclerView.Adapter<F>,
     private var dataList: MutableList<T>, private val fullList: MutableList<T>
 ) : RecyclerView.OnScrollListener() {
 
@@ -39,19 +38,25 @@ class OnScrollListenerMock<T>(
     }
 }
 
-class OnScrollListener<T>(
+class OnScrollListener<T, F: RecyclerView.ViewHolder>(
     private val layoutManager: LinearLayoutManager,
-    private val adapter: MyAdapter,
+    private val adapter: RecyclerView.Adapter<F>,
     private var dataList: MutableList<T>,
+    private val pageSize: Int,
     private val loadMore: (index: Int, callback: (List<T>) -> Unit) -> Unit
 ) : RecyclerView.OnScrollListener() {
 
     private var loading = false
+    private var finished = false
+
+    init {
+        if(dataList.size < pageSize) finished = true
+    }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 
-        if (!loading) {
+        if (!loading && !finished) {
             if (layoutManager.findLastCompletelyVisibleItemPosition() == dataList.size - 1) {
                 //bottom of list!
                 loading = true
@@ -63,6 +68,7 @@ class OnScrollListener<T>(
     private fun loadMore(recyclerView: RecyclerView) {
         val currentIndex = dataList.size
         loadMore(currentIndex) { list ->
+            if(list.size < pageSize) finished = true
             dataList.addAll(currentIndex, list)
             recyclerView.post { adapter.notifyDataSetChanged() }
             loading = false

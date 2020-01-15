@@ -32,7 +32,11 @@ data class Book(
     }
 
     private fun removeRating(rating: Double) {
-        this.rating = (this.rating * reviewAmount - rating) / (reviewAmount-1)
+        if (reviewAmount == 1) {
+            this.rating = 0.0
+        } else {
+            this.rating = (this.rating * reviewAmount - rating) / (reviewAmount-1)
+        }
         this.reviewAmount--
     }
 }

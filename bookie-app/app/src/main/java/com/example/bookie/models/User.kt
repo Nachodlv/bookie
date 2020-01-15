@@ -3,7 +3,6 @@ package com.example.bookie.models
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.*
 
@@ -13,7 +12,8 @@ data class User(
     @SerializedName("email") @ColumnInfo(name = "email") val email: String,
     @SerializedName("firstName") @ColumnInfo(name = "firstName") val firstName: String,
     @SerializedName("lastName") @ColumnInfo(name = "lastName") val lastName: String,
-    @ColumnInfo(name = "lastFetch")  var lastFetch: Long = Calendar.getInstance().timeInMillis
+    @SerializedName("followerAmount") val followerAmount: Int,
+    @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis
 ) : JSONConvertable
 
 data class UserRegisterForm(
@@ -22,13 +22,43 @@ data class UserRegisterForm(
     @SerializedName("password") val password: String = ""
 ) : JSONConvertable
 
-/*
-*
-//From JSON
-val json = "..."
-val object = json.toObject<User>()
+data class UserPreview(
+    @SerializedName("id") val id: String = "",
+    @SerializedName("firstName") val firstName: String = "",
+    @SerializedName("lastName") val lastName: String = "",
+    @SerializedName("isFollower") val isFollower: Boolean = false,
+    @SerializedName("isFollowedByMe") val isFollowedByMe: Boolean = false
+) : JSONConvertable
 
-// To JSON
-val json = object.toJSON()
-*
-* */
+data class UserReviewResponse(
+    @SerializedName("id") val id: String,
+    @SerializedName("comment") val comment: String,
+    @SerializedName("rating") val rating: Int,
+    @SerializedName("timestamp") val timestamp: Date,
+    @SerializedName("likes") val likes: Int,
+    @SerializedName("liked") val liked: Boolean
+) : JSONConvertable {
+    fun toReview(user: User): Review = Review(
+        id,
+        user.id,
+        user.firstName,
+        user.lastName,
+        comment,
+        rating,
+        timestamp,
+        Calendar.getInstance().timeInMillis,
+        likes,
+        liked
+    )
+}
+
+data class UserFollower(
+    @SerializedName("id") val id: String,
+    @SerializedName("firstName") val firstName: String,
+    @SerializedName("lastName") val lastName: String,
+    @SerializedName("followed") val followed: Boolean
+) : JSONConvertable {
+    fun toUserPreview(isFollower: Boolean): UserPreview =
+        UserPreview(id, firstName, lastName, isFollower, followed)
+
+}

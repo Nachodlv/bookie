@@ -50,10 +50,18 @@
     <string name="menu_shelf">Shelf</string>
     <string name="menu_settings">Settings</string>
 
-<!--    SEARCH BAR -->
-    <string name="search_hint">Search for a book</string>
+    <!--BOOK CARDS-->
+    <string name="book_content_desc">Book cover image</string>
 
-<!--    ERRORS-->
+    <!--SEARCH BAR -->
+    <string name="search_hint">Search for a book</string>
+    <string name="search_hint_dialog">Search for a user</string>
+
+    <!--FOLLOWING SEARCH-->
+    <string name="search_activity">Search for new users</string>
+    <string name="find_new_users">Find new users</string>
+
+    <!--ERRORS-->
     <string name="no_internet">Can\'t connect to the internet</string>
     <string name="default_error">An unexpected error occurred</string>
 
@@ -65,4 +73,14 @@
 
 <!--    BOOK LIST-->
     <string name="book_list">Book list</string>
+
+<!--    BOOK PROFILE-->
+    <string name="title_book_profile">Book Details</string>
+    <string name="write_review">Did you read it? Write a review!</string>
+    <string name="submit_review">Submit</string>
+    <string name="edit_review">Edit</string>
+    <string name="rating_required">Please rate the review</string>
+    <string name="successful_review">Review submitted!</string>
+    <string name="read_more">Read more…</string>
+    <string name="read_less">Read less</string>
 </resources>
