@@ -1,16 +1,91 @@
 <resources>
     <string name="app_name">BookieApp</string>
+    <string name="app_logo">BookieApp logo</string>
+
+<!--    SHARED PREFERENCES-->
+    <string name="shared_preferences">app.bookie.com.shared_preferences</string>
+    <string name="login_token">login_token</string>
+
+<!--    LOGIN -->
+    <string name="email_input">Email</string>
+    <string name="password_input">Password</string>
+    <string name="login_button">Login</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="register">Register</string>
+    <string name="empty_input">The input can not be empty</string>
+    <string name="login_successful">The login was made successfully</string>
+    <string name="invalid_credentials">The email or the password are incorrect</string>
+    <string name="login_unsuccessful">An error occurred while trying to login</string>
+    <string name="error_getting_user">An error occurred while getting the logged user</string>
+
+<!--    RECOVER PASSWORD-->
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="recover_password">Recover password</string>
+    <string name="email_sent">An email was sent to your email</string>
+    <string name="reset_password">Test</string>
+    <string name="new_password">New password</string>
+    <string name="repeat_new_password">Repeat new password</string>
+    <string name="change_password">Change password</string>
+
+<!--    REGISTER -->
+    <string name="name">Name</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="invalid_password">The password must have more than six characters</string>
+    <string name="invalid_repeat_password">The passwords must match</string>
+    <string name="lastName">Last name</string>
+    <string name="register_successful">The registration was made successfully</string>
+    <string name="register_unsuccessful">An error occurred while trying to register</string>
+    <string name="email_repeated">The email is already taken</string>
+
+    <!--NAVIGATION-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="nav_header_title">Bookie</string>
+
+    <string name="action_logout">Logout</string>
 
     <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_tools">Tools</string>
-    <string name="menu_share">Share</string>
-    <string name="menu_send">Send</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_scan">Scan Book</string>
+    <string name="menu_shelf">Shelf</string>
+    <string name="menu_settings">Settings</string>
+
+    <!--HOME-->
+    <string name="empty_message">Bookie has nothing to show to you. Try following someone!</string>
+
+    <!--BOOK CARDS-->
+    <string name="book_content_desc">Book cover image</string>
+
+    <!--SEARCH BAR -->
+    <string name="search_hint">Search for a book</string>
+    <string name="search_hint_dialog">Search for a user</string>
+
+    <!--FOLLOWING SEARCH-->
+    <string name="search_activity">Search for new users</string>
+    <string name="find_new_users">Find new users</string>
+
+    <!--ERRORS-->
+    <string name="no_internet">Can\'t connect to the internet</string>
+    <string name="default_error">An unexpected error occurred</string>
+
+<!--    SCAN-->
+    <string name="scanning">Scanning…</string>
+    <string name="code_detected">Code detected. Searching for the book</string>
+    <string name="start_scanning">Looking for the book…</string>
+    <string name="no_book_found">No book found with that code</string>
+
+<!--    BOOK LIST-->
+    <string name="book_list">Book list</string>
+
+<!--    BOOK PROFILE-->
+    <string name="title_book_profile">Book Details</string>
+    <string name="write_review">Did you read it? Write a review!</string>
+    <string name="submit_review">Submit</string>
+    <string name="edit_review">Edit</string>
+    <string name="rating_required">Please rate the review</string>
+    <string name="successful_review">Review submitted!</string>
+    <string name="read_more">Read more…</string>
+    <string name="read_less">Read less</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
 </resources>

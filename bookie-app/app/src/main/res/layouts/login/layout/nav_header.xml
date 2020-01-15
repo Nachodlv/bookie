@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="176dp"
+    android:background="@color/colorSecondary"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:layout_width="67dp"
+        android:layout_height="104dp"
+        android:contentDescription="@string/app_logo"
+        android:src="@drawable/bookie"
+        android:tint="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:id="@+id/text_nav_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="@string/nav_header_title"
+        android:textColor="#000000" />
+
+    <!--<TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="info@codinginflow.com" />-->
+
+</LinearLayout>
