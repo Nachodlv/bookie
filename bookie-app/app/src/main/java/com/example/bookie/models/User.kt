@@ -12,7 +12,7 @@ data class User(
     @SerializedName("email") @ColumnInfo(name = "email") val email: String,
     @SerializedName("firstName") @ColumnInfo(name = "firstName") val firstName: String,
     @SerializedName("lastName") @ColumnInfo(name = "lastName") val lastName: String,
-    @SerializedName("followerAmount") val followerAmount: Int,
+    @SerializedName("followerAmount") var followerAmount: Int,
     @ColumnInfo(name = "lastFetch") var lastFetch: Long = Calendar.getInstance().timeInMillis
 ) : JSONConvertable
 
