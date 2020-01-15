@@ -18,6 +18,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".ui.login.ResetPassword">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="bookie.app"
+                    android:host="reset-password" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ui.profile.PublicProfile"></activity>
         <activity
             android:name=".ui.book_profile.BookProfile"

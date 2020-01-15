@@ -2,6 +2,10 @@ package com.example.bookie.api.client
 
 import android.content.Context
 import com.example.bookie.R
+import com.example.bookie.api.routes.Register
+import com.example.bookie.api.routes.UserById
+import com.example.bookie.models.User
+import com.example.bookie.models.toObject
 import com.example.bookie.api.routes.*
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.*
@@ -22,7 +26,7 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         lastName: String,
         completion: (message: String) -> Unit,
         onError: (errorCode: Int, message: String) -> Unit
-    ) {
+        ) {
         if (ctx == null) return
         val route = Register(email, password, firstName, lastName)
         this.performRequest(route) { response ->

@@ -1,8 +1,12 @@
 package com.example.bookie.ui.login
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,7 +22,6 @@ import com.example.bookie.utils.TextValidator
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.login_main.*
 
 
@@ -27,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
     private var loaderFragment: LoaderFragment = LoaderFragment()
     private val injector = KodeinInjector()
     private val authRepository: AuthRepository by injector.instance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +56,8 @@ class LoginActivity : AppCompatActivity() {
         register_button.setOnClickListener { goToRegisterView() }
 
         showMessage()
+
+        forgot_password.setOnClickListener { forgotPassword(it) }
     }
 
     private fun login(view: View) {
@@ -103,6 +109,51 @@ class LoginActivity : AppCompatActivity() {
                 is RepositoryStatus.Success -> startActivity(Intent(this, MainActivity::class.java))
             }
         })
+    }
+
+    private fun forgotPassword(view: View) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setTitle(applicationContext.getString(R.string.recover_password))
+        // Set up the input
+        val input = EditText(this)
+        input.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        input.hint = applicationContext.getString(R.string.email_input)
+
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        lp.setMargins(500, 0, 500, 0)
+        input.layoutParams = lp
+        input.addTextChangedListener(EmailValidator(input))
+
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton(
+            "Reset password"
+        ) { _, _ -> }
+        builder.setNegativeButton(
+            "Cancel"
+        ) { dialog, _ -> dialog.cancel() }
+
+        val dialog = builder.create()
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            if (!TextValidator.hasErrors(input))
+                authRepository.recoverPassword(input.text.toString(), {
+                    dialog.cancel()
+                    SnackbarUtil.showSnackbar(
+                        view,
+                        applicationContext.getString(R.string.email_sent)
+                    )
+                }, { error, code ->
+                    if (code == 404) input.error = error
+                    else SnackbarUtil.showSnackbar(view, error)
+                })
+        }
     }
 
 
