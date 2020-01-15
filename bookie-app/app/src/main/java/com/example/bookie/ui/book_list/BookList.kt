@@ -48,6 +48,12 @@ class BookList : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        searchForBooks()
+
+    }
+
     private fun searchForBooks() {
         val bundle = intent.extras ?: return
         val query = bundle.getString("searchQuery") ?: return

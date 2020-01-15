@@ -99,9 +99,9 @@ class MainActivity : AppCompatActivity() {
         }
         authRepository.getUserLoggedIn().observe(this, Observer {
             when (it) {
-                is RepositoryStatus.Success -> text_nav_header.text =
+                is RepositoryStatus.Success -> text_nav_header?.text =
                     "Bookie - ${it.data.firstName} ${it.data.lastName}"
-                is RepositoryStatus.Error -> text_nav_header.text = "Bookie"
+                is RepositoryStatus.Error -> text_nav_header?.text = "Bookie"
             }
         })
     }

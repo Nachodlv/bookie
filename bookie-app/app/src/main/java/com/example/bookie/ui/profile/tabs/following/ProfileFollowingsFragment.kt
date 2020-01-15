@@ -46,6 +46,19 @@ class ProfileFollowingsFragment : Fragment() {
         injector.inject(appKodein())
 
 
+        searchFollowings(view)
+
+        // Add listener to search button
+        search_button.setOnClickListener { goToFollowingSearchView() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val container= search_button
+        if(container != null) searchFollowings(container.rootView)
+    }
+
+    private fun searchFollowings(view: View) {
         val userId = userId ?: return
         userRepository.getUserFollowing(userId, 0, pageSize)
             .observe(viewLifecycleOwner, Observer<RepositoryStatus<List<UserPreview>>> {
@@ -58,9 +71,6 @@ class ProfileFollowingsFragment : Fragment() {
                 }
 
             })
-
-        // Add listener to search button
-        search_button.setOnClickListener { goToFollowingSearchView() }
     }
 
     private fun setUpRecyclerView(view: View, followings: MutableList<UserPreview>) {
