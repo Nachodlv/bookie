@@ -202,6 +202,49 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         }
     }
 
+    fun followUser(
+        userId: String,
+        follow: Boolean,
+        completion: () -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = FollowUser(userId, follow, token)
+        performRequest(route) {
+            when (it.statusCode) {
+                200 -> completion()
+                else -> error(it.json)
+            }
+        }
+    }
+
+    fun isFollowed(
+        userId: String,
+        completion: (isFollowed: Boolean) -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = IsUserFollwed(userId, token)
+        performRequest(route) {
+            when (it.statusCode) {
+                200 -> {
+                    completion(it.json.toBoolean())
+                }
+                else -> error(it.json)
+            }
+        }
+    }
+
     private inline fun <reified T : JSONConvertable> getModelsFromArray(json: String): List<T> {
         val array = JSONArray(json)
         val models = mutableListOf<T>()

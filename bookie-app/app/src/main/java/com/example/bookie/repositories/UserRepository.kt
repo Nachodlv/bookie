@@ -161,6 +161,37 @@ class UserRepository constructor(
         return mediator
     }
 
+    fun isFollowed(userId: String): LiveData<RepositoryStatus<Boolean>> {
+        val status = RepositoryStatus.initStatus<Boolean>()
+        userClient.isFollowed(
+            userId,
+            { executor.execute { status.postValue(RepositoryStatus.Success(it)) } },
+            { executor.execute { status.postValue(RepositoryStatus.Error(it)) } })
+
+        return status
+    }
+
+    fun followUser(userId: String): LiveData<RepositoryStatus<String>> {
+        return followOrUnFollowUser(userId, true)
+    }
+
+    fun unFollowUser(userId: String): LiveData<RepositoryStatus<String>> {
+        return followOrUnFollowUser(userId, false)
+    }
+
+    private fun followOrUnFollowUser(userId: String, follow: Boolean):
+            LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+
+        userClient.followUser(
+            userId,
+            follow,
+            { executor.execute { status.postValue(RepositoryStatus.Success("")) } },
+            { executor.execute { status.postValue(RepositoryStatus.Error(it)) } })
+
+        return status
+    }
+
     private fun addFeedItem(
         mediator: MediatorLiveData<RepositoryStatus<List<FeedItem>>>,
         feedItems: MutableList<FeedItem>,

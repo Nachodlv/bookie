@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
+import com.example.bookie.models.UserPreview
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.UserRepository
 import com.example.bookie.utils.FollowingsAdapter
@@ -78,7 +79,7 @@ class ProfileFollowingSearchActivity : AppCompatActivity() {
             when (it) {
                 is RepositoryStatus.Success -> setUpRecyclerView(
                     query,
-                    it.data.map { user -> "${user.firstName} ${user.lastName}" }.toMutableList()
+                    it.data.toMutableList()
                 )
                 is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(toolbar.rootView, it.error)
             }
@@ -90,11 +91,11 @@ class ProfileFollowingSearchActivity : AppCompatActivity() {
         }, { error -> showError(error) }, 0)*/
     }
 
-    private fun setUpRecyclerView(query: String, users: MutableList<String>) {
+    private fun setUpRecyclerView(query: String, users: MutableList<UserPreview>) {
 
         val recList = findViewById<RecyclerView>(R.id.list_container)
         val viewManager = LinearLayoutManager(this)
-        val viewAdapter = FollowingsAdapter(users)
+        val viewAdapter = FollowingsAdapter(users, this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -118,7 +119,7 @@ class ProfileFollowingSearchActivity : AppCompatActivity() {
             ) { index, callback ->
                 userRepository.searchUser(query, index, pageSize).observe(this, Observer {
                     when (it) {
-                        is RepositoryStatus.Success -> callback(it.data.map { user -> "${user.firstName} ${user.lastName}" }.toMutableList())
+                        is RepositoryStatus.Success -> callback(it.data.toMutableList())
                         is RepositoryStatus.Error -> callback(mutableListOf())
                     }
                 })

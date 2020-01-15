@@ -45,25 +45,29 @@ class ProfileFollowingsFragment : Fragment() {
 
         injector.inject(appKodein())
 
-        val profileViewModel = activity?.run {
-            ViewModelProvider(this).get(ProfileViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
 
-            profileViewModel.users.observe(viewLifecycleOwner, Observer<MutableList<UserPreview>> { users ->
-                setUpRecyclerView(view,
-                    users.filter { user -> user.isFollowedByMe }.map { user -> "${user.firstName} ${user.lastName}" }.toMutableList()
-                )
+        val userId = userId ?: return
+        userRepository.getUserFollowing(userId, 0, pageSize)
+            .observe(viewLifecycleOwner, Observer<RepositoryStatus<List<UserPreview>>> {
+                when (it) {
+                    is RepositoryStatus.Success -> setUpRecyclerView(
+                        view,
+                        it.data.filter { user -> user.isFollowedByMe }.toMutableList()
+                    )
+                    is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
+                }
+
             })
 
         // Add listener to search button
         search_button.setOnClickListener { goToFollowingSearchView() }
     }
 
-    private fun setUpRecyclerView(view: View, followings: MutableList<String>) {
+    private fun setUpRecyclerView(view: View, followings: MutableList<UserPreview>) {
 
         val recList = view.findViewById(R.id.followings_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = FollowingsAdapter(followings)
+        val viewAdapter = FollowingsAdapter(followings, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -90,7 +94,7 @@ class ProfileFollowingsFragment : Fragment() {
                     userRepository.getUserFollowing(userId, index, pageSize)
                         .observe(viewLifecycleOwner, Observer {
                             when (it) {
-                                is RepositoryStatus.Success -> callback(it.data.map { p -> "${p.firstName} ${p.lastName}" })
+                                is RepositoryStatus.Success -> callback(it.data)
                                 is RepositoryStatus.Error -> callback(emptyList())
                             }
                         })

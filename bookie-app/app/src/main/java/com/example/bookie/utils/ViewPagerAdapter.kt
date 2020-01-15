@@ -7,7 +7,8 @@ import com.example.bookie.ui.profile.tabs.followers.ProfileFollowersFragment
 import com.example.bookie.ui.profile.tabs.following.ProfileFollowingsFragment
 import com.example.bookie.ui.profile.tabs.reviews.ProfileReviewsFragment
 
-class ViewPagerAdapter(fragment: Fragment, userId: String) : FragmentStateAdapter(fragment) {
+class ViewPagerAdapter(fragment: Fragment, userId: String, private val isPrivateProfile: Boolean) :
+    FragmentStateAdapter(fragment) {
 
     val bundle = Bundle()
 
@@ -15,11 +16,11 @@ class ViewPagerAdapter(fragment: Fragment, userId: String) : FragmentStateAdapte
         bundle.putString("userId", userId)
     }
 
-    override fun getItemCount(): Int = 3
+    override fun getItemCount(): Int = if(isPrivateProfile) 3 else 1
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int)
-        return when(position) {
+        return when (position) {
             0 -> addBundle(ProfileReviewsFragment())
             1 -> addBundle(ProfileFollowingsFragment())
             2 -> addBundle(ProfileFollowersFragment())
