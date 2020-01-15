@@ -56,7 +56,7 @@
         <activity
             android:name=".ui.login.RegisterActivity"
             android:label="@string/register"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".utils.SearchableActivity"
             android:launchMode="singleTop">
