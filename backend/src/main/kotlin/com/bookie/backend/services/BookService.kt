@@ -148,8 +148,12 @@ class BookService(val bookDao: BookDao,
 
         if (user.id != null) {
             val review = findReviewInBook(book.reviews, authorId)
+            val author = userService.getById(authorId).get()
+            val review2 = findReviewInAuthor(author.reviews, bookId)
             review.addLike(user.id)
+            review2.addLike(user.id)
             update(book)
+            userService.update(author)
             return review
         } else {
             throw UserNotFoundException("User not found") // This should never happen
@@ -165,8 +169,12 @@ class BookService(val bookDao: BookDao,
 
         if (user.id != null) {
             val review = findReviewInBook(book.reviews, authorId)
+            val author = userService.getById(authorId).get()
+            val review2 = findReviewInAuthor(author.reviews, bookId)
             review.removeLike(user.id)
+            review2.removeLike(user.id)
             update(book)
+            userService.update(author)
             return review
         } else {
             throw UserNotFoundException("User not found") // This should never happen
@@ -192,5 +200,13 @@ class BookService(val bookDao: BookDao,
             return review
         }
         throw ReviewNotFoundException("No review found for that book from that author")
+    }
+
+    private fun findReviewInAuthor(reviews: MutableList<Review>, bookId: String): Review {
+        val review: Review? = reviews.firstOrNull { review -> review.id == bookId }
+        if (review != null) {
+            return review
+        }
+        throw ReviewNotFoundException("No review found from that author for that book")
     }
 }
