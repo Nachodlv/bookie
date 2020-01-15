@@ -8,10 +8,11 @@
     android:padding="16dp">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher_round"
-        android:contentDescription="@string/app_logo" />
+        android:layout_width="67dp"
+        android:layout_height="104dp"
+        android:contentDescription="@string/app_logo"
+        android:src="@drawable/bookie"
+        android:tint="@color/colorPrimaryDark"/>
 
     <TextView
         android:layout_width="wrap_content"
