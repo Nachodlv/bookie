@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.MyApplication
 import com.example.bookie.MyApplication.Companion.appKodein
@@ -29,7 +28,6 @@ import com.example.bookie.ui.profile.PublicProfile
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.instance
 import com.example.bookie.ui.loader.LoaderFragment
-import com.example.bookie.ui.book_profile.BookProfile
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.util.*
