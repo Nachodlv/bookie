@@ -8,14 +8,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/header_container">
+        android:id="@+id/header_container"
+        android:background="@color/colorPrimaryLight">
 
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryLight"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
