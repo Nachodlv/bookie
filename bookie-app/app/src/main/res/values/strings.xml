@@ -42,6 +42,9 @@
     <string name="menu_shelf">Shelf</string>
     <string name="menu_settings">Settings</string>
 
+    <!--HOME-->
+    <string name="empty_message">Bookie has nothing to show to you and is very sad…</string>
+
     <!--BOOK CARDS-->
     <string name="book_content_desc">Book cover image</string>
 

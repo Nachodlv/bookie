@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +34,14 @@ class HomeFragment : Fragment() {
         injector.inject(appKodein())
         setHasOptionsMenu(true)
         val homeView = inflater.inflate(R.layout.fragment_home, container, false)
-        getFeed(homeView) { createList(homeView, it.toMutableList()) }
+        val constraintLayout = homeView.findViewById<ConstraintLayout>(R.id.empty_msg_container)
+        constraintLayout.visibility = View.VISIBLE
+        getFeed(homeView) {
+            if (it.isNotEmpty()) {
+                constraintLayout.visibility = View.GONE
+                createList(homeView, it.toMutableList())
+            }
+        }
         return homeView
     }
 
