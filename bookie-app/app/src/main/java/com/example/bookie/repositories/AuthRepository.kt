@@ -60,6 +60,32 @@ class AuthRepository constructor(
         sharedPreferencesDao.deleteToken()
     }
 
+    fun recoverPassword(
+        email: String,
+        completion: () -> Unit,
+        error: (errorMessage: String, statusCode: Int) -> Unit
+    ) {
+        authClient.recoverPassword(email, completion, error)
+    }
+
+    fun changePassword(newPassword: String, token: String): LiveData<RepositoryStatus<String>> {
+        val status = RepositoryStatus.initStatus<String>()
+        authClient.changePassword(newPassword,
+            token,
+            { message -> executor.execute { status.postValue(RepositoryStatus.Success(message)) } },
+            { errorMessage ->
+                executor.execute {
+                    status.postValue(
+                        RepositoryStatus.Error(
+                            errorMessage
+                        )
+                    )
+                }
+            })
+
+        return status
+    }
+
     private fun refreshUser(email: String) {
         // Runs in a background thread.
         executor.execute {
@@ -74,7 +100,7 @@ class AuthRepository constructor(
                     }
                     status.value = RepositoryStatus.Success(user)
                 }, { _, message -> status.value = RepositoryStatus.Error(message) })
-            } else GlobalScope.launch {  status.postValue(RepositoryStatus.Success(userExists))}
+            } else GlobalScope.launch { status.postValue(RepositoryStatus.Success(userExists)) }
         }
     }
 }

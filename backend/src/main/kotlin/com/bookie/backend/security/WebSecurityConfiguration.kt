@@ -29,7 +29,7 @@ class WebSecurityConfiguration(
                 .permitAll()
                 .antMatchers("/login")
                 .permitAll()
-                .antMatchers("/requestPasswordChange")
+                .antMatchers("/requestPasswordReset")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

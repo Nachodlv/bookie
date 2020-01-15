@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookie.R
+import com.example.bookie.models.User
 import com.example.bookie.models.UserPreview
 import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.repositories.UserRepository
@@ -17,6 +18,7 @@ import com.example.bookie.ui.profile.ProfileViewModel
 import com.example.bookie.utils.FollowingsAdapter
 import com.example.bookie.utils.OnScrollListener
 import com.example.bookie.utils.OnScrollListenerMock
+import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
@@ -43,23 +45,25 @@ class ProfileFollowersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         injector.inject(appKodein())
 
-        val profileViewModel = activity?.run {
-            ViewModelProvider(this).get(ProfileViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
+        val userId = userId ?: return
+        userRepository.getUserFollowers(userId, 0, pageSize)
+            .observe(viewLifecycleOwner, Observer<RepositoryStatus<List<UserPreview>>> {
+                when (it) {
+                    is RepositoryStatus.Success -> setUpRecyclerView(
+                        view,
+                        it.data.filter { user -> user.isFollowedByMe }.toMutableList()
+                    )
+                    is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
+                }
 
-        profileViewModel.users.observe(viewLifecycleOwner,
-                Observer<MutableList<UserPreview>> {
-                    users -> setUpRecyclerView(view,
-                        users.filter { user -> user.isFollower }.map { user -> "${user.firstName} ${user.lastName}" }.toMutableList()
-                )
-                })
+            })
     }
 
-    private fun setUpRecyclerView(view: View, followers: MutableList<String>){
+    private fun setUpRecyclerView(view: View, followers: MutableList<UserPreview>){
 
         val recList = view.findViewById(R.id.followers_container) as RecyclerView
         val viewManager = LinearLayoutManager(this.context)
-        val viewAdapter = FollowingsAdapter(followers)
+        val viewAdapter = FollowingsAdapter(followers, context)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
         recList.apply {
@@ -86,7 +90,7 @@ class ProfileFollowersFragment : Fragment() {
                     userRepository.getUserFollowers(userId, index, pageSize)
                         .observe(viewLifecycleOwner, Observer {
                             when (it) {
-                                is RepositoryStatus.Success -> callback(it.data.map { p -> "${p.firstName} ${p.lastName}" })
+                                is RepositoryStatus.Success -> callback(it.data)
                                 is RepositoryStatus.Error -> callback(emptyList())
                             }
                         })

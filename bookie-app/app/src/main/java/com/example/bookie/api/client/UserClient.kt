@@ -2,6 +2,10 @@ package com.example.bookie.api.client
 
 import android.content.Context
 import com.example.bookie.R
+import com.example.bookie.api.routes.Register
+import com.example.bookie.api.routes.UserById
+import com.example.bookie.models.User
+import com.example.bookie.models.toObject
 import com.example.bookie.api.routes.*
 import com.example.bookie.dao.SharedPreferencesDao
 import com.example.bookie.models.*
@@ -22,7 +26,7 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
         lastName: String,
         completion: (message: String) -> Unit,
         onError: (errorCode: Int, message: String) -> Unit
-    ) {
+        ) {
         if (ctx == null) return
         val route = Register(email, password, firstName, lastName)
         this.performRequest(route) { response ->
@@ -198,6 +202,49 @@ class UserClient(ctx: Context?) : ApiClient(ctx) {
                     completion(reviews)
                 }
                 else -> error(context.getString(R.string.default_error))
+            }
+        }
+    }
+
+    fun followUser(
+        userId: String,
+        follow: Boolean,
+        completion: () -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = FollowUser(userId, follow, token)
+        performRequest(route) {
+            when (it.statusCode) {
+                200 -> completion()
+                else -> error(it.json)
+            }
+        }
+    }
+
+    fun isFollowed(
+        userId: String,
+        completion: (isFollowed: Boolean) -> Unit,
+        error: (errorMessage: String) -> Unit
+    ) {
+        if (ctx == null) return
+        val token = SharedPreferencesDao.getToken(ctx)
+        if (token == null) {
+            error(ctx.getString(R.string.default_error))
+            return
+        }
+        val route = IsUserFollwed(userId, token)
+        performRequest(route) {
+            when (it.statusCode) {
+                200 -> {
+                    completion(it.json.toBoolean())
+                }
+                else -> error(it.json)
             }
         }
     }
