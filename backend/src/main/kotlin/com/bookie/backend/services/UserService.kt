@@ -283,7 +283,12 @@ class UserService(val userDao: UserDao,
             q
         }
         val result = userDao.findUsersByQueryParameter(query, user.id!!, pageable)
-        return result.orElse(emptyList())
+        if (result.isPresent) {
+            val resultList = result.get().toMutableList()
+            resultList.removeIf{item -> item.id == user.id}
+            return resultList
+        }
+        return emptyList()
     }
 
     private fun addReviewToFeed(review: FeedItem, id: String?) {
