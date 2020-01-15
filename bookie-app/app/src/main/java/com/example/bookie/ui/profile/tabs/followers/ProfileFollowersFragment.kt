@@ -45,6 +45,16 @@ class ProfileFollowersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         injector.inject(appKodein())
 
+       searchFollowers(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val container= followings_container
+        if(container != null) searchFollowers(container.rootView)
+    }
+
+    private fun searchFollowers(view: View) {
         val userId = userId ?: return
         userRepository.getUserFollowers(userId, 0, pageSize)
             .observe(viewLifecycleOwner, Observer<RepositoryStatus<List<UserPreview>>> {
