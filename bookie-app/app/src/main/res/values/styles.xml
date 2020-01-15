@@ -9,6 +9,7 @@
         <item name="android:buttonStyle">@style/CustomButton</item>
         <item name="toolbarStyle">@style/CustomToolbar</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="android:windowBackground">@color/whitesmoke</item>
     </style>
 
     <style name="CustomButton" parent="@style/Widget.AppCompat.Button">
