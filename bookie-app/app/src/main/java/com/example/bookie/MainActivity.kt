@@ -8,16 +8,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.*
 import com.example.bookie.repositories.AuthRepository
+import com.example.bookie.repositories.RepositoryStatus
 import com.example.bookie.ui.login.LoginActivity
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.nav_header.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -88,7 +91,19 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavigationMenu(navController: NavController) {
         val sideNavView = findViewById<NavigationView>(R.id.nav_view) ?: return
         sideNavView.setupWithNavController(navController)
-        sideNavView.setNavigationItemSelectedListener { onNavigationItemSelected(it, navController) }
+        sideNavView.setNavigationItemSelectedListener {
+            onNavigationItemSelected(
+                it,
+                navController
+            )
+        }
+        authRepository.getUserLoggedIn().observe(this, Observer {
+            when (it) {
+                is RepositoryStatus.Success -> text_nav_header.text =
+                    "Bookie - ${it.data.firstName} ${it.data.lastName}"
+                is RepositoryStatus.Error -> text_nav_header.text = "Bookie"
+            }
+        })
     }
 
     private fun setupActionBar(navController: NavController) {
@@ -99,7 +114,10 @@ class MainActivity : AppCompatActivity() {
         return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
     }
 
-    private fun onNavigationItemSelected(menuItem: MenuItem, navController: NavController): Boolean {
+    private fun onNavigationItemSelected(
+        menuItem: MenuItem,
+        navController: NavController
+    ): Boolean {
         when (menuItem.itemId) {
             R.id.action_logout -> onLogoutPressed()
             else -> menuItem.onNavDestinationSelected(navController)

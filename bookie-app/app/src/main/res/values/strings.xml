@@ -51,7 +51,7 @@
     <string name="menu_settings">Settings</string>
 
     <!--HOME-->
-    <string name="empty_message">Bookie has nothing to show to you and is very sad…</string>
+    <string name="empty_message">Bookie has nothing to show to you. Try following someone!</string>
 
     <!--BOOK CARDS-->
     <string name="book_content_desc">Book cover image</string>

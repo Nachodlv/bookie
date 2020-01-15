@@ -15,6 +15,7 @@
         android:tint="@color/colorPrimaryDark"/>
 
     <TextView
+        android:id="@+id/text_nav_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
