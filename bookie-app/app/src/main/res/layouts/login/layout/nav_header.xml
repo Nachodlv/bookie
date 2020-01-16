@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="@color/colorSecondary"
+    android:background="@color/colorSecondaryDark"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp">
@@ -12,7 +12,7 @@
         android:layout_height="104dp"
         android:contentDescription="@string/app_logo"
         android:src="@drawable/bookie"
-        android:tint="@color/colorPrimaryDark"/>
+        android:tint="@color/darkGray" />
 
     <TextView
         android:id="@+id/text_nav_header"
