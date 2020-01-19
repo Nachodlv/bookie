@@ -80,16 +80,11 @@ class BookProfile : AppCompatActivity() {
 
     private fun loadReviews(view: View, book: Book) {
 
-        reviewRepository.getReviews(book.id, 0, pageSize).observe(this, Observer {
-            when (it) {
-                is RepositoryStatus.Success -> loadList(
-                    view,
-                    book,
-                    it.data.map { r -> r.toReviewTab() }.toMutableList()
-                )
-                is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
-            }
-        })
+        loadList(
+            view,
+            book,
+            mutableListOf()
+        )
     }
 
     private fun loadList(view: View, book: Book, dataSet: MutableList<ReviewTab>) {

@@ -105,8 +105,9 @@ class BookRepository constructor(
                     bookId,
                     { book ->
                         executor.execute {
+                            status.postValue(RepositoryStatus.Success(book))
                             book.lastFetch = Calendar.getInstance().timeInMillis
-                            getReview(book, status)
+//                            getReview(book, status)
                         }
                     },
                     { error -> GlobalScope.launch { status.postValue(RepositoryStatus.Error(error)) } })
