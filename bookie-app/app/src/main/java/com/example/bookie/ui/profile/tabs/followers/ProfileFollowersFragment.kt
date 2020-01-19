@@ -61,7 +61,7 @@ class ProfileFollowersFragment : Fragment() {
                 when (it) {
                     is RepositoryStatus.Success -> setUpRecyclerView(
                         view,
-                        it.data.filter { user -> user.isFollowedByMe }.toMutableList()
+                        it.data.toMutableList()
                     )
                     is RepositoryStatus.Error -> SnackbarUtil.showSnackbar(view, it.error)
                 }

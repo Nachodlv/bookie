@@ -19,6 +19,7 @@ import com.example.bookie.utils.SnackbarUtil
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.android.appKodein
 import com.github.salomonbrys.kodein.instance
+import kotlinx.android.synthetic.main.fragment_reviews_tab.*
 
 
 class ProfileReviewsFragment : Fragment() {
@@ -43,6 +44,12 @@ class ProfileReviewsFragment : Fragment() {
 
         loadReviews(view)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val container= reviews_container
+        if(container != null) loadReviews(container.rootView)
     }
 
     private fun loadReviews(view: View) {
